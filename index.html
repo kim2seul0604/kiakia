@@ -23,13 +23,23 @@
     }
     .christmas-bg-tree {
   position: fixed;
-  right: 5%;
-  bottom: 5%;
-  font-size: 140px;      /* 트리 크기 */
-  opacity: 0.08;         /* 아주 연하게 */
-  pointer-events: none;  /* 클릭 막지 않도록 */
-  z-index: 0;
+  right: 5%;         /* 화면 오른쪽으로 5% */
+  bottom: 5%;        /* 화면 아래쪽에서 5% 올라온 위치 */
+  font-size: 140px;  /* 크기 크게 */
+  opacity: 0.07;     /* 연하게 (0 ~ 1 사이) */
+  pointer-events: none; /* 클릭 막지 않도록 */
+  z-index: 0;        /* 제일 뒤로 보내기 */
 }
+   .header {
+  position: relative;
+  z-index: 2;
+}
+
+.container {
+  position: relative;
+  z-index: 2;
+}
+      
     .snowflake {
   position: fixed;
   top: -10vh;
