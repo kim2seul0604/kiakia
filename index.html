@@ -216,6 +216,28 @@
       font-weight: 700;
     }
 
+    /* 하단 중앙 물음표 버튼 */
+    .help-btn {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: var(--primary-blue);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      z-index: 30;
+    }
+
+    .help-btn:active {
+      transform: translateX(-50%) scale(0.96);
+    }
+
     @media (max-width: 600px) {
       .container {
         padding: 12px;
@@ -311,6 +333,9 @@
       <div id="personResult" class="result"></div>
     </div>
   </div>
+
+  <!-- 하단 중앙 물음표 버튼 -->
+  <button class="help-btn" id="helpBtn">?</button>
 
   <script>
     // ===== 기본 데이터 (원래 순서 유지) =====
@@ -602,10 +627,10 @@
       updateWeekdayLabel("lookupDate","lookupDateWeekday");
       updateWeekdayLabel("personDate","personDateWeekday");
 
-      // 이름/작업명 셀렉트: 내림차순 정렬된 복사본 사용
+      // 이름/작업명 셀렉트: 오름차순 정렬된 복사본 사용
       const personSelect=document.getElementById("personName");
-      const sortedNamesDesc = [...names].sort((a,b)=>b.localeCompare(a));
-      sortedNamesDesc.forEach(n=>{
+      const sortedNamesAsc = [...names].sort((a,b)=>a.localeCompare(b));
+      sortedNamesAsc.forEach(n=>{
         const opt=document.createElement("option");
         opt.value=n;
         opt.textContent=n;
@@ -613,8 +638,8 @@
       });
 
       const taskSelect=document.getElementById("lookupTask");
-      const sortedTasksDesc = [...taskNames].sort((a,b)=>b.localeCompare(a));
-      sortedTasksDesc.forEach(t=>{
+      const sortedTasksAsc = [...taskNames].sort((a,b)=>a.localeCompare(b));
+      sortedTasksAsc.forEach(t=>{
         const opt=document.createElement("option");
         opt.value=t;
         opt.textContent=t;
@@ -630,6 +655,11 @@
       document.getElementById("dateInput").addEventListener("change",()=>updateWeekdayLabel("dateInput","dateInputWeekday"));
       document.getElementById("lookupDate").addEventListener("change",()=>updateWeekdayLabel("lookupDate","lookupDateWeekday"));
       document.getElementById("personDate").addEventListener("change",()=>updateWeekdayLabel("personDate","personDateWeekday"));
+
+      // 물음표 버튼 이벤트
+      document.getElementById("helpBtn").addEventListener("click", () => {
+        alert("만든사람 : 김이슬");
+      });
 
       renderDailySchedule();
       createSnowflakes();
