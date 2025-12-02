@@ -17,7 +17,51 @@
       margin: 0;
       padding: 0;
       color: #222;
+      position: relative;
+  overflow-x: hidden;
+}
     }
+    .christmas-bg-tree {
+  position: fixed;
+  right: 5%;
+  bottom: 5%;
+  font-size: 140px;      /* 트리 크기 */
+  opacity: 0.08;         /* 아주 연하게 */
+  pointer-events: none;  /* 클릭 막지 않도록 */
+  z-index: 0;
+}
+    .snowflake {
+  position: fixed;
+  top: -10vh;
+  color: #ffffff;
+  font-size: 12px;
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 3;
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes snow-fall {
+  0% {
+    transform: translateY(-10vh);
+  }
+  100% {
+    transform: translateY(110vh);
+  }
+}
+
+/* 헤더/컨테이너는 내용이 트리 위로 오게 z-index만 살짝 올려줘도 좋아요 */
+.header {
+  z-index: 2;
+  position: relative;
+}
+
+.container {
+  z-index: 2;
+  position: relative;
+}
     .header {
       background: linear-gradient(135deg, var(--kia-dark), #222);
       color: white;
@@ -236,6 +280,7 @@
   </style>
 </head>
 <body>
+  <div class="christmas-bg-tree">🎄</div>
   <!-- 기아 스타일 헤더 -->
   <header class="header">
   <div class="header-center">
@@ -366,7 +411,25 @@
       "RH 루1",
       "RH 루2"
     ];
+function createSnowflakes() {
+  const snowCount = 40; // 눈송이 개수 (원하면 늘려도 됨)
+  for (let i = 0; i < snowCount; i++) {
+    const span = document.createElement("span");
+    span.className = "snowflake";
+    span.textContent = "❄";
 
+    // 화면 랜덤 위치 & 속도
+    const startLeft = Math.random() * 100;       // 0 ~ 100 vw
+    const duration = 8 + Math.random() * 7;      // 8~15초
+    const delay = Math.random() * 10;            // 0~10초
+
+    span.style.left = startLeft + "vw";
+    span.style.animationDuration = duration + "s";
+    span.style.animationDelay = delay + "s";
+
+    document.body.appendChild(span);
+  }
+}
     const START_DATE = new Date(2025, 11, 1); // 2025-12-01
     const END_DATE   = new Date(2025, 11, 31);
 
@@ -655,7 +718,21 @@
     }
 
     // ===== 초기 세팅 =====
-    function init() {
+    function init() 
+    {
+  const dateInput = document.getElementById("dateInput");
+  const lookupDate = document.getElementById("lookupDate");
+  const personDate = document.getElementById("personDate");
+  const todayBtn = document.getElementById("todayBtn");
+
+  // ... 기존 초기화 코드들 ...
+
+  // 처음 로드시 한 번 그려주기
+  renderDailySchedule();
+
+  // 🎄 눈 내리기 시작
+  createSnowflakes();
+}{
       const dateInput = document.getElementById("dateInput");
       const lookupDate = document.getElementById("lookupDate");
       const personDate = document.getElementById("personDate");
