@@ -313,7 +313,7 @@
   </div>
 
   <script>
-    // ===== 기본 데이터 =====
+    // ===== 기본 데이터 (원래 순서 유지) =====
     const names = [
       "성훈","원빈","길운","대현","진솔","서진","이슬","민국","성천",
       "충훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
@@ -327,10 +327,6 @@
       "RH A필라","후드","3조1번","하이드로닉체결","낚2","엔진어스",
       "3조2번","RH 루1","RH 루2"
     ];
-
-    // 가나다/알파벳 오름차순 정렬
-    names.sort((a,b)=>a.localeCompare(b));
-    taskNames.sort((a,b)=>a.localeCompare(b));
 
     const START_DATE = new Date(2025,11,1); // 2025-12-01
     const END_DATE   = new Date(2025,11,31);
@@ -391,6 +387,7 @@
       const workIdx=getWorkDayIndex(date);
       if(workIdx===null) return null;
 
+      // names / taskNames 원본 순서 그대로 사용
       return names.map((person,i)=>{
         const rounds=[];
         for(let r=0;r<4;r++){
@@ -596,7 +593,6 @@
     }
 
     function init(){
-      // 기본 날짜 2025-12-01
       const defaultDate="2025-12-01";
       document.getElementById("dateInput").value  = defaultDate;
       document.getElementById("lookupDate").value = defaultDate;
@@ -606,9 +602,10 @@
       updateWeekdayLabel("lookupDate","lookupDateWeekday");
       updateWeekdayLabel("personDate","personDateWeekday");
 
-      // 이름/작업명 셀렉트 채우기 (정렬된 상태)
+      // 이름/작업명 셀렉트: 내림차순 정렬된 복사본 사용
       const personSelect=document.getElementById("personName");
-      names.forEach(n=>{
+      const sortedNamesDesc = [...names].sort((a,b)=>b.localeCompare(a));
+      sortedNamesDesc.forEach(n=>{
         const opt=document.createElement("option");
         opt.value=n;
         opt.textContent=n;
@@ -616,7 +613,8 @@
       });
 
       const taskSelect=document.getElementById("lookupTask");
-      taskNames.forEach(t=>{
+      const sortedTasksDesc = [...taskNames].sort((a,b)=>b.localeCompare(a));
+      sortedTasksDesc.forEach(t=>{
         const opt=document.createElement("option");
         opt.value=t;
         opt.textContent=t;
@@ -633,7 +631,6 @@
       document.getElementById("lookupDate").addEventListener("change",()=>updateWeekdayLabel("lookupDate","lookupDateWeekday"));
       document.getElementById("personDate").addEventListener("change",()=>updateWeekdayLabel("personDate","personDateWeekday"));
 
-      // 첫 로딩 시 오늘(또는 12/1) 기준 스케줄 표시
       renderDailySchedule();
       createSnowflakes();
     }
