@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>트림2반 12월 작업 스케줄</title>
+  <title>트림2반 12월 작업 스케줄 조회</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -292,7 +292,7 @@
 
     <!-- ② 날짜 + 라운드 + 작업명 → 담당자 찾기 -->
     <div class="card">
-      <h2>② 날짜 + 라운드 + 작업명으로 담당자 찾기</h2>
+      <h2>② 날짜 + 라운드 + 작업명으로 작업자 찾기</h2>
       <div>
         <label for="lookupDate">날짜</label><br/>
         <input type="date" id="lookupDate" />
@@ -311,14 +311,14 @@
         <label for="lookupTask">작업명</label><br/>
         <select id="lookupTask"></select>
       </div>
-      <button class="primary-btn" id="lookupBtn">담당자 찾기</button>
+      <button class="primary-btn" id="lookupBtn">작업자 찾기</button>
       <div id="lookupWarning" class="warning" style="display:none;"></div>
       <div id="lookupResult" class="result"></div>
     </div>
 
     <!-- ③ 날짜 + 이름 → 개인 작업 보기 -->
     <div class="card">
-      <h2>③ 날짜 + 이름으로 개인 작업 보기</h2>
+      <h2>③ 날짜 + 이름으로 개인 작업 조회하기</h2>
       <div>
         <label for="personDate">날짜</label><br/>
         <input type="date" id="personDate" />
