@@ -276,10 +276,12 @@
           <option value="4">4라운드</option>
         </select>
       </div>
-      <div>
-        <label for="lookupTask">작업명</label><br/>
-        <select id="lookupTask"></select>
-      </div>
+    <div>
+  <label>작업명 (최대 3개)</label><br/>
+  <select id="lookupTask1"></select><br/>
+  <select id="lookupTask2"></select><br/>
+  <select id="lookupTask3"></select>
+    </div>
       <button class="primary-btn" id="lookupBtn">담당자 찾기</button>
       <div id="lookupWarning" class="warning" style="display:none;"></div>
       <div id="lookupResult" class="result"></div>
@@ -482,57 +484,87 @@
     }
 
     // ===== ② 날짜 + 라운드 + 작업명 → 담당자 찾기 =====
-    function findPersonByDateRoundTask(){
-      const dateVal=document.getElementById("lookupDate").value;
-      const roundVal=document.getElementById("lookupRound").value;
-      const taskVal=document.getElementById("lookupTask").value;
-      const warning=document.getElementById("lookupWarning");
-      const result=document.getElementById("lookupResult");
+    // ===== ① 날짜 + 라운드 + 작업명들(최대 3개) → 담당자 찾기 =====
+function findPersonByDateRoundTask(){
+  const dateVal  = document.getElementById("lookupDate").value;
+  const roundVal = document.getElementById("lookupRound").value;
+  const warning  = document.getElementById("lookupWarning");
+  const result   = document.getElementById("lookupResult");
 
-      warning.style.display="none";
-      warning.textContent="";
-      result.textContent="";
+  warning.style.display = "none";
+  warning.textContent   = "";
+  result.textContent    = "";
 
-      updateWeekdayLabel("lookupDate","lookupDateWeekday");
+  updateWeekdayLabel("lookupDate","lookupDateWeekday");
 
-      const date=parseDateInput(dateVal);
-      if(!date){
-        warning.style.display="block";
-        warning.textContent="날짜를 선택해주세요.";
-        return;
+  const date = parseDateInput(dateVal);
+  if(!date){
+    warning.style.display = "block";
+    warning.textContent   = "날짜를 선택해주세요.";
+    return;
+  }
+
+  if(!isWorkDay(date)){
+    warning.style.display = "block";
+    if(date<START_DATE || date>END_DATE){
+      warning.textContent = "2025-12-01 ~ 2025-12-31 사이만 조회 가능합니다.";
+    }else if(date.getDay()===0){
+      warning.textContent = "일요일은 근무일이 아닙니다.";
+    }else if(HOLIDAYS.includes(formatDateISO(date))){
+      warning.textContent = "지정된 휴무일(12/12, 12/25)은 근무일이 아닙니다.";
+    }else{
+      warning.textContent = "근무일이 아닙니다.";
+    }
+    return;
+  }
+
+  const schedule = getDailySchedule(date);
+  if(!schedule){
+    warning.style.display = "block";
+    warning.textContent   = "해당 날짜의 스케줄을 찾을 수 없습니다.";
+    return;
+  }
+
+  const roundIdx = parseInt(roundVal,10) - 1;
+
+  // 선택된 작업명들 모으기 (최대 3개)
+  const selectIds = ["lookupTask1","lookupTask2","lookupTask3"];
+  const selectedTasks = [];
+  selectIds.forEach(id => {
+    const v = document.getElementById(id).value;
+    if (v) selectedTasks.push(v);
+  });
+
+  if(selectedTasks.length === 0){
+    warning.style.display = "block";
+    warning.textContent   = "작업을 최소 1개 이상 선택해주세요.";
+    return;
+  }
+
+  // 각 작업에 대해 담당자 찾기
+  let html = "";
+  selectedTasks.forEach((task, idx) => {
+    let found = null;
+
+    schedule.forEach(row => {
+      if(row.rounds[roundIdx] === task){
+        found = row.person;
       }
+    });
 
-      if(!isWorkDay(date)){
-        warning.style.display="block";
-        if(date<START_DATE || date>END_DATE){
-          warning.textContent="2025-12-01 ~ 2025-12-31 사이만 조회 가능합니다.";
-        }else if(date.getDay()===0){
-          warning.textContent="일요일은 근무일이 아닙니다.";
-        }else if(HOLIDAYS.includes(formatDateISO(date))){
-          warning.textContent="지정된 휴무일(12/12, 12/25)은 근무일이 아닙니다.";
-        }else{
-          warning.textContent="근무일이 아닙니다.";
-        }
-        return;
-      }
-
-      const schedule=getDailySchedule(date);
-      const roundIdx=parseInt(roundVal,10)-1;
-
-      let found=null;
-      schedule.forEach(row=>{
-        if(row.rounds[roundIdx]===taskVal){
-          found=row.person;
-        }
-      });
-
-      if(found){
-        result.innerHTML=`담당자: <span class="name">${found}</span>`;
-      }else{
-        result.textContent="해당 조건에 맞는 담당자를 찾을 수 없습니다.";
-      }
+    if(found){
+      html += `<div>${task} → <span class="name">${found}</span></div>`;
+    } else {
+      html += `<div>${task} → 담당자를 찾을 수 없습니다.</div>`;
     }
 
+    if (idx !== selectedTasks.length - 1) {
+      html += `<hr style="margin:6px 0; border:none; border-top:1px solid #eee;" />`;
+    }
+  });
+
+  result.innerHTML = html;
+}
  // ===== ③ 날짜 + 이름들 → 개인 작업 보기 (최대 3명) =====
 function showPersonSchedule(){
   const dateVal = document.getElementById("personDate").value;
@@ -665,14 +697,23 @@ function showPersonSchedule(){
     });
   });
 
-  const taskSelect=document.getElementById("lookupTask");
-  const sortedTasksAsc = [...taskNames].sort((a,b)=>a.localeCompare(b));
-  sortedTasksAsc.forEach(t=>{
-    const opt=document.createElement("option");
-    opt.value=t;
-    opt.textContent=t;
-    taskSelect.appendChild(opt);
+  // 작업명 드롭다운 3개 (오름차순 정렬된 복사본 사용)
+const sortedTasksAsc = [...taskNames].sort((a,b)=>a.localeCompare(b));
+["lookupTask1","lookupTask2","lookupTask3"].forEach(selectId => {
+  const sel = document.getElementById(selectId);
+  // 첫 옵션: 빈값 (선택 안 함)
+  const emptyOpt = document.createElement("option");
+  emptyOpt.value = "";
+  emptyOpt.textContent = "- 선택 안 함 -";
+  sel.appendChild(emptyOpt);
+
+  sortedTasksAsc.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t;
+    opt.textContent = t;
+    sel.appendChild(opt);
   });
+});
 
   // 이벤트
   document.getElementById("showDayBtn").addEventListener("click",renderDailySchedule);
