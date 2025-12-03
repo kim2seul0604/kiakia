@@ -317,14 +317,14 @@
     </div>
 <!-- ③ 날짜 + 이름 → 개인 작업 보기 -->
 <div class="card">
-  <h2>③ 날짜 + 작업자들(최대 3명) 작업 보기</h2>
+  <h2>③ 날짜 + 작업자 조회 </h2>
   <div>
     <label for="personDate">날짜</label><br/>
     <input type="date" id="personDate" />
     <span id="personDateWeekday" class="weekday-label"></span>
   </div>
   <div>
-    <label>작업자 선택 (최대 3명)</label><br/>
+    <label>작업자 선택 (최대 3명 가능)</label><br/>
     <select id="personName1"></select><br/>
     <select id="personName2"></select><br/>
     <select id="personName3"></select>
@@ -646,60 +646,54 @@ function showPersonSchedule(){
     }
 
     function init(){
-      const defaultDate="2025-12-01";
-      document.getElementById("dateInput").value  = defaultDate;
-      document.getElementById("lookupDate").value = defaultDate;
-      document.getElementById("personDate").value = defaultDate;
+  // 이름 드롭다운 3개 (오름차순 정렬된 복사본 사용)
+  const sortedNamesAsc = [...names].sort((a,b)=>a.localeCompare(b));
+  ["personName1","personName2","personName3"].forEach(selectId => {
+    const sel = document.getElementById(selectId);
+    // 첫 옵션: 빈값 (선택 안 함)
+    const emptyOpt = document.createElement("option");
+    emptyOpt.value = "";
+    emptyOpt.textContent = "- 선택 안 함 -";
+    sel.appendChild(emptyOpt);
 
-      updateWeekdayLabel("dateInput","dateInputWeekday");
-      updateWeekdayLabel("lookupDate","lookupDateWeekday");
-      updateWeekdayLabel("personDate","personDateWeekday");
-
-      // 이름 드롭다운 3개 (오름차순 정렬된 복사본 사용)
-const sortedNamesAsc = [...names].sort((a,b)=>a.localeCompare(b));
-["personName1","personName2","personName3"].forEach(selectId => {
-  const sel = document.getElementById(selectId);
-  // 첫 옵션: 빈값 (선택 안 함)
-  const emptyOpt = document.createElement("option");
-  emptyOpt.value = "";
-  emptyOpt.textContent = "- 선택 안 함 -";
-  sel.appendChild(emptyOpt);
-
-  sortedNamesAsc.forEach(n => {
-    const opt = document.createElement("option");
-    opt.value = n;
-    opt.textContent = n;
-    sel.appendChild(opt);
+    sortedNamesAsc.forEach(n => {
+      const opt = document.createElement("option");
+      opt.value = n;
+      opt.textContent = n;
+      sel.appendChild(opt);
+    });
   });
-});
 
-      const taskSelect=document.getElementById("lookupTask");
-      const sortedTasksAsc = [...taskNames].sort((a,b)=>a.localeCompare(b));
-      sortedTasksAsc.forEach(t=>{
-        const opt=document.createElement("option");
-        opt.value=t;
-        opt.textContent=t;
-        taskSelect.appendChild(opt);
-      });
+  const taskSelect=document.getElementById("lookupTask");
+  const sortedTasksAsc = [...taskNames].sort((a,b)=>a.localeCompare(b));
+  sortedTasksAsc.forEach(t=>{
+    const opt=document.createElement("option");
+    opt.value=t;
+    opt.textContent=t;
+    taskSelect.appendChild(opt);
+  });
 
-      // 이벤트
-      document.getElementById("showDayBtn").addEventListener("click",renderDailySchedule);
-      document.getElementById("lookupBtn").addEventListener("click",findPersonByDateRoundTask);
-      document.getElementById("personBtn").addEventListener("click",showPersonSchedule);
-      document.getElementById("todayBtn").addEventListener("click",goToToday);
+  // 이벤트
+  document.getElementById("showDayBtn").addEventListener("click",renderDailySchedule);
+  document.getElementById("lookupBtn").addEventListener("click",findPersonByDateRoundTask);
+  document.getElementById("personBtn").addEventListener("click",showPersonSchedule);
+  document.getElementById("todayBtn").addEventListener("click",goToToday);
 
-      document.getElementById("dateInput").addEventListener("change",()=>updateWeekdayLabel("dateInput","dateInputWeekday"));
-      document.getElementById("lookupDate").addEventListener("change",()=>updateWeekdayLabel("lookupDate","lookupDateWeekday"));
-      document.getElementById("personDate").addEventListener("change",()=>updateWeekdayLabel("personDate","personDateWeekday"));
+  document.getElementById("dateInput").addEventListener("change",()=>updateWeekdayLabel("dateInput","dateInputWeekday"));
+  document.getElementById("lookupDate").addEventListener("change",()=>updateWeekdayLabel("lookupDate","lookupDateWeekday"));
+  document.getElementById("personDate").addEventListener("change",()=>updateWeekdayLabel("personDate","personDateWeekday"));
 
-      // 물음표 버튼 이벤트
-      document.getElementById("helpBtn").addEventListener("click", () => {
-        alert("만든사람 : 김이슬");
-      });
+  // 물음표 버튼 이벤트
+  document.getElementById("helpBtn").addEventListener("click", () => {
+    alert("만든사람 : 김이슬");
+  });
 
-      renderDailySchedule();
-      createSnowflakes();
-    }
+  // 눈 효과
+  createSnowflakes();
+
+  // ✅ 처음 로드할 때 오늘 날짜 기준으로 설정 + 스케줄 표시
+  goToToday();
+}
 
     window.addEventListener("DOMContentLoaded",init);
   </script>
