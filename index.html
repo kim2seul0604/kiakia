@@ -258,10 +258,55 @@
     <button class="today-btn" id="todayBtn">🎅 오늘 날짜로 이동 🎅</button>
   </header>
 
-  <div class="container">
-    <!-- ① 하루 전체 스케줄 -->
+    <div class="container">
+    <!-- ① (원래 2번이었던 기능) 날짜 + 라운드 + 작업명 → 담당자 찾기 -->
     <div class="card">
-      <h2>① 하루 전체 스케줄 보기</h2>
+      <h2>① 날짜 + 라운드 + 작업명으로 담당자 찾기</h2>
+      <div>
+        <label for="lookupDate">날짜</label><br/>
+        <input type="date" id="lookupDate" />
+        <span id="lookupDateWeekday" class="weekday-label"></span>
+      </div>
+      <div>
+        <label for="lookupRound">라운드</label><br/>
+        <select id="lookupRound">
+          <option value="1">1라운드</option>
+          <option value="2">2라운드</option>
+          <option value="3">3라운드</option>
+          <option value="4">4라운드</option>
+        </select>
+      </div>
+      <div>
+        <label for="lookupTask">작업명</label><br/>
+        <select id="lookupTask"></select>
+      </div>
+      <button class="primary-btn" id="lookupBtn">담당자 찾기</button>
+      <div id="lookupWarning" class="warning" style="display:none;"></div>
+      <div id="lookupResult" class="result"></div>
+    </div>
+
+    <!-- ② (원래 3번이었던 기능) 날짜 + 작업자들(최대 3명) 작업 보기 -->
+    <div class="card">
+      <h2>② 날짜 + 작업자들(최대 3명) 작업 보기</h2>
+      <div>
+        <label for="personDate">날짜</label><br/>
+        <input type="date" id="personDate" />
+        <span id="personDateWeekday" class="weekday-label"></span>
+      </div>
+      <div>
+        <label>작업자 선택 (최대 3명)</label><br/>
+        <select id="personName1"></select><br/>
+        <select id="personName2"></select><br/>
+        <select id="personName3"></select>
+      </div>
+      <button class="primary-btn" id="personBtn">개인 작업 조회</button>
+      <div id="personWarning" class="warning" style="display:none;"></div>
+      <div id="personResult" class="result"></div>
+    </div>
+
+    <!-- ③ (원래 1번이었던 기능) 하루 전체 스케줄 보기 -->
+    <div class="card">
+      <h2>③ 하루 전체 스케줄 보기</h2>
       <div>
         <label for="dateInput">날짜</label><br/>
         <input type="date" id="dateInput" />
@@ -289,50 +334,6 @@
         </table>
       </div>
     </div>
-
-    <!-- ② 날짜 + 라운드 + 작업명 → 담당자 찾기 -->
-    <div class="card">
-      <h2>② 날짜 + 라운드 + 작업명으로 작업자 찾기</h2>
-      <div>
-        <label for="lookupDate">날짜</label><br/>
-        <input type="date" id="lookupDate" />
-        <span id="lookupDateWeekday" class="weekday-label"></span>
-      </div>
-      <div>
-        <label for="lookupRound">라운드</label><br/>
-        <select id="lookupRound">
-          <option value="1">1라운드</option>
-          <option value="2">2라운드</option>
-          <option value="3">3라운드</option>
-          <option value="4">4라운드</option>
-        </select>
-      </div>
-      <div>
-        <label for="lookupTask">작업명</label><br/>
-        <select id="lookupTask"></select>
-      </div>
-      <button class="primary-btn" id="lookupBtn">작업자 찾기</button>
-      <div id="lookupWarning" class="warning" style="display:none;"></div>
-      <div id="lookupResult" class="result"></div>
-    </div>
-<!-- ③ 날짜 + 이름 → 개인 작업 보기 -->
-<div class="card">
-  <h2>③ 날짜 + 작업자 조회 </h2>
-  <div>
-    <label for="personDate">날짜</label><br/>
-    <input type="date" id="personDate" />
-    <span id="personDateWeekday" class="weekday-label"></span>
-  </div>
-  <div>
-    <label>작업자 선택 (최대 3명 가능)</label><br/>
-    <select id="personName1"></select><br/>
-    <select id="personName2"></select><br/>
-    <select id="personName3"></select>
-  </div>
-  <button class="primary-btn" id="personBtn">개인 작업 조회</button>
-  <div id="personWarning" class="warning" style="display:none;"></div>
-  <div id="personResult" class="result"></div>
-</div>
   </div>
 
   <!-- 하단 중앙 물음표 버튼 -->
