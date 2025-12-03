@@ -210,6 +210,51 @@
       font-weight: 600;
       line-height: 1.4;
     }
+/* ①번 결과(작업명 → 담당자) 보기 좋게 정리 */
+.result-header {
+  font-size: 13px;
+  color: #555;
+  margin-top: 6px;
+  margin-bottom: 4px;
+}
+
+.result-list {
+  margin-top: 4px;
+  border-radius: 10px;
+  background: #fafafa;
+  padding: 6px 8px;
+  border: 1px solid #eee;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+
+.result-row:last-child {
+  border-bottom: none;
+}
+
+.result-task {
+  flex: 2;
+  text-align: left;
+}
+
+.result-arrow {
+  flex: 0;
+  margin: 0 4px;
+  color: #999;
+}
+
+.result-person {
+  flex: 1;
+  text-align: right;
+}
+
 
     .result .name {
       color: var(--primary-blue);
@@ -483,8 +528,7 @@
       });
     }
 
-    // ===== ② 날짜 + 라운드 + 작업명 → 담당자 찾기 =====
-    // ===== ① 날짜 + 라운드 + 작업명들(최대 3개) → 담당자 찾기 =====
+  // ===== ① 날짜 + 라운드 + 작업명들(최대 3개) → 담당자 찾기 =====
 function findPersonByDateRoundTask(){
   const dateVal  = document.getElementById("lookupDate").value;
   const roundVal = document.getElementById("lookupRound").value;
@@ -541,8 +585,13 @@ function findPersonByDateRoundTask(){
     return;
   }
 
-  // 각 작업에 대해 담당자 찾기
+  const weekdayText = formatKoreanWeekday(date); // (월), (화) 이런 거
+
+  // 헤더 + 리스트 박스 형태로 출력
   let html = "";
+  html += `<div class="result-header">${dateVal} ${weekdayText} / ${roundVal}라운드</div>`;
+  html += `<div class="result-list">`;
+
   selectedTasks.forEach((task, idx) => {
     let found = null;
 
@@ -553,16 +602,25 @@ function findPersonByDateRoundTask(){
     });
 
     if(found){
-      html += `<div>${task} → <span class="name">${found}</span></div>`;
+      html += `
+        <div class="result-row">
+          <div class="result-task">${task}</div>
+          <div class="result-arrow">→</div>
+          <div class="result-person"><span class="name">${found}</span></div>
+        </div>
+      `;
     } else {
-      html += `<div>${task} → 담당자를 찾을 수 없습니다.</div>`;
-    }
-
-    if (idx !== selectedTasks.length - 1) {
-      html += `<hr style="margin:6px 0; border:none; border-top:1px solid #eee;" />`;
+      html += `
+        <div class="result-row">
+          <div class="result-task">${task}</div>
+          <div class="result-arrow">→</div>
+          <div class="result-person">담당자 없음</div>
+        </div>
+      `;
     }
   });
 
+  html += `</div>`;
   result.innerHTML = html;
 }
  // ===== ③ 날짜 + 이름들 → 개인 작업 보기 (최대 3명) =====
