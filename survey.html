@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>특근 출석 관리</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary-green: #0a8a43;
+      --primary-blue: #007aff;
+      --bg-gray: #f5f5f7;
+      --border-gray: #dddddd;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      background: var(--bg-gray);
+      color: #222;
+    }
+
+    .header {
+      background: #111;
+      color: #fff;
+      padding: 14px 12px 10px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .header-sub {
+      font-size: 13px;
+      color: #ddd;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 12px 14px 18px;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 16px 0 8px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+      border: 1px solid var(--border-gray);
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    input[type="date"],
+    input[type="month"],
+    select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      margin-bottom: 6px;
+      max-width: 100%;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-size: 14px;
+      color: #fff;
+      background: var(--primary-green);
+      margin-top: 6px;
+      display: inline-block;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-secondary {
+      background: var(--primary-blue);
+    }
+
+    .info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .warning {
+      font-size: 13px;
+      color: #c00;
+      margin-top: 4px;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .row > div {
+      flex: 1 1 120px;
+      min-width: 0;
+    }
+
+    .status-group {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #fafafa;
+      border: 1px solid #eee;
+    }
+
+    .status-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .status-options {
+      font-size: 13px;
+    }
+
+    .status-options label {
+      font-weight: 400;
+      margin-right: 12px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .status-options input[type="radio"] {
+      margin-right: 3px;
+    }
+
+    .summary-block {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #fafafa;
+      border: 1px solid #eee;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .summary-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .list-names {
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .list-names.empty {
+      color: #999;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .back-link a {
+      color: var(--primary-blue);
+      text-decoration: none;
+    }
+
+    .chip-wrap {
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: #f0f0f0;
+    }
+
+    .chip button {
+      border: none;
+      background: none;
+      margin-left: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-title">특근 출석 관리</div>
+    <div class="header-sub">트림2반 · 토요일 특근 · 월별 관리</div>
+  </header>
+
+  <div class="container">
+    <!-- 공통: 특근 월 선택 -->
+    <div class="card">
+      <h2>특근 월 선택</h2>
+      <label for="monthSelect">특근 월</label>
+      <input type="month" id="monthSelect" />
+      <div class="info">
+        이 월에 설정된 특근 날짜 기준으로<br/>
+        아래 <b>① 내 참여 체크</b>와 <b>② 조별/전체 현황</b>이 함께 바뀝니다.
+      </div>
+    </div>
+
+    <!-- ① 개인 특근 참여 체크 -->
+    <div class="card">
+      <h2>① 내 특근 참여 체크</h2>
+      <label for="personSelect">이름</label>
+      <select id="personSelect">
+        <option value="">이름을 선택하세요</option>
+      </select>
+
+      <div id="personStatusArea">
+        <!-- 선택된 월 & 이름 기준으로 날짜별 참여여부 UI 생성 -->
+      </div>
+
+      <button class="btn" id="savePersonBtn">내 특근 참여여부 저장</button>
+      <div id="personMsg" class="info"></div>
+    </div>
+
+    <!-- ② 조별 / 전체 현황 조회 -->
+    <div class="card">
+      <h2>② 조별 / 전체 현황 조회</h2>
+      <div class="row">
+        <div>
+          <label for="summaryDateSelect">특근 날짜</label>
+          <select id="summaryDateSelect">
+            <!-- 월 선택에 따라 채워짐 -->
+          </select>
+        </div>
+        <div>
+          <label for="summaryGroupSelect">조회 대상</label>
+          <select id="summaryGroupSelect">
+            <option value="all">전체</option>
+            <option value="1조">1조</option>
+            <option value="2조">2조</option>
+            <option value="3조">3조</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-secondary" id="summaryBtn">조회</button>
+
+      <div id="summaryResult" class="summary-block" style="display:none;"></div>
+    </div>
+
+    <!-- ③ 관리자용: 월별 특근 날짜 설정 -->
+    <div class="card">
+      <h2>③ 관리자용 – 월별 특근 날짜 설정</h2>
+      <div class="info">
+        선택된 월에 대해 <b>특근 날짜</b>를 등록/삭제합니다.<br/>
+        기본으로 토요일 날짜를 자동 제안할 수도 있고, 명절/공휴일 등으로 변경할 수 있습니다.
+      </div>
+
+      <div id="currentMonthLabel" class="info" style="margin-top:6px;"></div>
+
+      <div style="margin-top:8px;">
+        <label>등록된 특근 날짜</label>
+        <div id="dateListArea" class="info">
+          <!-- chip 목록 -->
+        </div>
+      </div>
+
+      <div style="margin-top:8px;">
+        <label for="newDateInput">특근 날짜 추가</label>
+        <input type="date" id="newDateInput" />
+        <button class="btn btn-secondary" id="addDateBtn">날짜 추가</button>
+      </div>
+
+      <button class="btn" id="saveDatesBtn" style="margin-top:10px;">이 월의 특근 설정 저장</button>
+      <div id="dateMsg" class="info"></div>
+    </div>
+
+    <div class="back-link">
+      <a href="index.html">← 작업 스케줄 페이지로 돌아가기</a>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
+
+  <script>
+    // ===== Firebase 초기화 =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyCeeyyh0hxJUZZC5lvUH52iSCteNhzgbSI",
+      authDomain: "survey-87173.firebaseapp.com",
+      projectId: "survey-87173",
+      storageBucket: "survey-87173.firebasestorage.app",
+      messagingSenderId: "854671970902",
+      appId: "1:854671970902:web:74a0d89a4182e7a09321f7",
+      measurementId: "G-P5G2KDCGM0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    if (firebase.analytics) {
+      try { firebase.analytics(); } catch(e) {}
+    }
+
+    const DATES_COL = "ot_dates";
+    const ATT_COL   = "ot_attendance";
+
+    const weekdayNames = ["일","월","화","수","목","금","토"];
+
+    // ===== 인원 / 조 편성 =====
+    const people = [
+      // 1조
+      { name: "성해", group: "1조" },
+      { name: "충훈", group: "1조" },
+      { name: "성천", group: "1조" },
+      { name: "옥연", group: "1조" },
+      { name: "학현", group: "1조" },
+      { name: "용남", group: "1조" },
+      { name: "서진", group: "1조" },
+      { name: "우빈", group: "1조" },
+      { name: "기백", group: "1조" },
+      { name: "종명", group: "1조" }, // 1조 조장
+
+      // 2조
+      { name: "성훈", group: "2조" },
+      { name: "종익", group: "2조" },
+      { name: "웅기", group: "2조" },
+      { name: "민근", group: "2조" },
+      { name: "진솔", group: "2조" },
+      { name: "갑수", group: "2조" },
+      { name: "상건", group: "2조" },
+      { name: "원빈", group: "2조" },
+      { name: "대현", group: "2조" },
+      { name: "정현", group: "2조" }, // 2조 조장
+
+      // 3조
+      { name: "재권", group: "3조" },
+      { name: "제덕", group: "3조" },
+      { name: "정무", group: "3조" },
+      { name: "길운", group: "3조" },
+      { name: "범성", group: "3조" },
+      { name: "이슬", group: "3조" },
+      { name: "영환", group: "3조" },
+      { name: "수신", group: "3조" },
+      { name: "응규", group: "3조" },
+      { name: "민국", group: "3조" },
+      { name: "용섭", group: "3조" },
+      { name: "오채", group: "3조" },
+      { name: "형원", group: "3조" } // 3조 조장
+    ];
+
+    // ===== 공통 유틸 =====
+    function pad2(n){ return n.toString().padStart(2,"0"); }
+
+    function formatKoreanWeekday(dateStr){
+      const d = new Date(dateStr);
+      if(isNaN(d)) return "";
+      return "("+weekdayNames[d.getDay()]+")";
+    }
+
+    function formatDisplayDate(dateStr){
+      const d = new Date(dateStr);
+      if(isNaN(d)) return dateStr;
+      return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}${formatKoreanWeekday(dateStr)}`;
+    }
+
+    function getCurrentMonthValue(){
+      return document.getElementById("monthSelect").value; // "YYYY-MM"
+    }
+
+    function findGroupByName(name){
+      const p = people.find(p=>p.name===name);
+      return p ? p.group : "";
+    }
+
+    // 현재 월의 날짜 목록 캐시
+    let currentMonthDates = [];
+
+    // ===== Firestore 연동 함수 =====
+    async function loadDatesForMonth(monthKey){
+      if(!monthKey) return [];
+      const docRef = db.collection(DATES_COL).doc(monthKey);
+      const snap = await docRef.get();
+      if(!snap.exists){
+        return [];
+      }
+      const data = snap.data();
+      return Array.isArray(data.dates) ? data.dates.slice().sort() : [];
+    }
+
+    async function saveDatesForMonth(monthKey, dates){
+      await db.collection(DATES_COL).doc(monthKey).set({
+        dates: dates
+      }, { merge:true });
+    }
+
+    async function loadPersonAttendance(monthKey, name){
+      if(!monthKey || !name) return {};
+      const snap = await db.collection(ATT_COL)
+        .where("month","==",monthKey)
+        .where("name","==",name)
+        .get();
+      const result = {};
+      snap.forEach(doc=>{
+        const data = doc.data();
+        if(data.date){
+          result[data.date] = data.status || "unknown";
+        }
+      });
+      return result;
+    }
+
+    async function savePersonAttendance(monthKey, name, statusByDate){
+      const batch = db.batch();
+      Object.entries(statusByDate).forEach(([date,status])=>{
+        const docId = `${date}_${name}`;
+        const ref = db.collection(ATT_COL).doc(docId);
+        batch.set(ref,{
+          month: monthKey,
+          date: date,
+          name: name,
+          group: findGroupByName(name),
+          status: status,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge:true });
+      });
+      await batch.commit();
+    }
+
+    async function loadAttendanceByDate(dateStr){
+      const snap = await db.collection(ATT_COL)
+        .where("date","==",dateStr)
+        .get();
+      const list=[];
+      snap.forEach(doc=>list.push(doc.data()));
+      return list;
+    }
+
+    // ===== UI 렌더링 =====
+
+    function renderDateChips(monthKey){
+      const label = document.getElementById("currentMonthLabel");
+      if(monthKey){
+        const [y,m] = monthKey.split("-");
+        label.textContent = `${y}년 ${m}월 특근 날짜`;
+      }else{
+        label.textContent = "특근 월을 먼저 선택하세요.";
+      }
+
+      const area = document.getElementById("dateListArea");
+      area.innerHTML = "";
+      if(!monthKey){
+        area.textContent = "특근 월을 선택하면 이곳에 날짜가 표시됩니다.";
+        return;
+      }
+
+      if(!currentMonthDates.length){
+        area.textContent = "등록된 특근 날짜가 없습니다.";
+        return;
+      }
+
+      const wrap = document.createElement("div");
+      wrap.className = "chip-wrap";
+
+      currentMonthDates.forEach(dateStr=>{
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = formatDisplayDate(dateStr);
+
+        const btn = document.createElement("button");
+        btn.textContent = "×";
+        btn.addEventListener("click", ()=>{
+          currentMonthDates = currentMonthDates.filter(d=>d!==dateStr);
+          renderDateChips(monthKey);
+          fillSummaryDateSelect();
+          refreshPersonStatusArea();
+        });
+
+        chip.appendChild(btn);
+        wrap.appendChild(chip);
+      });
+
+      area.appendChild(wrap);
+    }
+
+    function fillSummaryDateSelect(){
+      const sel = document.getElementById("summaryDateSelect");
+      sel.innerHTML = "";
+      if(!currentMonthDates.length){
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "특근 날짜 없음";
+        sel.appendChild(opt);
+        return;
+      }
+      currentMonthDates.slice().sort().forEach(d=>{
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = formatDisplayDate(d) + " (" + d + ")";
+        sel.appendChild(opt);
+      });
+    }
+
+    async function refreshPersonStatusArea(){
+      const area = document.getElementById("personStatusArea");
+      area.innerHTML = "";
+      const monthKey = getCurrentMonthValue();
+      const name = document.getElementById("personSelect").value;
+
+      if(!monthKey){
+        area.innerHTML = '<div class="info">먼저 위에서 특근 월을 선택해주세요.</div>';
+        return;
+      }
+      if(!currentMonthDates.length){
+        area.innerHTML = '<div class="info">이 월에는 아직 등록된 특근 날짜가 없습니다. (관리자에서 추가 후 사용)</div>';
+        return;
+      }
+      if(!name){
+        area.innerHTML = '<div class="info">이름을 선택하면 날짜별로 참여 여부를 선택할 수 있습니다.</div>';
+        return;
+      }
+
+      const statusMap = await loadPersonAttendance(monthKey, name);
+
+      currentMonthDates.slice().sort().forEach(dateStr=>{
+        const div = document.createElement("div");
+        div.className = "status-group";
+
+        const title = document.createElement("div");
+        title.className = "status-title";
+        title.textContent = formatDisplayDate(dateStr) + " / " + dateStr;
+        div.appendChild(title);
+
+        const options = document.createElement("div");
+        options.className = "status-options";
+
+        const currentStatus = statusMap[dateStr] || "unknown";
+        const nameBase = "status_" + dateStr;
+
+        const makeRadio = (value, labelText) => {
+          const lbl = document.createElement("label");
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = nameBase;
+          input.value = value;
+          if(currentStatus === value) input.checked = true;
+          lbl.appendChild(input);
+          lbl.appendChild(document.createTextNode(labelText));
+          return lbl;
+        };
+
+        options.appendChild(makeRadio("yes","참여"));
+        options.appendChild(makeRadio("no","불참"));
+        options.appendChild(makeRadio("unknown","미정"));
+
+        div.appendChild(options);
+        area.appendChild(div);
+      });
+    }
+
+    async function handleSavePerson(){
+      const monthKey = getCurrentMonthValue();
+      const name = document.getElementById("personSelect").value;
+      const msg = document.getElementById("personMsg");
+      msg.textContent = "";
+
+      if(!monthKey){
+        msg.textContent = "특근 월을 먼저 선택해주세요.";
+        return;
+      }
+      if(!name){
+        msg.textContent = "이름을 선택해주세요.";
+        return;
+      }
+      if(!currentMonthDates.length){
+        msg.textContent = "이 월에는 특근 날짜가 없습니다. 관리자에서 먼저 날짜를 추가해야 합니다.";
+        return;
+      }
+
+      const statusByDate = {};
+      currentMonthDates.forEach(dateStr=>{
+        const radios = document.querySelectorAll(`input[name="status_${dateStr}"]`);
+        let v = "unknown";
+        radios.forEach(r=>{ if(r.checked) v = r.value; });
+        statusByDate[dateStr] = v;
+      });
+
+      try{
+        await savePersonAttendance(monthKey, name, statusByDate);
+        msg.textContent = "저장되었습니다.";
+        setTimeout(()=>{ msg.textContent=""; },2000);
+      }catch(e){
+        console.error(e);
+        msg.textContent = "저장 중 오류가 발생했습니다.";
+      }
+    }
+
+    async function handleSummary(){
+      const monthKey = getCurrentMonthValue();
+      const dateStr = document.getElementById("summaryDateSelect").value;
+      const group = document.getElementById("summaryGroupSelect").value;
+      const box = document.getElementById("summaryResult");
+      box.style.display = "block";
+      box.innerHTML = "";
+
+      if(!monthKey){
+        box.textContent = "특근 월을 먼저 선택해주세요.";
+        return;
+      }
+      if(!dateStr){
+        box.textContent = "특근 날짜가 없습니다. 관리자에서 먼저 날짜를 추가해야 합니다.";
+        return;
+      }
+
+      const allAttendance = await loadAttendanceByDate(dateStr);
+
+      let targetPeople;
+      if(group === "all"){
+        targetPeople = people;
+      }else{
+        targetPeople = people.filter(p=>p.group===group);
+      }
+
+      const statusMap = {};
+      allAttendance.forEach(item=>{
+        statusMap[item.name] = item.status || "unknown";
+      });
+
+      const yesList = [];
+      const noList = [];
+      const unknownList = [];
+
+      targetPeople.forEach(p=>{
+        const s = statusMap[p.name] || "unknown";
+        if(s==="yes") yesList.push(p);
+        else if(s==="no") noList.push(p);
+        else unknownList.push(p);
+      });
+
+      if(group === "all"){
+        const total = targetPeople.length;
+        const yesCnt = yesList.length;
+        const noCnt = noList.length;
+        const unkCnt = unknownList.length;
+        const rate = total>0 ? ((yesCnt/total)*100).toFixed(1) : "0.0";
+
+        let html = "";
+        html += `<div class="summary-title">${dateStr} ${formatKoreanWeekday(dateStr)} / 전체</div>`;
+        html += `<div>총원: ${total}명 · 참여: ${yesCnt}명 · 불참: ${noCnt}명 · 미응답: ${unkCnt}명</div>`;
+        html += `<div>참여율: <b>${rate}%</b></div>`;
+
+        html += renderSummaryLists(yesList, noList, unknownList, true);
+        box.innerHTML = html;
+      }else{
+        let html = "";
+        html += `<div class="summary-title">${dateStr} ${formatKoreanWeekday(dateStr)} / ${group}</div>`;
+        html += renderSummaryLists(yesList, noList, unknownList, false);
+        box.innerHTML = html;
+      }
+    }
+
+    function renderSummaryLists(yesList, noList, unknownList, showGroup){
+      const nameFormat = p => showGroup ? `${p.name} (${p.group})` : p.name;
+
+      const renderOne = (title, list, emoji, color) => {
+        const names = list.map(nameFormat);
+        const count = list.length;
+        let inner = `<div style="margin-top:8px;"><b style="color:${color};">${emoji} ${title} (${count}명)</b></div>`;
+        if(!count){
+          inner += `<div class="list-names empty">없음</div>`;
+        }else{
+          inner += `<div class="list-names">${names.join(", ")}</div>`;
+        }
+        return inner;
+      };
+
+      let html = "";
+      html += renderOne("참여", yesList, "✅", "#0a8a43");
+      html += renderOne("불참", noList, "❌", "#c00");
+      html += renderOne("미응답", unknownList, "❓", "#555");
+      return html;
+    }
+
+    function handleAddDate(){
+      const monthKey = getCurrentMonthValue();
+      const input = document.getElementById("newDateInput");
+      const msg = document.getElementById("dateMsg");
+      msg.textContent = "";
+
+      const v = input.value;
+      if(!monthKey){
+        msg.textContent = "먼저 특근 월을 선택해주세요.";
+        return;
+      }
+      if(!v){
+        msg.textContent = "추가할 날짜를 선택해주세요.";
+        return;
+      }
+      if(v.substring(0,7)!==monthKey){
+        msg.textContent = "선택한 월과 같은 달의 날짜만 추가할 수 있습니다.";
+        return;
+      }
+      if(currentMonthDates.includes(v)){
+        msg.textContent = "이미 등록된 날짜입니다.";
+        return;
+      }
+      currentMonthDates.push(v);
+      currentMonthDates.sort();
+      input.value = "";
+      renderDateChips(monthKey);
+      fillSummaryDateSelect();
+      refreshPersonStatusArea();
+    }
+
+    async function handleSaveDates(){
+      const monthKey = getCurrentMonthValue();
+      const msg = document.getElementById("dateMsg");
+      msg.textContent = "";
+
+      if(!monthKey){
+        msg.textContent = "특근 월을 먼저 선택해주세요.";
+        return;
+      }
+      try{
+        await saveDatesForMonth(monthKey, currentMonthDates.slice().sort());
+        msg.textContent = "저장되었습니다.";
+        setTimeout(()=>{ msg.textContent=""; },2000);
+      }catch(e){
+        console.error(e);
+        msg.textContent = "저장 중 오류가 발생했습니다.";
+      }
+    }
+
+    async function updateAllForMonth(){
+      const monthKey = getCurrentMonthValue();
+      if(!monthKey){
+        currentMonthDates = [];
+        renderDateChips(null);
+        fillSummaryDateSelect();
+        refreshPersonStatusArea();
+        return;
+      }
+      currentMonthDates = await loadDatesForMonth(monthKey);
+      renderDateChips(monthKey);
+      fillSummaryDateSelect();
+      refreshPersonStatusArea();
+    }
+
+    function initMonthSelectDefault(){
+      const now = new Date();
+      const m = `${now.getFullYear()}-${pad2(now.getMonth()+1)}`;
+      document.getElementById("monthSelect").value = m;
+    }
+
+    function initPeopleSelect(){
+      const sel = document.getElementById("personSelect");
+      const sorted = [...people].sort((a,b)=>a.name.localeCompare(b.name,"ko-KR"));
+      sorted.forEach(p=>{
+        const opt = document.createElement("option");
+        opt.value = p.name;
+        opt.textContent = `${p.name} (${p.group})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function initEvents(){
+      document.getElementById("monthSelect").addEventListener("change", updateAllForMonth);
+      document.getElementById("personSelect").addEventListener("change", refreshPersonStatusArea);
+      document.getElementById("savePersonBtn").addEventListener("click", ()=>{ handleSavePerson(); });
+      document.getElementById("summaryBtn").addEventListener("click", ()=>{ handleSummary(); });
+      document.getElementById("addDateBtn").addEventListener("click", ()=>{ handleAddDate(); });
+      document.getElementById("saveDatesBtn").addEventListener("click", ()=>{ handleSaveDates(); });
+    }
+
+    window.addEventListener("DOMContentLoaded", async ()=>{
+      initPeopleSelect();
+      initMonthSelectDefault();
+      initEvents();
+      await updateAllForMonth();
+    });
+  </script>
+</body>
+</html>
