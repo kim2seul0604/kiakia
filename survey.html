@@ -60,9 +60,9 @@
       border: 1px solid var(--border-gray);
     }
 
-    /* ✅ 관리자용 카드 전용 스타일 (연노랑 배경) */
+    /* ✅ 관리자용 카드: 연노랑 배경 */
     .card.admin-card {
-      background: #fffbe6;           /* 연노랑 */
+      background: #fffbe6;
       border-color: #f0e0a0;
     }
 
@@ -86,12 +86,21 @@
       width: 100%;
     }
 
-    /* ✅ 특근 월 선택 input 전용 스타일 (길쭉하지 않고 더 예쁘게) */
-    #monthSelect {
-      width: 190px;             /* 너무 길지 않게 */
-      border-radius: 999px;     /* pill 모양 */
+    /* ✅ 특근 월 선택용: 가운데 정렬 + 네모 박스 */
+    .month-select-wrap {
       text-align: center;
+      margin: 8px 0 10px;
+    }
+
+    #monthSelect {
       display: inline-block;
+      width: 220px;         /* 너무 길지 않게 */
+      max-width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;  /* 살짝 둥근 네모 */
+      background: #f3f3f3;
+      border: 1px solid #ccc;
+      text-align: center;
     }
 
     .btn {
@@ -229,7 +238,7 @@
         padding: 10px;
       }
 
-      /* 모바일에서는 monthSelect가 너무 작지 않도록 */
+      /* 모바일에서는 월 선택 박스가 카드 폭에 맞게 */
       #monthSelect {
         width: 100%;
       }
@@ -238,16 +247,18 @@
 </head>
 <body>
   <header class="header">
-    <div class="header-title">특근 출석 관리 테스트중!!</div>
-    <div class="header-sub">트림2반 · 특근 · 월별 관리</div>
+    <div class="header-title">특근 출석 관리</div>
+    <div class="header-sub">트림2반 · 토요일 특근 · 월별 관리</div>
   </header>
 
   <div class="container">
     <!-- 공통: 특근 월 선택 -->
     <div class="card">
       <h2>특근 월 선택</h2>
-      <label for="monthSelect">특근 월</label><br/>
-      <input type="month" id="monthSelect" />
+      <label for="monthSelect">특근 월</label>
+      <div class="month-select-wrap">
+        <input type="month" id="monthSelect" />
+      </div>
       <div class="info">
         이 월에 설정된 특근 날짜 기준으로<br/>
         아래 <b>① 내 참여 체크</b>와 <b>② 조별/전체 현황</b>이 함께 바뀝니다.
@@ -390,7 +401,7 @@
       { name: "상건", group: "2조" },
       { name: "원빈", group: "2조" },
       { name: "대현", group: "2조" },
-      { name: "승호", group: "2조" },  // ✅ 추가
+      { name: "승호", group: "2조" },  // 2조 누락분 추가
       { name: "정현", group: "2조" }, // 2조 조장
 
       // 3조
