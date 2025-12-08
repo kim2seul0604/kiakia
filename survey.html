@@ -299,6 +299,17 @@
         <button class="btn btn-secondary" id="addDateBtn">날짜 추가</button>
       </div>
 
+      <!-- ✅ 새로 추가: 이 월 토요일 자동 제안 버튼 -->
+      <div style="margin-top:8px;">
+        <button class="btn btn-secondary" id="autoSatBtn">
+          이 월 토요일 자동 제안
+        </button>
+        <div class="info">
+          기존에 등록된 날짜는 그대로 두고,<br/>
+          선택한 월의 모든 토요일을 자동으로 추가합니다.
+        </div>
+      </div>
+
       <button class="btn" id="saveDatesBtn" style="margin-top:10px;">이 월의 특근 설정 저장</button>
       <div id="dateMsg" class="info"></div>
     </div>
@@ -741,6 +752,56 @@
       refreshPersonStatusArea();
     }
 
+    // ✅ 새로 추가: 선택한 월의 모든 토요일 자동 추가
+    function handleAutoSaturday(){
+      const monthKey = getCurrentMonthValue();
+      const msg = document.getElementById("dateMsg");
+      msg.textContent = "";
+
+      if(!monthKey){
+        msg.textContent = "먼저 특근 월을 선택해주세요.";
+        return;
+      }
+
+      const parts = monthKey.split("-");
+      if(parts.length !== 2){
+        msg.textContent = "월 형식이 올바르지 않습니다.";
+        return;
+      }
+
+      const year  = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // JS: 0=1월
+      if(isNaN(year) || isNaN(month)){
+        msg.textContent = "월 정보가 올바르지 않습니다.";
+        return;
+      }
+
+      // 해당 월의 모든 토요일 찾기
+      const saturdays = [];
+      let d = new Date(year, month, 1);
+      while(d.getMonth() === month){
+        if(d.getDay() === 6){ // 6 = 토요일
+          const iso = d.getFullYear() + "-" +
+                      pad2(d.getMonth()+1) + "-" +
+                      pad2(d.getDate());
+          saturdays.push(iso);
+        }
+        d.setDate(d.getDate() + 1);
+      }
+
+      // 기존 날짜 + 토요일 날짜 합치고 중복 제거
+      const set = new Set(currentMonthDates);
+      saturdays.forEach(dateStr => set.add(dateStr));
+      currentMonthDates = Array.from(set).sort();
+
+      // 화면 갱신
+      renderDateChips(monthKey);
+      fillSummaryDateSelect();
+      refreshPersonStatusArea();
+
+      msg.textContent = "이 월의 토요일을 자동으로 추가했습니다. 아래 '이 월의 특근 설정 저장' 버튼을 눌러 확정해주세요.";
+    }
+
     async function handleSaveDates(){
       const monthKey = getCurrentMonthValue();
       const msg = document.getElementById("dateMsg");
@@ -798,6 +859,7 @@
       document.getElementById("savePersonBtn").addEventListener("click", ()=>{ handleSavePerson(); });
       document.getElementById("summaryBtn").addEventListener("click", ()=>{ handleSummary(); });
       document.getElementById("addDateBtn").addEventListener("click", ()=>{ handleAddDate(); });
+      document.getElementById("autoSatBtn").addEventListener("click", ()=>{ handleAutoSaturday(); });
       document.getElementById("saveDatesBtn").addEventListener("click", ()=>{ handleSaveDates(); });
     }
 
