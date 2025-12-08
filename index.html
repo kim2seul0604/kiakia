@@ -75,7 +75,7 @@
       padding: 8px 18px;
       border-radius: 999px;
       border: none;
-      background: #0a8a43;
+      background: #0a8a43; /* 기존 색 유지 */
       color: #fff;
       font-size: 14px;
       display: inline-block;
@@ -211,7 +211,7 @@
       line-height: 1.4;
     }
 
-    /* ①번 결과(작업명 → 담당자) 보기 좋게 정리 */
+    /* ① 결과(작업명 → 담당자) 정리용 */
     .result-header {
       font-size: 13px;
       color: #555;
@@ -261,7 +261,7 @@
       font-weight: 700;
     }
 
-    /* 물음표 버튼 (오른쪽 하단) */
+    /* 도움말 버튼 (우측 하단) */
     .help-btn {
       position: fixed;
       bottom: 12px;
@@ -280,7 +280,7 @@
     }
 
     .help-btn:active {
-      transform: scale(0.96);
+      transform: translateX(-50%) scale(0.96);
     }
 
     @media (max-width: 600px) {
@@ -300,11 +300,12 @@
   <!-- 헤더 -->
   <header class="header">
     <div class="header-title">트림2반 12월 작업 스케줄 조회</div>
-    <button class="today-btn" id="todayBtn">🎅 오늘 날짜로 이동 🎅</button>
+    <!-- ✅ 버튼 텍스트/ID 변경 -->
+    <button class="today-btn" id="surveyBtn">📋 특근 참여 조사</button>
   </header>
 
   <div class="container">
-    <!-- ① 날짜 + 라운드 + 작업명 → 담당자 찾기 -->
+    <!-- ① 날짜 + 라운드 + 작업명으로 담당자 찾기 -->
     <div class="card">
       <h2>① 날짜 + 라운드 + 작업명으로 담당자 찾기</h2>
       <div>
@@ -383,7 +384,7 @@
     </div>
   </div>
 
-  <!-- 물음표 버튼 -->
+  <!-- 도움말 버튼 -->
   <button class="help-btn" id="helpBtn">?</button>
 
   <script>
@@ -405,8 +406,8 @@
     const START_DATE = new Date(2025,11,1); // 2025-12-01
     const END_DATE   = new Date(2025,11,31);
     const HOLIDAYS   = ["2025-12-12","2025-12-25"];
+    const SPECIAL_SHIFT_DATE = "2025-12-09"; // 특수일 (2라운드 X)
     const weekdayNames = ["일","월","화","수","목","금","토"];
-    const SPECIAL_SHIFT_DAY = "2025-12-09";  // 특수날짜 (2라운드 쉬고 작업 밀리는 날)
 
     // ===== 날짜 유틸 =====
     function pad2(n){return n.toString().padStart(2,"0");}
@@ -457,64 +458,66 @@
       return null;
     }
 
-    // ===== 하루 스케줄 계산 (12/9 특수, 이후 하루 4개 진행 + 전체 1칸 밀림) =====
+    // 기본 스케줄 (특수일 적용 전)
+    function getBaseDailySchedule(workIdx){
+      return names.map((person,i)=>{
+        const rounds=[];
+        for(let r=0;r<4;r++){
+          const taskIdx=(i + workIdx*4 + r) % taskNames.length;
+          rounds.push(taskNames[taskIdx]);
+        }
+        return {person,rounds};
+      });
+    }
+
     function getDailySchedule(date){
       if(!isWorkDay(date)) return null;
-      const workIdx = getWorkDayIndex(date);
-      if(workIdx === null) return null;
+      const workIdx=getWorkDayIndex(date);
+      if(workIdx===null) return null;
 
       const iso = formatDateISO(date);
+      const specialDateObj = parseDateInput(SPECIAL_SHIFT_DATE);
+      const specialIdx = getWorkDayIndex(specialDateObj);
 
-      // 특수날짜의 workIdx
-      const specialDate = new Date(2025, 11, 9); // 2025-12-09
-      const specialWorkIdx = getWorkDayIndex(specialDate);
-
-      // 하루 시작 task 인덱스 base 계산
-      let base;
-      if (specialWorkIdx === null || workIdx <= specialWorkIdx) {
-        // 특수일 이전/당일: 원래대로 4개씩 진행
-        base = workIdx * 4;
-      } else {
-        // 특수일 이후: 그날 1개 덜 진행했으므로 전체가 1칸 밀린 상태
-        base = workIdx * 4 - 1;
+      // 특수일 전/후/당일 처리
+      if(specialIdx === null || workIdx < specialIdx){
+        return getBaseDailySchedule(workIdx);
       }
 
-      const isSpecialShiftDay = (iso === SPECIAL_SHIFT_DAY);
+      if(iso === SPECIAL_SHIFT_DATE){
+        const base = getBaseDailySchedule(workIdx);
+        // 1R 그대로, 2R X, 3R에 원래 2R, 4R에 원래 3R
+        return base.map(row=>{
+          return {
+            person: row.person,
+            rounds: [
+              row.rounds[0],
+              "X",
+              row.rounds[1],
+              row.rounds[2]
+            ]
+          };
+        });
+      }
 
-      return names.map((person, i) => {
-        const rounds = [];
+      if(workIdx === specialIdx + 1){
+        const basePrev = getBaseDailySchedule(workIdx-1);
+        const baseToday = getBaseDailySchedule(workIdx);
+        return names.map((person,i)=>{
+          return {
+            person,
+            rounds: [
+              basePrev[i].rounds[3], // 전날 4라운드 이월
+              baseToday[i].rounds[0],
+              baseToday[i].rounds[1],
+              baseToday[i].rounds[2]
+            ]
+          };
+        });
+      }
 
-        for (let r = 0; r < 4; r++) {
-          let taskText = "";
-
-          if (isSpecialShiftDay) {
-            // 2025-12-09 특수 규칙
-            // 1R: base + 0 (원래 1R)
-            // 2R: 쉬는 시간 (빈칸)
-            // 3R: base + 1 (원래 2R)
-            // 4R: base + 2 (원래 3R)
-            if (r === 1) {
-              taskText = ""; // 2라운드는 쉬는 시간
-            } else {
-              let offset;
-              if (r === 0) offset = 0;     // 1R
-              else if (r === 2) offset = 1; // 3R
-              else offset = 2;              // 4R
-
-              const taskIdx = (i + base + offset) % taskNames.length;
-              taskText = taskNames[taskIdx];
-            }
-          } else {
-            // 일반 규칙: 1~4라운드 그대로 하루 4개씩 진행
-            const taskIdx = (i + base + r) % taskNames.length;
-            taskText = taskNames[taskIdx];
-          }
-
-          rounds.push(taskText);
-        }
-
-        return { person, rounds };
-      });
+      // 그 외 날짜는 기본 스케줄
+      return getBaseDailySchedule(workIdx);
     }
 
     // ===== ③ 하루 전체 스케줄 렌더 =====
@@ -556,8 +559,6 @@
         return;
       }
 
-      const iso = formatDateISO(date);
-
       schedule.forEach(row=>{
         const tr=document.createElement("tr");
         const tdName=document.createElement("td");
@@ -565,14 +566,9 @@
         tdName.textContent=row.person;
         tr.appendChild(tdName);
 
-        row.rounds.forEach((task, idx)=>{
+        row.rounds.forEach(task=>{
           const td=document.createElement("td");
-          // 12월 9일 2라운드는 "X"로 표시
-          if (iso === SPECIAL_SHIFT_DAY && idx === 1) {
-            td.textContent = "X";
-          } else {
-            td.textContent = task;
-          }
+          td.textContent=task;
           tr.appendChild(td);
         });
 
@@ -580,7 +576,7 @@
       });
     }
 
-    // ===== ① 날짜 + 라운드 + 작업명들(최대 3개) → 담당자 찾기 =====
+    // ===== ① 날짜 + 라운드 + 작업명(최대 3개) → 담당자 찾기 =====
     function findPersonByDateRoundTask(){
       const dateVal  = document.getElementById("lookupDate").value;
       const roundVal = document.getElementById("lookupRound").value;
@@ -623,7 +619,6 @@
 
       const roundIdx = parseInt(roundVal,10) - 1;
 
-      // 선택된 작업명들 모으기 (최대 3개)
       const selectIds = ["lookupTask1","lookupTask2","lookupTask3"];
       const selectedTasks = [];
       selectIds.forEach(id => {
@@ -637,14 +632,13 @@
         return;
       }
 
-      const weekdayText = formatKoreanWeekday(date); // (월), (화) 등
+      const weekdayText = formatKoreanWeekday(date);
 
-      // 헤더 + 리스트 박스 형태로 출력
       let html = "";
       html += `<div class="result-header">${dateVal} ${weekdayText} / ${roundVal}라운드</div>`;
       html += `<div class="result-list">`;
 
-      selectedTasks.forEach((task, idx) => {
+      selectedTasks.forEach((task) => {
         let found = null;
 
         schedule.forEach(row => {
@@ -709,7 +703,6 @@
         return;
       }
 
-      // 선택된 이름들 모으기 (최대 3명)
       const ids = ["personName1","personName2","personName3"];
       const selectedNames = [];
       ids.forEach(id => {
@@ -791,10 +784,9 @@
 
     function init(){
       // 이름 드롭다운 3개 (오름차순 정렬된 복사본 사용)
-      const sortedNamesAsc = [...names].sort((a,b)=>a.localeCompare(b));
+      const sortedNamesAsc = [...names].sort((a,b)=>a.localeCompare(b,"ko-KR"));
       ["personName1","personName2","personName3"].forEach(selectId => {
         const sel = document.getElementById(selectId);
-        // 첫 옵션: 빈값 (선택 안 함)
         const emptyOpt = document.createElement("option");
         emptyOpt.value = "";
         emptyOpt.textContent = "- 선택 안 함 -";
@@ -809,7 +801,7 @@
       });
 
       // 작업명 드롭다운 3개 (오름차순 정렬된 복사본 사용)
-      const sortedTasksAsc = [...taskNames].sort((a,b)=>a.localeCompare(b));
+      const sortedTasksAsc = [...taskNames].sort((a,b)=>a.localeCompare(b,"ko-KR"));
       ["lookupTask1","lookupTask2","lookupTask3"].forEach(selectId => {
         const sel = document.getElementById(selectId);
         const emptyOpt = document.createElement("option");
@@ -829,7 +821,11 @@
       document.getElementById("showDayBtn").addEventListener("click",renderDailySchedule);
       document.getElementById("lookupBtn").addEventListener("click",findPersonByDateRoundTask);
       document.getElementById("personBtn").addEventListener("click",showPersonSchedule);
-      document.getElementById("todayBtn").addEventListener("click",goToToday);
+
+      // ✅ 새 버튼: 특근 참여 조사 페이지로 이동
+      document.getElementById("surveyBtn").addEventListener("click", () => {
+        window.location.href = "survey.html";
+      });
 
       document.getElementById("dateInput").addEventListener("change",()=>updateWeekdayLabel("dateInput","dateInputWeekday"));
       document.getElementById("lookupDate").addEventListener("change",()=>updateWeekdayLabel("lookupDate","lookupDateWeekday"));
@@ -840,7 +836,10 @@
         alert("만든사람 : 김이슬");
       });
 
+      // 눈 효과
       createSnowflakes();
+
+      // 처음 로드할 때 오늘 날짜 기준으로 세팅
       goToToday();
     }
 
