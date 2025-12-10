@@ -471,54 +471,62 @@
     }
 
     function getDailySchedule(date){
-      if(!isWorkDay(date)) return null;
-      const workIdx=getWorkDayIndex(date);
-      if(workIdx===null) return null;
+  if(!isWorkDay(date)) return null;
 
-      const iso = formatDateISO(date);
-      const specialDateObj = parseDateInput(SPECIAL_SHIFT_DATE);
-      const specialIdx = getWorkDayIndex(specialDateObj);
+  const workIdx = getWorkDayIndex(date);
+  if (workIdx === null) return null;
 
-      // 특수일 전/후/당일 처리
-      if(specialIdx === null || workIdx < specialIdx){
-        return getBaseDailySchedule(workIdx);
+  const iso = formatDateISO(date);
+  const specialDateObj = parseDateInput(SPECIAL_SHIFT_DATE);
+  const specialIdx = getWorkDayIndex(specialDateObj);
+
+  // 🔹 특수일이 없거나, 특수일 이전이면 → 기존 기본 스케줄
+  if (specialIdx === null || workIdx < specialIdx) {
+    return names.map((person, i) => {
+      const rounds = [];
+      for (let r = 0; r < 4; r++) {
+        const taskIdx = (i + workIdx * 4 + r) % taskNames.length;
+        rounds.push(taskNames[taskIdx]);
       }
+      return { person, rounds };
+    });
+  }
 
-      if(iso === SPECIAL_SHIFT_DATE){
-        const base = getBaseDailySchedule(workIdx);
-        // 1R 그대로, 2R X, 3R에 원래 2R, 4R에 원래 3R
-        return base.map(row=>{
-          return {
-            person: row.person,
-            rounds: [
-              row.rounds[0],
-              "X",
-              row.rounds[1],
-              row.rounds[2]
-            ]
-          };
-        });
+  // 🔹 특수일 당일 (예: 2025-12-09)
+  if (workIdx === specialIdx) {
+    const base = names.map((person, i) => {
+      const rounds = [];
+      for (let r = 0; r < 4; r++) {
+        const taskIdx = (i + workIdx * 4 + r) % taskNames.length;
+        rounds.push(taskNames[taskIdx]);
       }
+      return { person, rounds };
+    });
 
-      if(workIdx === specialIdx + 1){
-        const basePrev = getBaseDailySchedule(workIdx-1);
-        const baseToday = getBaseDailySchedule(workIdx);
-        return names.map((person,i)=>{
-          return {
-            person,
-            rounds: [
-              basePrev[i].rounds[3], // 전날 4라운드 이월
-              baseToday[i].rounds[0],
-              baseToday[i].rounds[1],
-              baseToday[i].rounds[2]
-            ]
-          };
-        });
-      }
+    return base.map(row => ({
+      person: row.person,
+      rounds: [
+        row.rounds[0],  // 1라운드: 원래 1R
+        "X",            // 2라운드: 작업 없음
+        row.rounds[1],  // 3라운드: 원래 2R
+        row.rounds[2],  // 4라운드: 원래 3R
+      ]
+    }));
+  }
 
-      // 그 외 날짜는 기본 스케줄
-      return getBaseDailySchedule(workIdx);
+  // 🔹 특수일 이후 모든 근무일(다음날부터)은 전체적으로 1칸씩 밀린 스케줄
+  return names.map((person, i) => {
+    const rounds = [];
+    const offset = workIdx * 4 - 1;   // ✨ 여기서 한 칸 뒤로 밀기
+
+    for (let r = 0; r < 4; r++) {
+      const taskIdx = (i + offset + r) % taskNames.length;
+      rounds.push(taskNames[taskIdx]);
     }
+
+    return { person, rounds };
+  });
+}
 
     // ===== ③ 하루 전체 스케줄 렌더 =====
     function renderDailySchedule(){
