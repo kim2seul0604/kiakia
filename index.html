@@ -1,57 +1,849 @@
-function getDailySchedule(date){
-  if(!isWorkDay(date)) return null;
-
-  const workIdx = getWorkDayIndex(date);
-  if (workIdx === null) return null;
-
-  const iso = formatDateISO(date);
-  const specialDateObj = parseDateInput(SPECIAL_SHIFT_DATE);
-  const specialIdx = getWorkDayIndex(specialDateObj);
-
-  // 🔹 특수일이 없거나, 특수일 이전이면 → 기존 기본 스케줄
-  if (specialIdx === null || workIdx < specialIdx) {
-    return names.map((person, i) => {
-      const rounds = [];
-      for (let r = 0; r < 4; r++) {
-        const taskIdx = (i + workIdx * 4 + r) % taskNames.length;
-        rounds.push(taskNames[taskIdx]);
-      }
-      return { person, rounds };
-    });
-  }
-
-  // 🔹 특수일 당일 (예: 2025-12-09)
-  if (workIdx === specialIdx) {
-    const base = names.map((person, i) => {
-      const rounds = [];
-      for (let r = 0; r < 4; r++) {
-        const taskIdx = (i + workIdx * 4 + r) % taskNames.length;
-        rounds.push(taskNames[taskIdx]);
-      }
-      return { person, rounds };
-    });
-
-    return base.map(row => ({
-      person: row.person,
-      rounds: [
-        row.rounds[0],  // 1라운드: 원래 1R
-        "X",            // 2라운드: 작업 없음
-        row.rounds[1],  // 3라운드: 원래 2R
-        row.rounds[2],  // 4라운드: 원래 3R
-      ]
-    }));
-  }
-
-  // 🔹 특수일 이후 모든 근무일(다음날부터)은 전체적으로 1칸씩 밀린 스케줄
-  return names.map((person, i) => {
-    const rounds = [];
-    const offset = workIdx * 4 - 1;   // ✨ 여기서 한 칸 뒤로 밀기
-
-    for (let r = 0; r < 4; r++) {
-      const taskIdx = (i + offset + r) % taskNames.length;
-      rounds.push(taskNames[taskIdx]);
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>트림2반 12월 작업 스케줄 조회</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary-blue: #007aff;
+      --bg-gray: #f5f5f7;
+      --border-gray: #dddddd;
+      --header-dark: #111111;
     }
 
-    return { person, rounds };
-  });
-}
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      background: var(--bg-gray);
+      position: relative;
+      overflow-x: hidden;
+      color: #222;
+    }
+
+    /* 🎄 크리스마스 트리 배경 */
+    .christmas-bg-tree {
+      position: fixed;
+      right: 5%;
+      bottom: 5%;
+      font-size: 140px;
+      opacity: 0.07;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ❄ 눈송이 */
+    .snowflake {
+      position: fixed;
+      top: -10vh;
+      color: white;
+      font-size: 12px;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 10;
+      animation-name: snow-fall;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    @keyframes snow-fall {
+      0% { transform: translateY(-10vh); }
+      100% { transform: translateY(110vh); }
+    }
+
+    /* 헤더 */
+    .header {
+      background: var(--header-dark);
+      color: white;
+      padding: 16px 12px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .today-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: none;
+      background: #0a8a43; /* 기존 색 유지 */
+      color: #fff;
+      font-size: 14px;
+      display: inline-block;
+      margin: 0 auto;
+    }
+
+    .today-btn:active {
+      transform: scale(0.97);
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+      position: relative;
+      z-index: 5;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 18px 0 8px;
+      color: #111;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+      border: 1px solid var(--border-gray);
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    input[type="date"],
+    select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      margin-bottom: 6px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    button.primary-btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      background: var(--primary-blue);
+      color: #fff;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    button.primary-btn:active {
+      transform: scale(0.97);
+    }
+
+    .weekday-label {
+      font-size: 12px;
+      color: #555;
+      margin-left: 4px;
+    }
+
+    .info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .warning {
+      font-size: 13px;
+      color: #c00;
+      margin-top: 8px;
+    }
+
+    /* 테이블 */
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 8px;
+      border-radius: 12px;
+      border: 1px solid #eee;
+      position: relative;
+      background: #fff;
+    }
+
+    table {
+      border-collapse: collapse;
+      min-width: 600px;
+      font-size: 13px;
+      width: max-content;
+    }
+
+    th, td {
+      border-bottom: 1px solid #eee;
+      padding: 6px 8px;
+      white-space: nowrap;
+      text-align: center;
+      background: #fff;
+    }
+
+    th {
+      background: #fafafa;
+      font-weight: 700;
+    }
+
+    /* 이름 컬럼 고정 (sticky) */
+    .daily-table th.name-col,
+    .daily-table td.name-col {
+      position: sticky;
+      left: 0;
+      background: #fff;
+      z-index: 5;
+      text-align: left;
+    }
+
+    .daily-table thead th.name-col {
+      z-index: 6;
+    }
+
+    .result {
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    /* ① 결과(작업명 → 담당자) 정리용 */
+    .result-header {
+      font-size: 13px;
+      color: #555;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    .result-list {
+      margin-top: 4px;
+      border-radius: 10px;
+      background: #fafafa;
+      padding: 6px 8px;
+      border: 1px solid #eee;
+    }
+
+    .result-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 13px;
+    }
+
+    .result-row:last-child {
+      border-bottom: none;
+    }
+
+    .result-task {
+      flex: 2;
+      text-align: left;
+    }
+
+    .result-arrow {
+      flex: 0;
+      margin: 0 4px;
+      color: #999;
+    }
+
+    .result-person {
+      flex: 1;
+      text-align: right;
+    }
+
+    .result .name {
+      color: var(--primary-blue);
+      font-weight: 700;
+    }
+
+    /* 도움말 버튼 (우측 하단) */
+    .help-btn {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: var(--primary-blue);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      z-index: 30;
+      transform: none;
+    }
+
+    .help-btn:active {
+      transform: translateX(-50%) scale(0.96);
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 12px;
+      }
+      table {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 🎄 크리스마스 트리 배경 -->
+  <div class="christmas-bg-tree">🎄</div>
+
+  <!-- 헤더 -->
+  <header class="header">
+    <div class="header-title">트림2반 12월 작업 스케줄 조회</div>
+    <!-- ✅ 버튼 텍스트/ID 변경 -->
+    <button class="today-btn" id="surveyBtn">📋 특근 참여 조사</button>
+  </header>
+
+  <div class="container">
+    <!-- ① 날짜 + 라운드 + 작업명으로 담당자 찾기 -->
+    <div class="card">
+      <h2>① 날짜 + 라운드 + 작업명으로 담당자 찾기</h2>
+      <div>
+        <label for="lookupDate">날짜</label><br/>
+        <input type="date" id="lookupDate" />
+        <span id="lookupDateWeekday" class="weekday-label"></span>
+      </div>
+      <div>
+        <label for="lookupRound">라운드</label><br/>
+        <select id="lookupRound">
+          <option value="1">1라운드</option>
+          <option value="2">2라운드</option>
+          <option value="3">3라운드</option>
+          <option value="4">4라운드</option>
+        </select>
+      </div>
+      <div>
+        <label>작업명 (최대 3개)</label><br/>
+        <select id="lookupTask1"></select><br/>
+        <select id="lookupTask2"></select><br/>
+        <select id="lookupTask3"></select>
+      </div>
+      <button class="primary-btn" id="lookupBtn">담당자 찾기</button>
+      <div id="lookupWarning" class="warning" style="display:none;"></div>
+      <div id="lookupResult" class="result"></div>
+    </div>
+
+    <!-- ② 날짜 + 작업자 작업 보기 -->
+    <div class="card">
+      <h2>② 날짜 + 작업자 작업 보기</h2>
+      <div>
+        <label for="personDate">날짜</label><br/>
+        <input type="date" id="personDate" />
+        <span id="personDateWeekday" class="weekday-label"></span>
+      </div>
+      <div>
+        <label>작업자 선택 (최대 3명)</label><br/>
+        <select id="personName1"></select><br/>
+        <select id="personName2"></select><br/>
+        <select id="personName3"></select>
+      </div>
+      <button class="primary-btn" id="personBtn">개인 작업 조회</button>
+      <div id="personWarning" class="warning" style="display:none;"></div>
+      <div id="personResult" class="result"></div>
+    </div>
+
+    <!-- ③ 하루 전체 스케줄 보기 -->
+    <div class="card">
+      <h2>③ 하루 전체 스케줄 보기</h2>
+      <div>
+        <label for="dateInput">날짜</label><br/>
+        <input type="date" id="dateInput" />
+        <span id="dateInputWeekday" class="weekday-label"></span>
+        <button class="primary-btn" id="showDayBtn">조회</button>
+      </div>
+      <div class="info">
+        2025-12-01 ~ 2025-12-31 만 조회가능.<br/>
+        일요일, 12월 12일, 12월 25일은 휴일지정
+      </div>
+      <div id="dailyWarning" class="warning" style="display:none;"></div>
+
+      <div class="table-wrapper">
+        <table class="daily-table">
+          <thead>
+            <tr>
+              <th class="name-col">이름</th>
+              <th>1라운드</th>
+              <th>2라운드</th>
+              <th>3라운드</th>
+              <th>4라운드</th>
+            </tr>
+          </thead>
+          <tbody id="dailyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 도움말 버튼 -->
+  <button class="help-btn" id="helpBtn">?</button>
+
+  <script>
+    // ===== 기본 데이터 =====
+    const names = [
+      "성훈","원빈","길운","대현","진솔","서진","이슬","민국","성천",
+      "충훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
+      "응규","영환","상건","재덕","옥연","수신","오채","종익","용남"
+    ];
+
+    const taskNames = [
+      "LH B필라","L에어백투입","2조1번","LH C필라","SK주유구","멤버어스",
+      "LH A필라","마스터실린더","도어탈거","낚1","범퍼가이드","2조2번",
+      "AS커버","LH 루1","LH 루2","RH B필라","R에어백투입","RH C필라",
+      "RH A필라","후드","3조1번","하이드로닉체결","낚2","엔진어스",
+      "3조2번","RH 루1","RH 루2"
+    ];
+
+    const START_DATE = new Date(2025,11,1); // 2025-12-01
+    const END_DATE   = new Date(2025,11,31);
+    const HOLIDAYS   = ["2025-12-12","2025-12-25"];
+    const SPECIAL_SHIFT_DATE = "2025-12-09"; // 특수일 (2라운드 X)
+    const weekdayNames = ["일","월","화","수","목","금","토"];
+
+    // ===== 날짜 유틸 =====
+    function pad2(n){return n.toString().padStart(2,"0");}
+
+    function formatDateISO(d){
+      return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
+    }
+
+    function parseDateInput(v){
+      if(!v) return null;
+      const p=v.split("-");
+      if(p.length!==3) return null;
+      const y=parseInt(p[0],10), m=parseInt(p[1],10), d=parseInt(p[2],10);
+      if(isNaN(y)||isNaN(m)||isNaN(d)) return null;
+      return new Date(y,m-1,d);
+    }
+
+    function formatKoreanWeekday(date){
+      if(!date) return "";
+      return "("+weekdayNames[date.getDay()]+")";
+    }
+
+    function updateWeekdayLabel(inputId,labelId){
+      const val=document.getElementById(inputId).value;
+      const date=parseDateInput(val);
+      document.getElementById(labelId).textContent = formatKoreanWeekday(date);
+    }
+
+    function isWorkDay(d){
+      const iso=formatDateISO(d);
+      if(d<START_DATE || d>END_DATE) return false;
+      if(d.getDay()===0) return false; // Sunday
+      if(HOLIDAYS.includes(iso)) return false;
+      return true;
+    }
+
+    function getWorkDayIndex(targetDate){
+      if(!isWorkDay(targetDate)) return null;
+      let idx=-1;
+      let d=new Date(START_DATE.getTime());
+      while(d<=targetDate){
+        if(isWorkDay(d)){
+          idx++;
+          if(formatDateISO(d)===formatDateISO(targetDate)) return idx;
+        }
+        d.setDate(d.getDate()+1);
+      }
+      return null;
+    }
+
+    // 기본 스케줄 (특수일 적용 전)
+    function getBaseDailySchedule(workIdx){
+      return names.map((person,i)=>{
+        const rounds=[];
+        for(let r=0;r<4;r++){
+          const taskIdx=(i + workIdx*4 + r) % taskNames.length;
+          rounds.push(taskNames[taskIdx]);
+        }
+        return {person,rounds};
+      });
+    }
+
+    function getDailySchedule(date){
+      if(!isWorkDay(date)) return null;
+      const workIdx=getWorkDayIndex(date);
+      if(workIdx===null) return null;
+
+      const iso = formatDateISO(date);
+      const specialDateObj = parseDateInput(SPECIAL_SHIFT_DATE);
+      const specialIdx = getWorkDayIndex(specialDateObj);
+
+      // 특수일 전/후/당일 처리
+      if(specialIdx === null || workIdx < specialIdx){
+        return getBaseDailySchedule(workIdx);
+      }
+
+      if(iso === SPECIAL_SHIFT_DATE){
+        const base = getBaseDailySchedule(workIdx);
+        // 1R 그대로, 2R X, 3R에 원래 2R, 4R에 원래 3R
+        return base.map(row=>{
+          return {
+            person: row.person,
+            rounds: [
+              row.rounds[0],
+              "X",
+              row.rounds[1],
+              row.rounds[2]
+            ]
+          };
+        });
+      }
+
+      if(workIdx === specialIdx + 1){
+        const basePrev = getBaseDailySchedule(workIdx-1);
+        const baseToday = getBaseDailySchedule(workIdx);
+        return names.map((person,i)=>{
+          return {
+            person,
+            rounds: [
+              basePrev[i].rounds[3], // 전날 4라운드 이월
+              baseToday[i].rounds[0],
+              baseToday[i].rounds[1],
+              baseToday[i].rounds[2]
+            ]
+          };
+        });
+      }
+
+      // 그 외 날짜는 기본 스케줄
+      return getBaseDailySchedule(workIdx);
+    }
+
+    // ===== ③ 하루 전체 스케줄 렌더 =====
+    function renderDailySchedule(){
+      const val=document.getElementById("dateInput").value;
+      const date=parseDateInput(val);
+      const warning=document.getElementById("dailyWarning");
+      const tbody=document.getElementById("dailyTableBody");
+      tbody.innerHTML="";
+      warning.style.display="none";
+      warning.textContent="";
+
+      updateWeekdayLabel("dateInput","dateInputWeekday");
+
+      if(!date){
+        warning.style.display="block";
+        warning.textContent="날짜를 선택해주세요.";
+        return;
+      }
+
+      if(!isWorkDay(date)){
+        warning.style.display="block";
+        if(date<START_DATE || date>END_DATE){
+          warning.textContent="2025-12-01 ~ 2025-12-31 사이만 조회 가능합니다.";
+        }else if(date.getDay()===0){
+          warning.textContent="일요일은 근무일이 아닙니다.";
+        }else if(HOLIDAYS.includes(formatDateISO(date))){
+          warning.textContent="지정된 휴무일(12/12, 12/25)은 근무일이 아닙니다.";
+        }else{
+          warning.textContent="근무일이 아닙니다.";
+        }
+        return;
+      }
+
+      const schedule=getDailySchedule(date);
+      if(!schedule || !schedule.length){
+        warning.style.display="block";
+        warning.textContent="해당 날짜의 스케줄이 없습니다.";
+        return;
+      }
+
+      schedule.forEach(row=>{
+        const tr=document.createElement("tr");
+        const tdName=document.createElement("td");
+        tdName.className="name-col";
+        tdName.textContent=row.person;
+        tr.appendChild(tdName);
+
+        row.rounds.forEach(task=>{
+          const td=document.createElement("td");
+          td.textContent=task;
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ===== ① 날짜 + 라운드 + 작업명(최대 3개) → 담당자 찾기 =====
+    function findPersonByDateRoundTask(){
+      const dateVal  = document.getElementById("lookupDate").value;
+      const roundVal = document.getElementById("lookupRound").value;
+      const warning  = document.getElementById("lookupWarning");
+      const result   = document.getElementById("lookupResult");
+
+      warning.style.display = "none";
+      warning.textContent   = "";
+      result.textContent    = "";
+
+      updateWeekdayLabel("lookupDate","lookupDateWeekday");
+
+      const date = parseDateInput(dateVal);
+      if(!date){
+        warning.style.display = "block";
+        warning.textContent   = "날짜를 선택해주세요.";
+        return;
+      }
+
+      if(!isWorkDay(date)){
+        warning.style.display = "block";
+        if(date<START_DATE || date>END_DATE){
+          warning.textContent = "2025-12-01 ~ 2025-12-31 사이만 조회 가능합니다.";
+        }else if(date.getDay()===0){
+          warning.textContent = "일요일은 근무일이 아닙니다.";
+        }else if(HOLIDAYS.includes(formatDateISO(date))){
+          warning.textContent = "지정된 휴무일(12/12, 12/25)은 근무일이 아닙니다.";
+        }else{
+          warning.textContent = "근무일이 아닙니다.";
+        }
+        return;
+      }
+
+      const schedule = getDailySchedule(date);
+      if(!schedule){
+        warning.style.display = "block";
+        warning.textContent   = "해당 날짜의 스케줄을 찾을 수 없습니다.";
+        return;
+      }
+
+      const roundIdx = parseInt(roundVal,10) - 1;
+
+      const selectIds = ["lookupTask1","lookupTask2","lookupTask3"];
+      const selectedTasks = [];
+      selectIds.forEach(id => {
+        const v = document.getElementById(id).value;
+        if (v) selectedTasks.push(v);
+      });
+
+      if(selectedTasks.length === 0){
+        warning.style.display = "block";
+        warning.textContent   = "작업을 최소 1개 이상 선택해주세요.";
+        return;
+      }
+
+      const weekdayText = formatKoreanWeekday(date);
+
+      let html = "";
+      html += `<div class="result-header">${dateVal} ${weekdayText} / ${roundVal}라운드</div>`;
+      html += `<div class="result-list">`;
+
+      selectedTasks.forEach((task) => {
+        let found = null;
+
+        schedule.forEach(row => {
+          if(row.rounds[roundIdx] === task){
+            found = row.person;
+          }
+        });
+
+        if(found){
+          html += `
+            <div class="result-row">
+              <div class="result-task">${task}</div>
+              <div class="result-arrow">→</div>
+              <div class="result-person"><span class="name">${found}</span></div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="result-row">
+              <div class="result-task">${task}</div>
+              <div class="result-arrow">→</div>
+              <div class="result-person">담당자 없음</div>
+            </div>
+          `;
+        }
+      });
+
+      html += `</div>`;
+      result.innerHTML = html;
+    }
+
+    // ===== ② 날짜 + 이름들 → 개인 작업 보기 (최대 3명) =====
+    function showPersonSchedule(){
+      const dateVal = document.getElementById("personDate").value;
+      const warning = document.getElementById("personWarning");
+      const result  = document.getElementById("personResult");
+
+      warning.style.display = "none";
+      warning.textContent   = "";
+      result.textContent    = "";
+
+      updateWeekdayLabel("personDate","personDateWeekday");
+
+      const date = parseDateInput(dateVal);
+      if(!date){
+        warning.style.display = "block";
+        warning.textContent   = "날짜를 선택해주세요.";
+        return;
+      }
+
+      if(!isWorkDay(date)){
+        warning.style.display = "block";
+        if(date<START_DATE || date>END_DATE){
+          warning.textContent = "2025-12-01 ~ 2025-12-31 사이만 조회 가능합니다.";
+        }else if(date.getDay()===0){
+          warning.textContent = "일요일은 근무일이 아닙니다.";
+        }else if(HOLIDAYS.includes(formatDateISO(date))){
+          warning.textContent = "지정된 휴무일(12/12, 12/25)은 근무일이 아닙니다.";
+        }else{
+          warning.textContent = "근무일이 아닙니다.";
+        }
+        return;
+      }
+
+      const ids = ["personName1","personName2","personName3"];
+      const selectedNames = [];
+      ids.forEach(id => {
+        const v = document.getElementById(id).value;
+        if (v) selectedNames.push(v);
+      });
+
+      if(selectedNames.length === 0){
+        warning.style.display = "block";
+        warning.textContent   = "작업자를 최소 1명 이상 선택해주세요.";
+        return;
+      }
+
+      const schedule = getDailySchedule(date);
+      if(!schedule){
+        warning.style.display = "block";
+        warning.textContent   = "해당 날짜의 스케줄을 찾을 수 없습니다.";
+        return;
+      }
+
+      let html = "";
+      selectedNames.forEach((name, idx) => {
+        const row = schedule.find(r => r.person === name);
+        if(!row){
+          html += `<div><span class="name">${name}</span> : 스케줄을 찾을 수 없습니다.</div>`;
+        }else{
+          const [r1,r2,r3,r4] = row.rounds;
+          html += `
+            <div style="margin-top:${idx===0 ? 0 : 8}px;">
+              ${dateVal} ${formatKoreanWeekday(date)} / <span class="name">${name}</span>
+            </div>
+            <div>1라운드: ${r1}</div>
+            <div>2라운드: ${r2}</div>
+            <div>3라운드: ${r3}</div>
+            <div>4라운드: ${r4}</div>
+          `;
+        }
+        if (idx !== selectedNames.length - 1) {
+          html += `<hr style="margin:8px 0; border:none; border-top:1px solid #eee;" />`;
+        }
+      });
+
+      result.innerHTML = html;
+    }
+
+    // ❄ 눈 생성
+    function createSnowflakes(){
+      const count=40;
+      for(let i=0;i<count;i++){
+        const el=document.createElement("span");
+        el.className="snowflake";
+        el.textContent="❄";
+        el.style.left = (Math.random()*100) + "vw";
+        el.style.animationDuration = (8+Math.random()*7) + "s";
+        el.style.animationDelay = (Math.random()*10) + "s";
+        document.body.appendChild(el);
+      }
+    }
+
+    function goToToday(){
+      const today = new Date();
+      let target = today;
+      if(today<START_DATE || today>END_DATE){
+        target=new Date(START_DATE.getTime());
+      }
+      const iso=formatDateISO(target);
+
+      document.getElementById("dateInput").value   = iso;
+      document.getElementById("lookupDate").value  = iso;
+      document.getElementById("personDate").value  = iso;
+
+      updateWeekdayLabel("dateInput","dateInputWeekday");
+      updateWeekdayLabel("lookupDate","lookupDateWeekday");
+      updateWeekdayLabel("personDate","personDateWeekday");
+
+      renderDailySchedule();
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    function init(){
+      // 이름 드롭다운 3개 (오름차순 정렬된 복사본 사용)
+      const sortedNamesAsc = [...names].sort((a,b)=>a.localeCompare(b,"ko-KR"));
+      ["personName1","personName2","personName3"].forEach(selectId => {
+        const sel = document.getElementById(selectId);
+        const emptyOpt = document.createElement("option");
+        emptyOpt.value = "";
+        emptyOpt.textContent = "- 선택 안 함 -";
+        sel.appendChild(emptyOpt);
+
+        sortedNamesAsc.forEach(n => {
+          const opt = document.createElement("option");
+          opt.value = n;
+          opt.textContent = n;
+          sel.appendChild(opt);
+        });
+      });
+
+      // 작업명 드롭다운 3개 (오름차순 정렬된 복사본 사용)
+      const sortedTasksAsc = [...taskNames].sort((a,b)=>a.localeCompare(b,"ko-KR"));
+      ["lookupTask1","lookupTask2","lookupTask3"].forEach(selectId => {
+        const sel = document.getElementById(selectId);
+        const emptyOpt = document.createElement("option");
+        emptyOpt.value = "";
+        emptyOpt.textContent = "- 선택 안 함 -";
+        sel.appendChild(emptyOpt);
+
+        sortedTasksAsc.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t;
+          opt.textContent = t;
+          sel.appendChild(opt);
+        });
+      });
+
+      // 이벤트
+      document.getElementById("showDayBtn").addEventListener("click",renderDailySchedule);
+      document.getElementById("lookupBtn").addEventListener("click",findPersonByDateRoundTask);
+      document.getElementById("personBtn").addEventListener("click",showPersonSchedule);
+
+      // ✅ 새 버튼: 특근 참여 조사 페이지로 이동
+      document.getElementById("surveyBtn").addEventListener("click", () => {
+        window.location.href = "survey.html";
+      });
+
+      document.getElementById("dateInput").addEventListener("change",()=>updateWeekdayLabel("dateInput","dateInputWeekday"));
+      document.getElementById("lookupDate").addEventListener("change",()=>updateWeekdayLabel("lookupDate","lookupDateWeekday"));
+      document.getElementById("personDate").addEventListener("change",()=>updateWeekdayLabel("personDate","personDateWeekday"));
+
+      // 물음표 버튼 이벤트
+      document.getElementById("helpBtn").addEventListener("click", () => {
+        alert("만든사람 : 김이슬");
+      });
+
+      // 눈 효과
+      createSnowflakes();
+
+      // 처음 로드할 때 오늘 날짜 기준으로 세팅
+      goToToday();
+    }
+
+    window.addEventListener("DOMContentLoaded",init);
+  </script>
+</body>
+</html>
