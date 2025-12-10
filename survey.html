@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>특근 출석 관리(테스트중)</title>
+  <title>특근 출석 관리(test)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -60,354 +60,7 @@
       border: 1px solid var(--border-gray);
     }
 
-    /* 관리자 카드 연노랑 */
-    .card.admin-card {
-      background: #fffbe6;
-      border-color: #f0e0a0;
-    }
-
-    /* 📌 3번 카드와 동일한 디자인 입력박스 */
-    .admin-input {
-      width: 100%;
-      padding: 12px;
-      font-size: 18px;
-      text-align: center;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      background: #f8f8f8;
-      color: #222;
-      box-sizing: border-box;
-    }
-
-    /* 월 선택 wrapper */
-    .month-select-wrap {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin: 8px 0 10px;
-    }
-
-    label {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      display: inline-block;
-    }
-
-    input[type="date"],
-    select {
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-      margin-bottom: 6px;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 999px;
-      padding: 9px 16px;
-      font-size: 14px;
-      color: #fff;
-      background: var(--primary-green);
-      margin-top: 6px;
-      display: inline-block;
-    }
-
-    .btn:active {
-      transform: scale(0.97);
-    }
-
-    .btn-secondary {
-      background: var(--primary-blue);
-    }
-
-    .info {
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
-    }
-
-    .warning {
-      font-size: 13px;
-      color: #c00;
-      margin-top: 4px;
-    }
-
-    .row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .row > div {
-      flex: 1 1 120px;
-      min-width: 0;
-    }
-
-    .status-group {
-      margin-top: 8px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      background: #fafafa;
-      border: 1px solid #eee;
-    }
-
-    .status-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .status-options {
-      font-size: 13px;
-    }
-
-    .status-options label {
-      font-weight: 400;
-      margin-right: 12px;
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .status-options input[type="radio"] {
-      margin-right: 3px;
-    }
-
-    .summary-block {
-      margin-top: 8px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      background: #fafafa;
-      border: 1px solid #eee;
-      font-size: 13px;
-      line-height: 1.5;
-      display: none;
-    }
-
-    .summary-title {
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .chip-wrap {
-      margin-top: 4px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      background: #f0f0f0;
-    }
-
-    .chip button {
-      border: none;
-      background: none;
-      margin-left: 4px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 10px;
-      }
-      .admin-input {
-        width: 100%;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <header class="header">
-    <div class="header-title">특근 출석 관리(테스트중)</div>
-    <div class="header-sub">트림2반 · 토요일 특근 조사</div>
-  </header>
-
-  <div class="container">
-
-    <!-- 1️⃣ 특근 월 선택 -->
-    <div class="card">
-      <h2>특근 월 선택</h2>
-      <label for="monthSelect">특근 월</label>
-      <div class="month-select-wrap">
-        <select id="monthSelect" class="admin-input"></select>
-      </div>
-      <div class="info">
-        이 달에 등록된 특근 날짜 기준으로<br/>
-        아래 ① 참여체크, ② 조별/전체현황이 자동 반영됩니다.
-      </div>
-    </div>
-
-        <!-- 2️⃣ 개인 특근 참여 체크 -->
-    <div class="card">
-      <h2>① 특근 참여 체크</h2>
-
-      <label for="personSelect">이름 선택</label>
-      <select id="personSelect" class="admin-input"></select>
-
-      <div class="status-group">
-        <div class="status-title">이번주 토요일 특근 참여여부</div>
-        <div class="status-options">
-          <label><input type="radio" name="status" value="참석"> 참석</label>
-          <label><input type="radio" name="status" value="불참"> 불참</label>
-          <label><input type="radio" name="status" value="미응답"> 미응답</label>
-        </div>
-      </div>
-
-      <button class="btn" id="saveStatusBtn">저장하기</button>
-      <div id="saveStatusMsg" class="info"></div>
-    </div>
-
-
-    <!-- 3️⃣ 조별 / 전체 현황 조회 -->
-    <div class="card admin-card">
-      <h2>② 조별 / 전체 특근 현황 조회</h2>
-
-      <label for="teamSelect">조회 구분</label>
-      <select id="teamSelect" class="admin-input">
-        <option value="all">전체</option>
-        <option value="1">1조 (조장: 종명)</option>
-        <option value="2">2조 (조장: 정현)</option>
-        <option value="3">3조 (조장: 형원)</option>
-      </select>
-
-      <button class="btn-secondary btn" id="viewStatusBtn">현황 보기</button>
-
-      <div id="summaryBlock" class="summary-block">
-        <div class="summary-title">📌 특근 현황 요약</div>
-        <div id="summaryText"></div>
-
-        <div class="summary-title" style="margin-top:6px;">참석</div>
-        <div id="listAttend" class="chip-wrap"></div>
-
-        <div class="summary-title" style="margin-top:6px;">불참</div>
-        <div id="listAbsent" class="chip-wrap"></div>
-
-        <div class="summary-title" style="margin-top:6px;">미응답</div>
-        <div id="listUnknown" class="chip-wrap"></div>
-      </div>
-    </div>
-
-
-    <!-- 4️⃣ 관리자용 특근 날짜 등록 -->
-    <div class="card admin-card">
-      <h2>③ 관리자용 · 특근 날짜 등록</h2>
-
-      <label for="adminDateInput">특근 날짜 지정</label>
-      <input id="adminDateInput" type="date" class="admin-input">
-
-      <button class="btn-secondary btn" id="addDateBtn">특근 날짜 추가</button>
-
-      <div class="info" style="margin-top:6px;">
-        등록된 날짜들은 자동으로 월별 관리되며<br/>
-        ① 참여 체크 및 ② 현황 조회에 반영됩니다.
-      </div>
-
-      <div id="savedDateList" class="chip-wrap" style="margin-top:10px;"></div>
-    </div>
-
-  </div> <!-- container 끝 -->
-
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc } 
-      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCeeyyh0hxJUZZC5lvUH52iSCteNhzgbSI",
-      authDomain: "survey-87173.firebaseapp.com",
-      projectId: "survey-87173",
-      storageBucket: "survey-87173.firebasestorage.app",
-      messagingSenderId: "854671970902",
-      appId: "1:854671970902:web:74a0d89a4182e7a09321f7",
-      measurementId: "G-P5G2KDCGM0"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    /* -----------------------------------------------
-       기본 데이터
-    ----------------------------------------------- */
-    const team1 = ["성해","충훈","성천","옥연","학현","용남","서진","우빈","기백"];
-    const team2 = ["성훈","종익","웅기","민국","진솔","갑수","상건","원빈","대현","승호"];
-    const team3 = ["재권","제덕","정무","길운","범성","이슬","영환","수신","응규","민국","용섭","오채"];
-
-    const allMembers = [...team1, ...team2, ...team3];
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <title>특근 출석 관리</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --primary-green: #0a8a43;
-      --primary-blue: #007aff;
-      --bg-gray: #f5f5f7;
-      --border-gray: #dddddd;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
-      background: var(--bg-gray);
-      color: #222;
-    }
-
-    .header {
-      background: #111;
-      color: #fff;
-      padding: 14px 12px 10px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .header-title {
-      font-size: 20px;
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-    .header-sub {
-      font-size: 13px;
-      color: #ddd;
-    }
-
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 12px 14px 18px;
-    }
-
-    h2 {
-      font-size: 16px;
-      margin: 16px 0 8px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 14px;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-      border: 1px solid var(--border-gray);
-    }
-
-    /* 관리자용 카드: 연노랑 */
+    /* ✅ 관리자용 카드: 연노랑 배경 */
     .card.admin-card {
       background: #fffbe6;
       border-color: #f0e0a0;
@@ -420,7 +73,6 @@
       display: inline-block;
     }
 
-    /* 기본 인풋 스타일 */
     input[type="date"],
     input[type="month"],
     select {
@@ -432,25 +84,23 @@
       max-width: 100%;
       box-sizing: border-box;
       width: 100%;
-      background: #fff;
     }
 
-    /* 📌 1번 월선택 & 3번 날짜 인풋 공통(모양 통일) */
-    .admin-input {
-      padding: 10px 12px;
-      font-size: 16px;
-      border-radius: 12px;
-      background: #f8f8f8;
+    /* ✅ 특근 월 선택용: 가운데 정렬 + 네모 박스 */
+    .month-select-wrap {
+      text-align: center;
+      margin: 8px 0 10px;
+    }
+
+    #monthSelect {
+      display: inline-block;
+      width: 220px;         /* 너무 길지 않게 */
+      max-width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;  /* 살짝 둥근 네모 */
+      background: #f3f3f3;
       border: 1px solid #ccc;
       text-align: center;
-    }
-
-    /* 1번 카드 월 선택 박스를 가운데 정렬 */
-    .month-select-wrap {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin: 8px 0 10px;
     }
 
     .btn {
@@ -532,7 +182,6 @@
       border: 1px solid #eee;
       font-size: 13px;
       line-height: 1.5;
-      display: none;
     }
 
     .summary-title {
@@ -588,7 +237,9 @@
       .container {
         padding: 10px;
       }
-      .admin-input {
+
+      /* 모바일에서는 월 선택 박스가 카드 폭에 맞게 */
+      #monthSelect {
         width: 100%;
       }
     }
@@ -601,12 +252,12 @@
   </header>
 
   <div class="container">
-    <!-- 1️⃣ 특근 월 선택 -->
+    <!-- 공통: 특근 월 선택 -->
     <div class="card">
       <h2>특근 월 선택</h2>
       <label for="monthSelect">특근 월</label>
       <div class="month-select-wrap">
-        <input type="month" id="monthSelect" class="admin-input" />
+        <input type="month" id="monthSelect" />
       </div>
       <div class="info">
         이 월에 설정된 특근 날짜 기준으로<br/>
@@ -652,7 +303,7 @@
       </div>
       <button class="btn btn-secondary" id="summaryBtn">조회</button>
 
-      <div id="summaryResult" class="summary-block"></div>
+      <div id="summaryResult" class="summary-block" style="display:none;"></div>
     </div>
 
     <!-- ③ 관리자용: 월별 특근 날짜 설정 (연노랑 카드) -->
@@ -674,7 +325,7 @@
 
       <div style="margin-top:8px;">
         <label for="newDateInput">특근 날짜 추가</label>
-        <input type="date" id="newDateInput" class="admin-input" />
+        <input type="date" id="newDateInput" />
         <button class="btn btn-secondary" id="addDateBtn">날짜 추가</button>
       </div>
 
@@ -750,7 +401,7 @@
       { name: "상건", group: "2조" },
       { name: "원빈", group: "2조" },
       { name: "대현", group: "2조" },
-      { name: "승호", group: "2조" },  // 추가
+      { name: "승호", group: "2조" },  // 2조 누락분 추가
       { name: "정현", group: "2조" }, // 2조 조장
 
       // 3조
@@ -1252,4 +903,3 @@
   </script>
 </body>
 </html>
-
