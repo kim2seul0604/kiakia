@@ -33,18 +33,6 @@ body {
   background: #0a8a43;
   color: #fff;
 }
-
-/* === 하루 전체 스케줄 가독성 개선 === */
-.day-table td {
-  font-size: 12px;
-}
-
-/* 라운드별 점진적 강조 */
-.round-1 { color: #999; }
-.round-2 { color: #666; }
-.round-3 { color: #333; }
-.round-4 { color: #000; font-weight: 600; }
-
 .container {
   max-width: 960px;
   margin: 0 auto;
@@ -218,11 +206,8 @@ function renderDay(){
   getSchedule(d).forEach(r=>{
     dayBody.innerHTML+=`
     <tr>
-       <td class="name-col">${r.name}</td>
-      <td class="round-1">${r.rounds[0]}</td>
-      <td class="round-2">${r.rounds[1]}</td>
-      <td class="round-3">${r.rounds[2]}</td>
-      <td class="round-4">${r.rounds[3]}</td>
+      <td class="name-col">${r.name}</td>
+      ${r.rounds.map(x=>`<td>${x}</td>`).join("")}
     </tr>`;
   });
 }
@@ -251,15 +236,10 @@ function showPerson(){
 }
 
 /* ===== 초기화 ===== */
-function fillSelectSorted(selects, arr){
-  [...arr].sort((a,b)=>a.localeCompare(b,'ko'))
-    .forEach(v=>selects.forEach(s=>s.innerHTML+=`<option>${v}</option>`));
+function init(){
+  tasks.forEach(t=>[task1,task2,task3].forEach(s=>s.innerHTML+=`<option>${t}</option>`));
+  names.forEach(n=>[p1,p2,p3].forEach(s=>s.innerHTML+=`<option>${n}</option>`));
 }
-fillSelectSorted([task1,task2,task3], tasks);
-fillSelectSorted([p1,p2,p3], names);
-
-
-
 function goToday(){
   const t=iso(new Date());
   dayDate.value=findDate.value=personDate.value=t;
