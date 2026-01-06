@@ -1,105 +1,127 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>트림2반 작업 스케줄 조회</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-/* ===== 기존 UI 그대로 ===== */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  margin: 0;
-  background: #f5f5f7;
-  color: #222;
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f5f5f7;
+  color:#222;
 }
-.header {
-  background: #111;
-  color: #fff;
-  padding: 16px 12px;
-  text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+
+header {
+  background:#111;
+  color:#fff;
+  padding:16px;
+  text-align:center;
+  position:sticky;
+  top:0;
+  z-index:10;
 }
-.header-title {
-  font-size: 22px;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
+
 .today-btn {
-  padding: 8px 18px;
-  border-radius: 999px;
-  border: none;
-  background: #0a8a43;
-  color: #fff;
+  margin-top:10px;
+  padding:8px 18px;
+  border:none;
+  border-radius:999px;
+  background:#0a8a43;
+  color:#fff;
 }
+
 .container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 16px;
+  max-width:960px;
+  margin:0 auto;
+  padding:16px;
 }
+
 .card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 14px;
-  margin-bottom: 16px;
-  border: 1px solid #ddd;
+  background:#fff;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:16px;
+  box-shadow:0 6px 16px rgba(0,0,0,.06);
 }
-h2 { font-size: 16px; margin: 0 0 10px; }
-label { font-size: 13px; font-weight: 600; }
+
+h2 { font-size:16px; margin-bottom:10px; }
+
+label { font-size:13px; font-weight:600; }
+
 input, select {
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 6px;
+  padding:6px 10px;
+  font-size:14px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin-bottom:6px;
 }
-button.primary-btn {
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: none;
-  background: #007aff;
-  color: #fff;
+
+button.primary {
+  padding:8px 16px;
+  border-radius:999px;
+  border:none;
+  background:#007aff;
+  color:#fff;
 }
-.table-wrapper { overflow-x: auto; }
+
+.warning { color:#c00; font-size:13px; margin-top:6px; }
+
+.table-wrap {
+  overflow-x:auto;
+  margin-top:8px;
+}
+
 table {
-  border-collapse: collapse;
-  min-width: 600px;
+  border-collapse:collapse;
+  min-width:600px;
+  width:max-content;
+  font-size:12px;
 }
+
 th, td {
-  border-bottom: 1px solid #eee;
-  padding: 6px 8px;
-  white-space: nowrap;
-  text-align: center;
+  padding:6px 8px;
+  border-bottom:1px solid #eee;
+  text-align:center;
+  white-space:nowrap;
 }
-th { background: #fafafa; }
+
+th { background:#fafafa; }
+
 .name-col {
-  position: sticky;
-  left: 0;
-  background: #fff;
-  text-align: left;
+  position:sticky;
+  left:0;
+  background:#fff;
+  font-weight:700;
+  z-index:2;
 }
-.warning { color: #c00; font-size: 13px; }
-.result { font-size: 14px; font-weight: 600; }
+
+/* 라운드 색상 */
+.round-1 { color:#999; }
+.round-2 { color:#666; }
+.round-3 { color:#333; }
+.round-4 { color:#000; font-weight:600; }
 </style>
 </head>
 
 <body>
-<header class="header">
-  <div class="header-title">트림2반 작업 스케줄 조회</div>
+
+<header>
+  <div style="font-size:22px;font-weight:800;">트림2반 작업 스케줄 조회</div>
   <button class="today-btn" onclick="goToday()">오늘</button>
 </header>
 
 <div class="container">
 
-<!-- =================== ① 하루 전체 스케줄 =================== -->
+<!-- ① 하루 전체 -->
 <div class="card">
 <h2>① 하루 전체 스케줄 보기</h2>
-<label>날짜</label><br/>
 <input type="date" id="dayDate">
-<button class="primary-btn" onclick="renderDay()">조회</button>
+<button class="primary" onclick="renderDay()">조회</button>
 <div id="dayWarn" class="warning"></div>
 
-<div class="table-wrapper">
+<div class="table-wrap">
 <table>
 <thead>
 <tr>
@@ -112,47 +134,47 @@ th { background: #fafafa; }
 </div>
 </div>
 
-<!-- =================== ② 작업 → 담당자 =================== -->
+<!-- ② 작업 → 담당자 -->
 <div class="card">
 <h2>② 날짜 + 라운드 + 작업 → 담당자</h2>
-<input type="date" id="findDate"><br/>
+<input type="date" id="findDate"><br>
 <select id="findRound">
 <option value="0">1라운드</option>
 <option value="1">2라운드</option>
 <option value="2">3라운드</option>
 <option value="3">4라운드</option>
-</select><br/>
-<select id="task1"></select><br/>
-<select id="task2"></select><br/>
-<select id="task3"></select><br/>
-<button class="primary-btn" onclick="findPerson()">찾기</button>
-<div id="findResult" class="result"></div>
+</select><br>
+<select id="task1"></select><br>
+<select id="task2"></select><br>
+<select id="task3"></select><br>
+<button class="primary" onclick="findPerson()">찾기</button>
+<div id="findResult"></div>
 </div>
 
-<!-- =================== ③ 개인 작업 =================== -->
+<!-- ③ 개인 작업 -->
 <div class="card">
-<h2>③ 날짜 + 작업자 개인 작업</h2>
-<input type="date" id="personDate"><br/>
-<select id="p1"></select><br/>
-<select id="p2"></select><br/>
-<select id="p3"></select><br/>
-<button class="primary-btn" onclick="showPerson()">조회</button>
-<div id="personResult" class="result"></div>
+<h2>③ 날짜 + 작업자 → 개인 작업</h2>
+<input type="date" id="personDate"><br>
+<select id="p1"></select><br>
+<select id="p2"></select><br>
+<select id="p3"></select><br>
+<button class="primary" onclick="showPerson()">조회</button>
+<div id="personResult"></div>
 </div>
 
 </div>
 
 <script>
 /* ===== 데이터 ===== */
-const START_DATE = new Date("2026-01-05");
+const START = new Date(2026,0,5);
 
-const SPECIAL_DAYS = [
-  "2026-02-16","2026-02-17","2026-02-18","2026-02-19"
+const HOLIDAYS = [
+"2026-02-16","2026-02-17","2026-02-18","2026-02-19"
 ];
 
 const names = [
-"영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해","응규",
-"영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
+"영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
+"응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
 "성훈","원빈","길운","대현","진솔","서진","이슬","민국","성천","충훈"
 ];
 
@@ -167,34 +189,30 @@ const tasks = [
 
 /* ===== 유틸 ===== */
 function iso(d){ return d.toISOString().slice(0,10); }
-function isSpecial(d){ return SPECIAL_DAYS.includes(iso(d)); }
 function isWork(d){
+  if(d<START) return false;
   if(d.getDay()===0) return false;
-  if(isSpecial(d)) return false;
-  return true;
+  return !HOLIDAYS.includes(iso(d));
 }
-function workIndex(date){
-  let i=0, d=new Date(START_DATE);
-  while(d<date){
-    if(isWork(d)) i++;
-    d.setDate(d.getDate()+1);
+function workIndex(d){
+  let i=-1, t=new Date(START);
+  while(t<=d){
+    if(isWork(t)) i++;
+    if(iso(t)===iso(d)) return i;
+    t.setDate(t.getDate()+1);
   }
-  return i;
 }
 
-/* ===== 스케줄 계산 ===== */
-function getSchedule(date){
-  if(!isWork(date)) return null;
-  const idx = workIndex(date)*4;
-  return names.map((n,i)=>({
-    name:n,
-    rounds:[
-      tasks[(idx+i)%tasks.length],
-      tasks[(idx+i+1)%tasks.length],
-      tasks[(idx+i+2)%tasks.length],
-      tasks[(idx+i+3)%tasks.length]
-    ]
-  }));
+/* ===== 스케줄 ===== */
+function getSchedule(d){
+  const idx=workIndex(d);
+  return names.map((n,i)=>{
+    const rounds=[];
+    for(let r=0;r<4;r++){
+      rounds.push(tasks[(i+idx*4+r)%tasks.length]);
+    }
+    return {name:n,rounds};
+  });
 }
 
 /* ===== 기능 ===== */
@@ -207,7 +225,10 @@ function renderDay(){
     dayBody.innerHTML+=`
     <tr>
       <td class="name-col">${r.name}</td>
-      ${r.rounds.map(x=>`<td>${x}</td>`).join("")}
+      <td class="round-1">${r.rounds[0]}</td>
+      <td class="round-2">${r.rounds[1]}</td>
+      <td class="round-3">${r.rounds[2]}</td>
+      <td class="round-4">${r.rounds[3]}</td>
     </tr>`;
   });
 }
@@ -218,10 +239,11 @@ function findPerson(){
   const s=getSchedule(d);
   const r=findRound.value;
   const sel=[task1,task2,task3].map(x=>x.value).filter(Boolean);
-  findResult.innerHTML=sel.map(t=>{
+  findResult.innerHTML="";
+  sel.forEach(t=>{
     const p=s.find(x=>x.rounds[r]===t);
-    return `${t} → ${p?p.name:"없음"}`;
-  }).join("<br/>");
+    findResult.innerHTML+=`${t} → ${p?p.name:"없음"}<br>`;
+  });
 }
 
 function showPerson(){
@@ -229,23 +251,38 @@ function showPerson(){
   if(!isWork(d)) return;
   const s=getSchedule(d);
   const sel=[p1,p2,p3].map(x=>x.value).filter(Boolean);
-  personResult.innerHTML=sel.map(n=>{
+  personResult.innerHTML="";
+  sel.forEach(n=>{
     const r=s.find(x=>x.name===n);
-    return `${n} : ${r.rounds.join(" / ")}`;
-  }).join("<hr/>");
+    personResult.innerHTML+=`
+    <b>${n}</b><br>
+    1R ${r.rounds[0]}<br>
+    2R ${r.rounds[1]}<br>
+    3R ${r.rounds[2]}<br>
+    4R ${r.rounds[3]}<hr>`;
+  });
 }
 
 /* ===== 초기화 ===== */
-function init(){
-  tasks.forEach(t=>[task1,task2,task3].forEach(s=>s.innerHTML+=`<option>${t}</option>`));
-  names.forEach(n=>[p1,p2,p3].forEach(s=>s.innerHTML+=`<option>${n}</option>`));
+function fillSorted(sel, arr){
+  sel.innerHTML="<option value=''>- 선택 -</option>";
+  [...arr].sort((a,b)=>a.localeCompare(b,"ko")).forEach(v=>{
+    sel.innerHTML+=`<option>${v}</option>`;
+  });
 }
+
+fillSorted(task1,tasks); fillSorted(task2,tasks); fillSorted(task3,tasks);
+fillSorted(p1,names); fillSorted(p2,names); fillSorted(p3,names);
+
 function goToday(){
-  const t=iso(new Date());
-  dayDate.value=findDate.value=personDate.value=t;
+  const t=new Date(); const d=isWork(t)?t:START;
+  dayDate.value=iso(d);
+  findDate.value=iso(d);
+  personDate.value=iso(d);
   renderDay();
 }
-init(); goToday();
+goToday();
 </script>
+
 </body>
 </html>
