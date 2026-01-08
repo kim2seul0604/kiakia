@@ -48,8 +48,6 @@ header {
 
 h2 { font-size:16px; margin-bottom:10px; }
 
-label { font-size:13px; font-weight:600; }
-
 input, select {
   padding:6px 10px;
   font-size:14px;
@@ -66,7 +64,11 @@ button.primary {
   color:#fff;
 }
 
-.warning { color:#c00; font-size:13px; margin-top:6px; }
+.warning {
+  color:#c00;
+  font-size:13px;
+  margin-top:6px;
+}
 
 .table-wrap {
   overflow-x:auto;
@@ -77,7 +79,7 @@ table {
   border-collapse:collapse;
   min-width:600px;
   width:max-content;
-  font-size:11.5px; /* 👈 1번 기능 글자 약간 축소 */
+  font-size:11.5px;
 }
 
 th, td {
@@ -169,7 +171,7 @@ th { background:#fafafa; }
 const START = new Date(2026,0,5);
 
 const HOLIDAYS = [
-"2026-02-16","2026-02-17","2026-02-18","2026-02-19"
+  "2026-02-16","2026-02-17","2026-02-18","2026-02-19"
 ];
 
 const names = [
@@ -198,12 +200,12 @@ function isWork(d){
 
 function workIndex(d){
   if(!isWork(d)) return null;
-  let i = -1;
+  let idx = -1;
   let t = new Date(START);
   while(t <= d){
-    if(isWork(t)) i++;
-    if(iso(t) === iso(d)) return i;
-    t.setDate(t.getDate() + 1);
+    if(isWork(t)) idx++;
+    if(iso(t) === iso(d)) return idx;
+    t.setDate(t.getDate()+1);
   }
   return null;
 }
@@ -224,16 +226,19 @@ function getSchedule(d){
 
 /* ===== 기능 ===== */
 function renderDay(){
-  const d = new Date(dayDate.value);
+  if(!dayDate.value){
+    dayWarn.textContent="날짜를 선택하세요.";
+    return;
+  }
+  const d=new Date(dayDate.value);
   dayBody.innerHTML="";
   if(!isWork(d)){
     dayWarn.textContent="휴무일입니다.";
     return;
   }
   dayWarn.textContent="";
-  const s = getSchedule(d);
-  s.forEach(r=>{
-    dayBody.innerHTML += `
+  getSchedule(d).forEach(r=>{
+    dayBody.innerHTML+=`
     <tr>
       <td class="name-col">${r.name}</td>
       <td class="round-1">${r.rounds[0]}</td>
@@ -245,6 +250,7 @@ function renderDay(){
 }
 
 function findPerson(){
+  if(!findDate.value) return;
   const d=new Date(findDate.value);
   if(!isWork(d)) return;
   const s=getSchedule(d);
@@ -258,6 +264,7 @@ function findPerson(){
 }
 
 function showPerson(){
+  if(!personDate.value) return;
   const d=new Date(personDate.value);
   if(!isWork(d)) return;
   const s=getSchedule(d);
