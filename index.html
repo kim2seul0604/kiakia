@@ -216,7 +216,7 @@ function getSchedule(d){
   return names.map((name,i)=>{
     const rounds=[];
     for(let r=0;r<4;r++){
-      rounds.push(tasks[(i*4 + idx*4 + r) % tasks.length]);
+      rounds.push(tasks[(i + idx*4 + r) % tasks.length]);
     }
     return { name, rounds };
   });
