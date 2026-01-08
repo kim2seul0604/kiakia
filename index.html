@@ -77,7 +77,7 @@ table {
   border-collapse:collapse;
   min-width:600px;
   width:max-content;
-  font-size:12px;
+  font-size:11.5px; /* 👈 1번 기능 글자 약간 축소 */
 }
 
 th, td {
@@ -98,9 +98,9 @@ th { background:#fafafa; }
 }
 
 /* 라운드 색상 */
-.round-1 { color:#999; }
-.round-2 { color:#666; }
-.round-3 { color:#333; }
+.round-1 { color:#aaa; }
+.round-2 { color:#777; }
+.round-3 { color:#444; }
 .round-4 { color:#000; font-weight:600; }
 </style>
 </head>
@@ -165,7 +165,7 @@ th { background:#fafafa; }
 </div>
 
 <script>
-/* ===== 데이터 ===== */
+/* ===== 기준 ===== */
 const START = new Date(2026,0,5);
 
 const HOLIDAYS = [
@@ -189,40 +189,51 @@ const tasks = [
 
 /* ===== 유틸 ===== */
 function iso(d){ return d.toISOString().slice(0,10); }
+
 function isWork(d){
-  if(d<START) return false;
-  if(d.getDay()===0) return false;
+  if(d < START) return false;
+  if(d.getDay() === 0) return false;
   return !HOLIDAYS.includes(iso(d));
 }
+
 function workIndex(d){
-  let i=-1, t=new Date(START);
-  while(t<=d){
+  if(!isWork(d)) return null;
+  let i = -1;
+  let t = new Date(START);
+  while(t <= d){
     if(isWork(t)) i++;
-    if(iso(t)===iso(d)) return i;
-    t.setDate(t.getDate()+1);
+    if(iso(t) === iso(d)) return i;
+    t.setDate(t.getDate() + 1);
   }
+  return null;
 }
 
 /* ===== 스케줄 ===== */
 function getSchedule(d){
-  const idx=workIndex(d);
-  return names.map((n,i)=>{
+  const idx = workIndex(d);
+  if(idx === null) return null;
+
+  return names.map((name,i)=>{
     const rounds=[];
     for(let r=0;r<4;r++){
-      rounds.push(tasks[(i+idx*4+r)%tasks.length]);
+      rounds.push(tasks[(i*4 + idx*4 + r) % tasks.length]);
     }
-    return {name:n,rounds};
+    return { name, rounds };
   });
 }
 
 /* ===== 기능 ===== */
 function renderDay(){
-  const d=new Date(dayDate.value);
+  const d = new Date(dayDate.value);
   dayBody.innerHTML="";
-  if(!isWork(d)){ dayWarn.textContent="휴무일"; return; }
+  if(!isWork(d)){
+    dayWarn.textContent="휴무일입니다.";
+    return;
+  }
   dayWarn.textContent="";
-  getSchedule(d).forEach(r=>{
-    dayBody.innerHTML+=`
+  const s = getSchedule(d);
+  s.forEach(r=>{
+    dayBody.innerHTML += `
     <tr>
       <td class="name-col">${r.name}</td>
       <td class="round-1">${r.rounds[0]}</td>
@@ -275,7 +286,8 @@ fillSorted(task1,tasks); fillSorted(task2,tasks); fillSorted(task3,tasks);
 fillSorted(p1,names); fillSorted(p2,names); fillSorted(p3,names);
 
 function goToday(){
-  const t=new Date(); const d=isWork(t)?t:START;
+  const t=new Date();
+  const d=isWork(t)?t:START;
   dayDate.value=iso(d);
   findDate.value=iso(d);
   personDate.value=iso(d);
