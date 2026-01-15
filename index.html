@@ -74,6 +74,7 @@ button.primary {
   text-align:center;
 }
 
+/* 날짜 + 버튼 가운데 */
 .date-row {
   display:flex;
   justify-content:center;
@@ -118,6 +119,7 @@ th {
 .round-3 { color:#444; }
 .round-4 { color:#000; font-weight:600; }
 
+/* 도움말 버튼 */
 .help-btn {
   position:fixed;
   right:14px;
@@ -144,7 +146,6 @@ th {
 </header>
 
 <div class="container">
-
   <div class="card">
     <h2>🐥✈️ 트림 2반 전체 스케줄 조회하기 🍀🐥</h2>
 
@@ -170,32 +171,40 @@ th {
       </table>
     </div>
   </div>
-
 </div>
 
 <button class="help-btn" id="helpBtn">?</button>
 
-<!-- ✅ 데이터 파일 -->
 <script src="data.js"></script>
-
 <script>
-/* ===== 아이폰 안전 날짜 파싱 ===== */
+/* ===== localStorage 우선 로딩 ===== */
+function loadWorkers(){
+  const saved = localStorage.getItem("workers");
+  return saved ? JSON.parse(saved) : workers;
+}
+
+function loadTasks(){
+  const saved = localStorage.getItem("tasks");
+  return saved ? JSON.parse(saved) : tasksData;
+}
+
+/* ===== 날짜 유틸 ===== */
 function parseDate(v){
   if(!v) return null;
   const [y,m,d] = v.split('-').map(Number);
   return new Date(y, m-1, d);
 }
 
-/* ===== 기준 ===== */
-const START = new Date(START_DATE);
-
-/* 기준일 (고정 로직 유지) */
-const BASE_DATE = new Date(2026,0,13);
-const BASE_TASK = tasksData[0];      // 항상 첫 번째 작업
-const BASE_PERSON = workers[1];      // 갑수 (순서 기준)
-
-/* ===== 유틸 ===== */
 function iso(d){ return d.toISOString().slice(0,10); }
+
+/* ===== 기준 ===== */
+const START = new Date("2026-01-05");
+const BASE_DATE = new Date("2026-01-13");
+
+/* ===== 휴무 ===== */
+const HOLIDAYS = [
+  "2026-02-16","2026-02-17","2026-02-18","2026-02-19"
+];
 
 function isWork(d){
   if(d < START) return false;
@@ -210,28 +219,27 @@ function workIndex(d){
   while(t <= d){
     if(isWork(t)) i++;
     if(iso(t) === iso(d)) return i;
-    t.setDate(t.getDate() + 1);
+    t.setDate(t.getDate()+1);
   }
   return null;
 }
 
-/* ===== 핵심 스케줄 ===== */
+/* ===== 스케줄 계산 (순서 기반) ===== */
 function getSchedule(d){
   const todayIdx = workIndex(d);
   const baseIdx = workIndex(BASE_DATE);
   if(todayIdx === null || baseIdx === null) return null;
 
-  const dayShift = (todayIdx - baseIdx) * 4;
-  const baseTaskIdx = tasksData.indexOf(BASE_TASK);
-  const basePersonIdx = workers.indexOf(BASE_PERSON);
+  const names = loadWorkers();
+  const tasks = loadTasks();
 
-  return workers.map((name, personIdx)=>{
+  const dayShift = (todayIdx - baseIdx) * 4;
+
+  return names.map((name, personIdx)=>{
     const rounds = [];
     for(let r=0;r<4;r++){
-      const taskIdx =
-        (baseTaskIdx + dayShift + r + (personIdx - basePersonIdx) + tasksData.length)
-        % tasksData.length;
-      rounds.push(tasksData[taskIdx]);
+      const taskIdx = (personIdx + dayShift + r) % tasks.length;
+      rounds.push(tasks[taskIdx]);
     }
     return { name, rounds };
   });
@@ -248,9 +256,9 @@ function renderDay(){
   }
 
   dayWarn.textContent = "";
-  const s = getSchedule(d);
+  const list = getSchedule(d);
 
-  s.forEach(r=>{
+  list.forEach(r=>{
     dayBody.innerHTML += `
       <tr>
         <td class="name-col">${r.name}</td>
@@ -266,18 +274,14 @@ function renderDay(){
 /* ===== 오늘 ===== */
 function goToday(){
   const t = new Date();
-  const d = isWork(t) ? t : START;
-  dayDate.value = iso(d);
+  dayDate.value = iso(isWork(t)?t:START);
   renderDay();
 }
 
 /* ===== 도움말 ===== */
-document.getElementById("helpBtn").addEventListener("click", ()=>{
-  alert(
-    "만든사람 : 김이슬\n" +
-    "최종 수정일 : 2026-01-15"
-  );
-});
+helpBtn.onclick = ()=>{
+  alert("만든사람 : 김이슬\n최종 수정일 : 2026-01-15");
+};
 
 goToday();
 </script>
