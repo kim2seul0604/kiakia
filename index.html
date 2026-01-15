@@ -52,6 +52,14 @@ h2 {
   text-align:center;
 }
 
+.date-row {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+
 input {
   padding:6px 10px;
   font-size:14px;
@@ -72,15 +80,6 @@ button.primary {
   font-size:13px;
   margin-top:6px;
   text-align:center;
-}
-
-/* 날짜 + 버튼 가운데 */
-.date-row {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  margin-bottom:6px;
 }
 
 .table-wrap {
@@ -114,12 +113,13 @@ th {
   z-index:2;
 }
 
+/* 라운드 시인성 */
 .round-1 { color:#aaa; }
 .round-2 { color:#777; }
 .round-3 { color:#444; }
 .round-4 { color:#000; font-weight:600; }
 
-/* 도움말 버튼 */
+/* ❓ 도움말 버튼 */
 .help-btn {
   position:fixed;
   right:14px;
@@ -146,8 +146,9 @@ th {
 </header>
 
 <div class="container">
+
   <div class="card">
-    <h2>🐥✈️ 트림 2반 전체 스케줄 조회하기 🍀🐥</h2>
+    <h2>🍀 트림 2반 전체 스케줄 🍀</h2>
 
     <div class="date-row">
       <input type="date" id="dayDate">
@@ -171,40 +172,53 @@ th {
       </table>
     </div>
   </div>
+
 </div>
 
 <button class="help-btn" id="helpBtn">?</button>
 
-<script src="data.js"></script>
 <script>
-/* ===== localStorage 우선 로딩 ===== */
-function loadWorkers(){
-  const saved = localStorage.getItem("workers");
-  return saved ? JSON.parse(saved) : workers;
-}
-
-function loadTasks(){
-  const saved = localStorage.getItem("tasks");
-  return saved ? JSON.parse(saved) : tasksData;
-}
-
-/* ===== 날짜 유틸 ===== */
+/* ===== 날짜 파싱 (아이폰 안전) ===== */
 function parseDate(v){
   if(!v) return null;
-  const [y,m,d] = v.split('-').map(Number);
+  const [y,m,d] = v.split("-").map(Number);
   return new Date(y, m-1, d);
 }
 
-function iso(d){ return d.toISOString().slice(0,10); }
-
 /* ===== 기준 ===== */
-const START = new Date("2026-01-05");
-const BASE_DATE = new Date("2026-01-13");
+const START = new Date(2026,0,5);
+const BASE_DATE = new Date(2026,0,13);
 
-/* ===== 휴무 ===== */
-const HOLIDAYS = [
-  "2026-02-16","2026-02-17","2026-02-18","2026-02-19"
+/* 기준은 항상 "첫 작업 + 첫 작업자" */
+const BASE_PERSON_INDEX = 0; // 작업자 첫번째
+const BASE_TASK_INDEX = 0;   // 작업 첫번째
+
+/* ===== 휴무일 ===== */
+const HOLIDAYS = JSON.parse(localStorage.getItem("holidays")) || [
+  "2026-02-16",
+  "2026-02-17",
+  "2026-02-18",
+  "2026-02-19"
 ];
+
+/* ===== 작업자 / 작업 (관리자 페이지 연동) ===== */
+const names = JSON.parse(localStorage.getItem("workers")) || [
+  "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
+  "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
+  "성훈","원빈","길운","대현","진솔","준현","서진","이슬","민국","성천","충훈"
+];
+
+const tasks = JSON.parse(localStorage.getItem("tasks")) || [
+  "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
+  "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
+  "낚1","범퍼가이드","2조2번","AS커버","LH 루1","LH 루2",
+  "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
+  "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
+  "3조2번","RH 루1","RH 루2"
+];
+
+/* ===== 유틸 ===== */
+function iso(d){ return d.toISOString().slice(0,10); }
 
 function isWork(d){
   if(d < START) return false;
@@ -213,7 +227,6 @@ function isWork(d){
 }
 
 function workIndex(d){
-  if(!isWork(d)) return null;
   let i = -1;
   let t = new Date(START);
   while(t <= d){
@@ -224,21 +237,20 @@ function workIndex(d){
   return null;
 }
 
-/* ===== 스케줄 계산 (순서 기반) ===== */
+/* ===== 스케줄 계산 (순서 100% 보장) ===== */
 function getSchedule(d){
   const todayIdx = workIndex(d);
   const baseIdx = workIndex(BASE_DATE);
-  if(todayIdx === null || baseIdx === null) return null;
+  if(todayIdx === null || baseIdx === null) return [];
 
-  const names = loadWorkers();
-  const tasks = loadTasks();
+  const shift = (todayIdx - baseIdx) * 4;
 
-  const dayShift = (todayIdx - baseIdx) * 4;
-
-  return names.map((name, personIdx)=>{
+  return names.map((name, i)=>{
     const rounds = [];
-    for(let r=0;r<4;r++){
-      const taskIdx = (personIdx + dayShift + r) % tasks.length;
+    for(let r=0; r<4; r++){
+      const taskIdx =
+        (BASE_TASK_INDEX + shift + r + (i - BASE_PERSON_INDEX) + tasks.length)
+        % tasks.length;
       rounds.push(tasks[taskIdx]);
     }
     return { name, rounds };
@@ -256,9 +268,7 @@ function renderDay(){
   }
 
   dayWarn.textContent = "";
-  const list = getSchedule(d);
-
-  list.forEach(r=>{
+  getSchedule(d).forEach(r=>{
     dayBody.innerHTML += `
       <tr>
         <td class="name-col">${r.name}</td>
@@ -266,20 +276,20 @@ function renderDay(){
         <td class="round-2">${r.rounds[1]}</td>
         <td class="round-3">${r.rounds[2]}</td>
         <td class="round-4">${r.rounds[3]}</td>
-      </tr>
-    `;
+      </tr>`;
   });
 }
 
 /* ===== 오늘 ===== */
 function goToday(){
   const t = new Date();
-  dayDate.value = iso(isWork(t)?t:START);
+  const d = isWork(t) ? t : START;
+  dayDate.value = iso(d);
   renderDay();
 }
 
 /* ===== 도움말 ===== */
-helpBtn.onclick = ()=>{
+document.getElementById("helpBtn").onclick = ()=>{
   alert("만든사람 : 김이슬\n최종 수정일 : 2026-01-15");
 };
 
