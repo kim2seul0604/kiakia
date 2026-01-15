@@ -74,7 +74,6 @@ button.primary {
   text-align:center;
 }
 
-/* 날짜 + 조회 버튼 가운데 정렬 */
 .date-row {
   display:flex;
   justify-content:center;
@@ -114,13 +113,11 @@ th {
   z-index:2;
 }
 
-/* 라운드 시인성 */
 .round-1 { color:#aaa; }
 .round-2 { color:#777; }
 .round-3 { color:#444; }
 .round-4 { color:#000; font-weight:600; }
 
-/* ❓ 도움말 버튼 */
 .help-btn {
   position:fixed;
   right:14px;
@@ -176,8 +173,10 @@ th {
 
 </div>
 
-<!-- ❓ 도움말 버튼 -->
 <button class="help-btn" id="helpBtn">?</button>
+
+<!-- ✅ 데이터 파일 -->
+<script src="data.js"></script>
 
 <script>
 /* ===== 아이폰 안전 날짜 파싱 ===== */
@@ -187,38 +186,13 @@ function parseDate(v){
   return new Date(y, m-1, d);
 }
 
-/* ===== 기준 설정 ===== */
-const START = new Date(2026,0,5);
+/* ===== 기준 ===== */
+const START = new Date(START_DATE);
 
-/* 기준일 */
+/* 기준일 (고정 로직 유지) */
 const BASE_DATE = new Date(2026,0,13);
-const BASE_TASK = "LH휀다";
-const BASE_PERSON = "갑수";
-
-/* 휴무일 */
-const HOLIDAYS = [
-  "2026-02-16",
-  "2026-02-17",
-  "2026-02-18",
-  "2026-02-19"
-];
-
-/* 작업자 순서 */
-const names = [
-  "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
-  "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
-  "성훈","원빈","길운","대현","진솔","준현","서진","이슬","민국","성천","충훈"
-];
-
-/* 작업 순서 */
-const tasks = [
-  "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
-  "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
-  "낚1","범퍼가이드","2조2번","AS커버","LH 루1","LH 루2",
-  "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
-  "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
-  "3조2번","RH 루1","RH 루2"
-];
+const BASE_TASK = tasksData[0];      // 항상 첫 번째 작업
+const BASE_PERSON = workers[1];      // 갑수 (순서 기준)
 
 /* ===== 유틸 ===== */
 function iso(d){ return d.toISOString().slice(0,10); }
@@ -241,23 +215,23 @@ function workIndex(d){
   return null;
 }
 
-/* ===== 스케줄 로직 ===== */
+/* ===== 핵심 스케줄 ===== */
 function getSchedule(d){
   const todayIdx = workIndex(d);
   const baseIdx = workIndex(BASE_DATE);
   if(todayIdx === null || baseIdx === null) return null;
 
   const dayShift = (todayIdx - baseIdx) * 4;
-  const baseTaskIdx = tasks.indexOf(BASE_TASK);
-  const basePersonIdx = names.indexOf(BASE_PERSON);
+  const baseTaskIdx = tasksData.indexOf(BASE_TASK);
+  const basePersonIdx = workers.indexOf(BASE_PERSON);
 
-  return names.map((name, personIdx)=>{
+  return workers.map((name, personIdx)=>{
     const rounds = [];
-    for(let r=0; r<4; r++){
+    for(let r=0;r<4;r++){
       const taskIdx =
-        (baseTaskIdx + dayShift + r + (personIdx - basePersonIdx) + tasks.length)
-        % tasks.length;
-      rounds.push(tasks[taskIdx]);
+        (baseTaskIdx + dayShift + r + (personIdx - basePersonIdx) + tasksData.length)
+        % tasksData.length;
+      rounds.push(tasksData[taskIdx]);
     }
     return { name, rounds };
   });
