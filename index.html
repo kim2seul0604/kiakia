@@ -49,6 +49,7 @@ header {
 h2 {
   font-size:16px;
   margin-bottom:10px;
+  text-align:center;
 }
 
 input {
@@ -70,6 +71,16 @@ button.primary {
   color:#c00;
   font-size:13px;
   margin-top:6px;
+  text-align:center;
+}
+
+/* 날짜 + 조회 버튼 가운데 정렬 */
+.date-row {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin-bottom:6px;
 }
 
 .table-wrap {
@@ -137,27 +148,31 @@ th {
 
 <div class="container">
 
-<div class="card">
-  <h2>🐥🍀✈️트림 2반 전체 스케줄 조회하기🏖️🏕️🐥</h2>
-  <input type="date" id="dayDate">
-  <button class="primary" onclick="renderDay()">조회</button>
-  <div id="dayWarn" class="warning"></div>
+  <div class="card">
+    <h2>🐥🍀✈️ 트림 2반 전체 스케줄 조회하기 🏖️🏕️🐥</h2>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th class="name-col">이름</th>
-          <th>1R</th>
-          <th>2R</th>
-          <th>3R</th>
-          <th>4R</th>
-        </tr>
-      </thead>
-      <tbody id="dayBody"></tbody>
-    </table>
+    <div class="date-row">
+      <input type="date" id="dayDate">
+      <button class="primary" onclick="renderDay()">조회</button>
+    </div>
+
+    <div id="dayWarn" class="warning"></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="name-col">이름</th>
+            <th>1R</th>
+            <th>2R</th>
+            <th>3R</th>
+            <th>4R</th>
+          </tr>
+        </thead>
+        <tbody id="dayBody"></tbody>
+      </table>
+    </div>
   </div>
-</div>
 
 </div>
 
@@ -286,6 +301,7 @@ function goToday(){
 document.getElementById("helpBtn").addEventListener("click", ()=>{
   alert(
     "만든사람 : 김이슬\n" +
+    "버전 : v1.0\n" +
     "최종 수정일 : 2026-01-15"
   );
 });
