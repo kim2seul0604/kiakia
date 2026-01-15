@@ -108,6 +108,23 @@ th {
 .round-2 { color:#777; }
 .round-3 { color:#444; }
 .round-4 { color:#000; font-weight:600; }
+
+/* ❓ 도움말 버튼 */
+.help-btn {
+  position:fixed;
+  right:14px;
+  bottom:14px;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:none;
+  background:#007aff;
+  color:#fff;
+  font-size:22px;
+  font-weight:800;
+  box-shadow:0 4px 10px rgba(0,0,0,.25);
+  z-index:50;
+}
 </style>
 </head>
 
@@ -144,6 +161,9 @@ th {
 
 </div>
 
+<!-- ❓ 도움말 버튼 -->
+<button class="help-btn" id="helpBtn">?</button>
+
 <script>
 /* ===== 아이폰 안전 날짜 파싱 ===== */
 function parseDate(v){
@@ -155,9 +175,7 @@ function parseDate(v){
 /* ===== 기준 설정 ===== */
 const START = new Date(2026,0,5);
 
-/* 기준일: 1월 13일
-   기준 작업: LH휀다
-   기준 작업자: 갑수 */
+/* 기준일 */
 const BASE_DATE = new Date(2026,0,13);
 const BASE_TASK = "LH휀다";
 const BASE_PERSON = "갑수";
@@ -208,7 +226,7 @@ function workIndex(d){
   return null;
 }
 
-/* ===== 핵심 스케줄 로직 (확정본) ===== */
+/* ===== 스케줄 로직 ===== */
 function getSchedule(d){
   const todayIdx = workIndex(d);
   const baseIdx = workIndex(BASE_DATE);
@@ -263,6 +281,15 @@ function goToday(){
   dayDate.value = iso(d);
   renderDay();
 }
+
+/* ===== 도움말 ===== */
+document.getElementById("helpBtn").addEventListener("click", ()=>{
+  alert(
+    "만든사람 : 김이슬\n" +
+    "버전 : v6\n" +
+    "최종 수정일 : 2026-01-15"
+  );
+});
 
 goToday();
 </script>
