@@ -2,274 +2,99 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>트림2반 작업 스케줄 조회</title>
+<title>트림2반 작업 스케줄</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:#f5f5f7;
-  color:#222;
-}
-
-header {
-  background:#111;
-  color:#fff;
-  padding:16px;
-  text-align:center;
-  position:sticky;
-  top:0;
-  z-index:10;
-}
-
-.today-btn {
-  margin-top:10px;
-  padding:8px 18px;
-  border:none;
-  border-radius:999px;
-  background:#0a8a43;
-  color:#fff;
-}
-
-.container {
-  max-width:960px;
-  margin:0 auto;
-  padding:16px;
-}
-
-.card {
-  background:#fff;
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:16px;
-  box-shadow:0 6px 16px rgba(0,0,0,.06);
-}
-
-h2 {
-  font-size:16px;
-  margin-bottom:10px;
-  text-align:center;
-}
-
-.date-row {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  margin-bottom:8px;
-}
-
-input {
-  padding:6px 10px;
-  font-size:14px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-
-button.primary {
-  padding:8px 16px;
-  border-radius:999px;
-  border:none;
-  background:#007aff;
-  color:#fff;
-}
-
-.warning {
-  color:#c00;
-  font-size:13px;
-  margin-top:6px;
-  text-align:center;
-}
-
-.table-wrap {
-  overflow-x:auto;
-  margin-top:8px;
-}
-
-table {
-  border-collapse:collapse;
-  min-width:600px;
-  width:max-content;
-  font-size:11.5px;
-}
-
-th, td {
-  padding:6px 8px;
-  border-bottom:1px solid #eee;
-  text-align:center;
-  white-space:nowrap;
-}
-
-th {
-  background:#fafafa;
-}
-
-.name-col {
-  position:sticky;
-  left:0;
-  background:#fff;
-  font-weight:700;
-  z-index:2;
-}
-
-/* 라운드 시인성 */
-.round-1 { color:#aaa; }
-.round-2 { color:#777; }
-.round-3 { color:#444; }
-.round-4 { color:#000; font-weight:600; }
-
-/* ❓ 도움말 버튼 */
-.help-btn {
-  position:fixed;
-  right:14px;
-  bottom:14px;
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  border:none;
-  background:#007aff;
-  color:#fff;
-  font-size:22px;
-  font-weight:800;
-  box-shadow:0 4px 10px rgba(0,0,0,.25);
-  z-index:50;
-}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f7}
+header{background:#111;color:#fff;padding:14px;text-align:center;position:sticky;top:0}
+.today-btn{margin-top:8px;padding:6px 16px;border:none;border-radius:999px;background:#0a8a43;color:#fff}
+.container{max-width:960px;margin:auto;padding:16px}
+.card{background:#fff;border-radius:16px;padding:14px;box-shadow:0 6px 16px rgba(0,0,0,.06)}
+.date-row{display:flex;justify-content:center;gap:8px;margin-bottom:6px}
+table{border-collapse:collapse;font-size:11.5px;width:max-content}
+th,td{padding:6px 8px;border-bottom:1px solid #eee;text-align:center;white-space:nowrap}
+th{background:#fafafa}
+.name-col{position:sticky;left:0;background:#fff;font-weight:700}
+.round-1{color:#aaa}
+.round-2{color:#777}
+.round-3{color:#444}
+.round-4{color:#000;font-weight:600}
+.help-btn{position:fixed;right:14px;bottom:14px;width:44px;height:44px;border-radius:50%;border:none;background:#007aff;color:#fff;font-size:22px}
 </style>
 </head>
 
 <body>
-
 <header>
-  <div style="font-size:22px;font-weight:800;">트림2반 작업 스케줄 조회</div>
-  <button class="today-btn" onclick="goToday()">오늘도 화이팅~‼️</button>
+  <div style="font-size:20px;font-weight:800;">트림2반 작업 스케줄</div>
+  <button class="today-btn" onclick="goToday()">오늘</button>
 </header>
 
 <div class="container">
-
   <div class="card">
-    <h2>🍀 트림 2반 전체 스케줄 🍀</h2>
-
     <div class="date-row">
       <input type="date" id="dayDate">
-      <button class="primary" onclick="renderDay()">조회</button>
+      <button onclick="renderDay()">조회</button>
     </div>
-
-    <div id="dayWarn" class="warning"></div>
-
-    <div class="table-wrap">
+    <div style="overflow-x:auto">
       <table>
         <thead>
           <tr>
             <th class="name-col">이름</th>
-            <th>1R</th>
-            <th>2R</th>
-            <th>3R</th>
-            <th>4R</th>
+            <th>1R</th><th>2R</th><th>3R</th><th>4R</th>
           </tr>
         </thead>
         <tbody id="dayBody"></tbody>
       </table>
     </div>
   </div>
-
 </div>
 
-<button class="help-btn" id="helpBtn">?</button>
+<button class="help-btn" onclick="alert('만든사람 : 김이슬\n최종 수정일 : 2026-01-15')">?</button>
 
+<script src="data.js"></script>
 <script>
-/* ===== 날짜 파싱 (아이폰 안전) ===== */
-function parseDate(v){
-  if(!v) return null;
-  const [y,m,d] = v.split("-").map(Number);
-  return new Date(y, m-1, d);
-}
-
-/* ===== 기준 ===== */
-const START = new Date(2026,0,5);
-const BASE_DATE = new Date(2026,0,13);
-
-/* 기준은 항상 "첫 작업 + 첫 작업자" */
-const BASE_PERSON_INDEX = 0; // 작업자 첫번째
-const BASE_TASK_INDEX = 0;   // 작업 첫번째
-
-/* ===== 휴무일 ===== */
-const HOLIDAYS = JSON.parse(localStorage.getItem("holidays")) || [
-  "2026-02-16",
-  "2026-02-17",
-  "2026-02-18",
-  "2026-02-19"
-];
-
-/* ===== 작업자 / 작업 (관리자 페이지 연동) ===== */
-const names = JSON.parse(localStorage.getItem("workers")) || [
-  "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
-  "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
-  "성훈","원빈","길운","대현","진솔","준현","서진","이슬","민국","성천","충훈"
-];
-
-const tasks = JSON.parse(localStorage.getItem("tasks")) || [
-  "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
-  "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
-  "낚1","범퍼가이드","2조2번","AS커버","LH 루1","LH 루2",
-  "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
-  "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
-  "3조2번","RH 루1","RH 루2"
-];
-
-/* ===== 유틸 ===== */
-function iso(d){ return d.toISOString().slice(0,10); }
+function parse(d){const[a,b,c]=d.split("-").map(Number);return new Date(a,b-1,c)}
+function iso(d){return d.toISOString().slice(0,10)}
 
 function isWork(d){
-  if(d < START) return false;
-  if(d.getDay() === 0) return false;
+  if(d < parse(START_DATE)) return false;
+  if(d.getDay()===0) return false;
   return !HOLIDAYS.includes(iso(d));
 }
 
 function workIndex(d){
-  let i = -1;
-  let t = new Date(START);
-  while(t <= d){
+  let i=-1,t=parse(START_DATE);
+  while(t<=d){
     if(isWork(t)) i++;
-    if(iso(t) === iso(d)) return i;
+    if(iso(t)===iso(d)) return i;
     t.setDate(t.getDate()+1);
   }
   return null;
 }
 
-/* ===== 스케줄 계산 (순서 100% 보장) ===== */
 function getSchedule(d){
-  const todayIdx = workIndex(d);
-  const baseIdx = workIndex(BASE_DATE);
-  if(todayIdx === null || baseIdx === null) return [];
+  const baseIdx=workIndex(parse(BASE_DATE));
+  const todayIdx=workIndex(d);
+  const dayShift=(todayIdx-baseIdx)*4;
 
-  const shift = (todayIdx - baseIdx) * 4;
-
-  return names.map((name, i)=>{
-    const rounds = [];
-    for(let r=0; r<4; r++){
-      const taskIdx =
-        (BASE_TASK_INDEX + shift + r + (i - BASE_PERSON_INDEX) + tasks.length)
-        % tasks.length;
-      rounds.push(tasks[taskIdx]);
+  return workers.map((name,pIdx)=>{
+    const rounds=[];
+    for(let r=0;r<4;r++){
+      const idx=(pIdx+dayShift+r)%tasks.length;
+      rounds.push(tasks[idx]);
     }
-    return { name, rounds };
+    return {name,rounds};
   });
 }
 
-/* ===== 출력 ===== */
 function renderDay(){
-  const d = parseDate(dayDate.value);
-  dayBody.innerHTML = "";
-
-  if(!d || !isWork(d)){
-    dayWarn.textContent = "휴무일입니다.";
-    return;
-  }
-
-  dayWarn.textContent = "";
+  const d=parse(dayDate.value);
+  const body=document.getElementById("dayBody");
+  body.innerHTML="";
+  if(!d||!isWork(d)) return;
   getSchedule(d).forEach(r=>{
-    dayBody.innerHTML += `
+    body.innerHTML+=`
       <tr>
         <td class="name-col">${r.name}</td>
         <td class="round-1">${r.rounds[0]}</td>
@@ -280,21 +105,12 @@ function renderDay(){
   });
 }
 
-/* ===== 오늘 ===== */
 function goToday(){
-  const t = new Date();
-  const d = isWork(t) ? t : START;
-  dayDate.value = iso(d);
+  const t=new Date();
+  dayDate.value=iso(t);
   renderDay();
 }
-
-/* ===== 도움말 ===== */
-document.getElementById("helpBtn").onclick = ()=>{
-  alert("만든사람 : 김이슬\n최종 수정일 : 2026-01-15");
-};
-
 goToday();
 </script>
-
 </body>
 </html>
