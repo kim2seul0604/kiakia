@@ -2,162 +2,125 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>트림2반 관리자</title>
+<title>관리자 페이지</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body {
-  margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:#f5f5f7;
-}
-header {
-  background:#111;
-  color:#fff;
-  padding:16px;
-  text-align:center;
-  font-size:20px;
-  font-weight:800;
-}
-.container {
-  max-width:900px;
-  margin:0 auto;
   padding:16px;
 }
+
 .card {
   background:#fff;
   border-radius:14px;
   padding:14px;
-  margin-bottom:20px;
-  box-shadow:0 6px 14px rgba(0,0,0,.08);
+  margin-bottom:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
+
 h2 {
   font-size:16px;
   margin-bottom:10px;
 }
+
 ul {
   list-style:none;
   padding:0;
 }
+
 li {
   display:flex;
-  align-items:center;
+  gap:6px;
   margin-bottom:6px;
 }
-li span {
-  flex:1;
-}
-button {
-  margin-left:4px;
-  padding:4px 8px;
-}
-.add-box {
-  display:flex;
-  margin-top:10px;
-}
-.add-box input {
+
+input {
   flex:1;
   padding:6px;
 }
-.save-btn {
-  width:100%;
-  padding:12px;
-  font-size:16px;
-  border:none;
-  border-radius:10px;
-  background:#007aff;
-  color:#fff;
+
+button {
+  padding:6px 10px;
 }
 </style>
 </head>
 
 <body>
 
-<header>트림2반 관리자 페이지</header>
-
-<div class="container">
-
 <div class="card">
-<h2>👷 작업자 순서</h2>
-<ul id="workerList"></ul>
-<div class="add-box">
-  <input id="newWorker" placeholder="작업자 추가">
-  <button onclick="addWorker()">추가</button>
-</div>
+  <h2>👷 작업자 관리</h2>
+  <ul id="workerList"></ul>
+  <button onclick="addWorker()">+ 작업자 추가</button>
 </div>
 
 <div class="card">
-<h2>🛠 작업 순서</h2>
-<ul id="taskList"></ul>
-<div class="add-box">
-  <input id="newTask" placeholder="작업 추가">
-  <button onclick="addTask()">추가</button>
-</div>
+  <h2>🛠 작업 관리</h2>
+  <ul id="taskList"></ul>
+  <button onclick="addTask()">+ 작업 추가</button>
 </div>
 
-<button class="save-btn" onclick="saveAll()">💾 저장</button>
-
+<div class="card">
+  <h2>📅 휴무일</h2>
+  <input type="date" id="holidayInput">
+  <button onclick="addHoliday()">추가</button>
+  <ul id="holidayList"></ul>
 </div>
 
 <script src="data.js"></script>
+
 <script>
-/* ===== LocalStorage ===== */
-const LS_WORKERS = "trim2_workers";
-const LS_TASKS   = "trim2_tasks";
-
-let workerData = JSON.parse(localStorage.getItem(LS_WORKERS)) || [...workers];
-let taskData   = JSON.parse(localStorage.getItem(LS_TASKS)) || [...tasks];
-
 /* ===== 렌더 ===== */
 function render(){
-  workerList.innerHTML="";
-  workerData.forEach((w,i)=>{
+  workerList.innerHTML = "";
+  workers.forEach((w,i)=>{
     workerList.innerHTML += `
       <li>
-        <span>${w}</span>
-        <button onclick="move(workerData,${i},-1)">▲</button>
-        <button onclick="move(workerData,${i},1)">▼</button>
-        <button onclick="del(workerData,${i})">❌</button>
+        <input value="${w}" onchange="workers[${i}] = this.value">
+        <button onclick="workers.splice(${i},1);render()">❌</button>
+        <button onclick="workers.splice(${i},0,'');render()">⬆</button>
       </li>`;
   });
 
-  taskList.innerHTML="";
-  taskData.forEach((t,i)=>{
+  taskList.innerHTML = "";
+  tasksData.forEach((t,i)=>{
     taskList.innerHTML += `
       <li>
-        <span>${t}</span>
-        <button onclick="move(taskData,${i},-1)">▲</button>
-        <button onclick="move(taskData,${i},1)">▼</button>
-        <button onclick="del(taskData,${i})">❌</button>
+        <input value="${t}" onchange="tasksData[${i}] = this.value">
+        <button onclick="tasksData.splice(${i},1);render()">❌</button>
+        <button onclick="tasksData.splice(${i},0,'');render()">⬆</button>
+      </li>`;
+  });
+
+  holidayList.innerHTML = "";
+  HOLIDAYS.forEach((d,i)=>{
+    holidayList.innerHTML += `
+      <li>
+        ${d}
+        <button onclick="HOLIDAYS.splice(${i},1);render()">❌</button>
       </li>`;
   });
 }
 
-/* ===== 조작 ===== */
-function move(arr,i,dir){
-  const ni=i+dir;
-  if(ni<0||ni>=arr.length) return;
-  [arr[i],arr[ni]]=[arr[ni],arr[i]];
-  render();
-}
-function del(arr,i){
-  arr.splice(i,1);
-  render();
-}
+/* ===== 추가 ===== */
 function addWorker(){
-  const v=newWorker.value.trim();
-  if(v){ workerData.push(v); newWorker.value=""; render(); }
-}
-function addTask(){
-  const v=newTask.value.trim();
-  if(v){ taskData.push(v); newTask.value=""; render(); }
+  workers.push("");
+  render();
 }
 
-/* ===== 저장 ===== */
-function saveAll(){
-  localStorage.setItem(LS_WORKERS, JSON.stringify(workerData));
-  localStorage.setItem(LS_TASKS, JSON.stringify(taskData));
-  alert("저장 완료! index 페이지에 즉시 반영됩니다.");
+function addTask(){
+  tasksData.push("");
+  render();
+}
+
+function addHoliday(){
+  const v = holidayInput.value;
+  if(v && !HOLIDAYS.includes(v)){
+    HOLIDAYS.push(v);
+    holidayInput.value="";
+    render();
+  }
 }
 
 render();
