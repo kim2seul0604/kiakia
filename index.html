@@ -103,6 +103,7 @@ th {
   z-index:2;
 }
 
+/* 라운드 시인성 */
 .round-1 { color:#aaa; }
 .round-2 { color:#777; }
 .round-3 { color:#444; }
@@ -119,7 +120,6 @@ th {
 
 <div class="container">
 
-<!-- ① 하루 전체 스케줄 -->
 <div class="card">
   <h2>① 하루 전체 스케줄 보기</h2>
   <input type="date" id="dayDate">
@@ -145,16 +145,24 @@ th {
 </div>
 
 <script>
-/* ===== 안전한 날짜 파싱 (아이폰 대응) ===== */
+/* ===== 아이폰 안전 날짜 파싱 ===== */
 function parseDate(v){
   if(!v) return null;
   const [y,m,d] = v.split('-').map(Number);
   return new Date(y, m-1, d);
 }
 
-/* ===== 기준 ===== */
+/* ===== 기준 설정 ===== */
 const START = new Date(2026,0,5);
 
+/* 기준일: 1월 13일
+   기준 작업: LH휀다
+   기준 작업자: 갑수 */
+const BASE_DATE = new Date(2026,0,13);
+const BASE_TASK = "LH휀다";
+const BASE_PERSON = "갑수";
+
+/* 휴무일 */
 const HOLIDAYS = [
   "2026-02-16",
   "2026-02-17",
@@ -162,12 +170,14 @@ const HOLIDAYS = [
   "2026-02-19"
 ];
 
+/* 작업자 순서 */
 const names = [
   "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
   "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
   "성훈","원빈","길운","대현","진솔","준현","서진","이슬","민국","성천","충훈"
 ];
 
+/* 작업 순서 */
 const tasks = [
   "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
   "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
@@ -182,7 +192,7 @@ function iso(d){ return d.toISOString().slice(0,10); }
 
 function isWork(d){
   if(d < START) return false;
-  if(d.getDay() === 0) return false; // 일요일
+  if(d.getDay() === 0) return false;
   return !HOLIDAYS.includes(iso(d));
 }
 
@@ -198,25 +208,29 @@ function workIndex(d){
   return null;
 }
 
-/* ===== 스케줄 계산 ===== */
+/* ===== 핵심 스케줄 로직 (확정본) ===== */
 function getSchedule(d){
-  const idx = workIndex(d);
-  if(idx === null) return null;
+  const todayIdx = workIndex(d);
+  const baseIdx = workIndex(BASE_DATE);
+  if(todayIdx === null || baseIdx === null) return null;
 
-  return names.map((name,i)=>{
-    return {
-      name,
-      rounds: [
-        tasks[(i + idx*4 + 0) % tasks.length],
-        tasks[(i + idx*4 + 1) % tasks.length],
-        tasks[(i + idx*4 + 2) % tasks.length],
-        tasks[(i + idx*4 + 3) % tasks.length]
-      ]
-    };
+  const dayShift = (todayIdx - baseIdx) * 4;
+  const baseTaskIdx = tasks.indexOf(BASE_TASK);
+  const basePersonIdx = names.indexOf(BASE_PERSON);
+
+  return names.map((name, personIdx)=>{
+    const rounds = [];
+    for(let r=0; r<4; r++){
+      const taskIdx =
+        (baseTaskIdx + dayShift + r + (personIdx - basePersonIdx) + tasks.length)
+        % tasks.length;
+      rounds.push(tasks[taskIdx]);
+    }
+    return { name, rounds };
   });
 }
 
-/* ===== 하루 전체 출력 ===== */
+/* ===== 출력 ===== */
 function renderDay(){
   const d = parseDate(dayDate.value);
   dayBody.innerHTML = "";
@@ -242,7 +256,7 @@ function renderDay(){
   });
 }
 
-/* ===== 오늘 버튼 ===== */
+/* ===== 오늘 ===== */
 function goToday(){
   const t = new Date();
   const d = isWork(t) ? t : START;
