@@ -2,128 +2,189 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>관리자 페이지</title>
+<title>트림2반 관리자</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
+body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:#f5f5f7;
+  margin:0;
+}
+header{
+  background:#111;
+  color:#fff;
+  padding:16px;
+  text-align:center;
+}
+.container{
+  max-width:900px;
+  margin:0 auto;
   padding:16px;
 }
-
-.card {
+.card{
   background:#fff;
   border-radius:14px;
   padding:14px;
   margin-bottom:16px;
   box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
-
-h2 {
+h2{
   font-size:16px;
   margin-bottom:10px;
 }
-
-ul {
-  list-style:none;
-  padding:0;
-}
-
-li {
+.row{
   display:flex;
+  align-items:center;
   gap:6px;
   margin-bottom:6px;
 }
-
-input {
+.row span{
   flex:1;
-  padding:6px;
 }
-
-button {
-  padding:6px 10px;
+button{
+  padding:4px 8px;
+  border:none;
+  border-radius:6px;
+  background:#007aff;
+  color:#fff;
+}
+button.gray{ background:#888; }
+button.red{ background:#d33; }
+input{
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+.save-btn{
+  width:100%;
+  padding:12px;
+  font-size:16px;
+  border-radius:999px;
+  margin-top:12px;
 }
 </style>
 </head>
 
 <body>
 
+<header>
+  <h1>🛠 트림2반 관리자 페이지</h1>
+</header>
+
+<div class="container">
+
 <div class="card">
-  <h2>👷 작업자 관리</h2>
-  <ul id="workerList"></ul>
-  <button onclick="addWorker()">+ 작업자 추가</button>
+<h2>👤 작업자 관리 (순서 중요)</h2>
+<div id="workerList"></div>
+<input id="newWorker" placeholder="작업자 추가">
+<button onclick="addWorker()">추가</button>
 </div>
 
 <div class="card">
-  <h2>🛠 작업 관리</h2>
-  <ul id="taskList"></ul>
-  <button onclick="addTask()">+ 작업 추가</button>
+<h2>🔧 작업 관리 (순서 중요)</h2>
+<div id="taskList"></div>
+<input id="newTask" placeholder="작업 추가">
+<button onclick="addTask()">추가</button>
 </div>
 
-<div class="card">
-  <h2>📅 휴무일</h2>
-  <input type="date" id="holidayInput">
-  <button onclick="addHoliday()">추가</button>
-  <ul id="holidayList"></ul>
-</div>
+<button class="save-btn" onclick="saveAll()">💾 저장하기</button>
 
-<script src="data.js"></script>
+</div>
 
 <script>
-/* ===== 렌더 ===== */
-function render(){
-  workerList.innerHTML = "";
+/* ===== 데이터 로드 ===== */
+let workers = JSON.parse(localStorage.getItem("workers")) || [
+  "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
+  "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
+  "성훈","원빈","길운","대현","진솔","준현","서진","이슬","민국","성천","충훈"
+];
+
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [
+  "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
+  "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
+  "낚1","범퍼가이드","2조2번","AS커버","LH 루1","LH 루2",
+  "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
+  "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
+  "3조2번","RH 루1","RH 루2"
+];
+
+/* ===== 공통 ===== */
+function swap(arr,i,j){
+  [arr[i],arr[j]] = [arr[j],arr[i]];
+}
+
+/* ===== 작업자 ===== */
+function renderWorkers(){
+  workerList.innerHTML="";
   workers.forEach((w,i)=>{
-    workerList.innerHTML += `
-      <li>
-        <input value="${w}" onchange="workers[${i}] = this.value">
-        <button onclick="workers.splice(${i},1);render()">❌</button>
-        <button onclick="workers.splice(${i},0,'');render()">⬆</button>
-      </li>`;
-  });
-
-  taskList.innerHTML = "";
-  tasksData.forEach((t,i)=>{
-    taskList.innerHTML += `
-      <li>
-        <input value="${t}" onchange="tasksData[${i}] = this.value">
-        <button onclick="tasksData.splice(${i},1);render()">❌</button>
-        <button onclick="tasksData.splice(${i},0,'');render()">⬆</button>
-      </li>`;
-  });
-
-  holidayList.innerHTML = "";
-  HOLIDAYS.forEach((d,i)=>{
-    holidayList.innerHTML += `
-      <li>
-        ${d}
-        <button onclick="HOLIDAYS.splice(${i},1);render()">❌</button>
-      </li>`;
+    workerList.innerHTML+=`
+      <div class="row">
+        <span>${i+1}. ${w}</span>
+        <button onclick="moveWorker(${i},-1)">▲</button>
+        <button onclick="moveWorker(${i},1)">▼</button>
+        <button class="red" onclick="delWorker(${i})">✖</button>
+      </div>`;
   });
 }
 
-/* ===== 추가 ===== */
+function moveWorker(i,d){
+  if(i+d<0||i+d>=workers.length) return;
+  swap(workers,i,i+d);
+  renderWorkers();
+}
+function delWorker(i){
+  workers.splice(i,1);
+  renderWorkers();
+}
 function addWorker(){
-  workers.push("");
-  render();
+  const v=newWorker.value.trim();
+  if(!v) return;
+  workers.push(v);
+  newWorker.value="";
+  renderWorkers();
 }
 
+/* ===== 작업 ===== */
+function renderTasks(){
+  taskList.innerHTML="";
+  tasks.forEach((t,i)=>{
+    taskList.innerHTML+=`
+      <div class="row">
+        <span>${i+1}. ${t}</span>
+        <button onclick="moveTask(${i},-1)">▲</button>
+        <button onclick="moveTask(${i},1)">▼</button>
+        <button class="red" onclick="delTask(${i})">✖</button>
+      </div>`;
+  });
+}
+
+function moveTask(i,d){
+  if(i+d<0||i+d>=tasks.length) return;
+  swap(tasks,i,i+d);
+  renderTasks();
+}
+function delTask(i){
+  tasks.splice(i,1);
+  renderTasks();
+}
 function addTask(){
-  tasksData.push("");
-  render();
+  const v=newTask.value.trim();
+  if(!v) return;
+  tasks.push(v);
+  newTask.value="";
+  renderTasks();
 }
 
-function addHoliday(){
-  const v = holidayInput.value;
-  if(v && !HOLIDAYS.includes(v)){
-    HOLIDAYS.push(v);
-    holidayInput.value="";
-    render();
-  }
+/* ===== 저장 ===== */
+function saveAll(){
+  localStorage.setItem("workers",JSON.stringify(workers));
+  localStorage.setItem("tasks",JSON.stringify(tasks));
+  alert("저장 완료! 📦\n이제 index.html 새로고침하면 반영돼요");
 }
 
-render();
+renderWorkers();
+renderTasks();
 </script>
 
 </body>
