@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>트림2반 관리자 페이지</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f5f5f7;
+  margin:0;
+  padding:16px;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+h2{
+  font-size:16px;
+  margin-bottom:10px;
+}
+
+input{
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+button{
+  padding:8px 14px;
+  border-radius:999px;
+  border:none;
+  background:#007aff;
+  color:#fff;
+  margin-left:6px;
+}
+
+.list{
+  margin-top:10px;
+  font-size:14px;
+}
+
+.item{
+  display:flex;
+  justify-content:space-between;
+  padding:4px 0;
+}
+
+.delete{
+  background:#ff3b30;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🛠️ 트림2반 관리자 페이지</h1>
+
+<!-- 👤 인원 관리 -->
+<div class="card">
+  <h2>👤 작업자 관리</h2>
+  <input id="nameInput" placeholder="이름 입력">
+  <button onclick="addName()">추가</button>
+
+  <div id="nameList" class="list"></div>
+</div>
+
+<!-- 🛠️ 작업 관리 -->
+<div class="card">
+  <h2>🛠️ 작업 관리</h2>
+  <input id="taskInput" placeholder="작업명 입력">
+  <button onclick="addTask()">추가</button>
+
+  <div id="taskList" class="list"></div>
+</div>
+
+<!-- 💾 저장 -->
+<div class="card">
+  <button onclick="saveData()" style="width:100%;font-size:16px;">
+    💾 저장하기
+  </button>
+</div>
+
+<script>
+/* ===== 기본 데이터 ===== */
+let DATA = {
+  names: [
+    "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
+    "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
+    "성훈","원빈","길운","대현","진솔","준현","서진","이슬","민국","성천","충훈"
+  ],
+  tasks: [
+    "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
+    "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
+    "낚1","범퍼가이드","2조2번","AS커버","LH 루1","LH 루2",
+    "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
+    "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
+    "3조2번","RH 루1","RH 루2"
+  ]
+};
+
+/* ===== 로컬 저장 불러오기 ===== */
+const saved = localStorage.getItem("TRIM2_DATA");
+if(saved){
+  DATA = JSON.parse(saved);
+}
+
+function render(){
+  nameList.innerHTML = "";
+  DATA.names.forEach((n,i)=>{
+    nameList.innerHTML += `
+      <div class="item">
+        ${n}
+        <button class="delete" onclick="delName(${i})">삭제</button>
+      </div>`;
+  });
+
+  taskList.innerHTML = "";
+  DATA.tasks.forEach((t,i)=>{
+    taskList.innerHTML += `
+      <div class="item">
+        ${t}
+        <button class="delete" onclick="delTask(${i})">삭제</button>
+      </div>`;
+  });
+}
+
+/* ===== 인원 ===== */
+function addName(){
+  if(!nameInput.value) return;
+  DATA.names.push(nameInput.value);
+  nameInput.value="";
+  render();
+}
+
+function delName(i){
+  DATA.names.splice(i,1);
+  render();
+}
+
+/* ===== 작업 ===== */
+function addTask(){
+  if(!taskInput.value) return;
+  DATA.tasks.push(taskInput.value);
+  taskInput.value="";
+  render();
+}
+
+function delTask(i){
+  DATA.tasks.splice(i,1);
+  render();
+}
+
+/* ===== 저장 ===== */
+function saveData(){
+  localStorage.setItem("TRIM2_DATA", JSON.stringify(DATA));
+  alert("저장 완료! 조회 페이지 새로고침하면 반영돼요 👍");
+}
+
+render();
+</script>
+
+</body>
+</html>
