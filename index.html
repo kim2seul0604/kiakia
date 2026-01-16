@@ -75,12 +75,8 @@ th{background:#fafafa;}
   <!-- ✅ 공지: 코드에 고정(모두에게 동일) -->
   <div class="card">
     <h2>📌 공지</h2>
-    <div class="notice">
-      <div><span class="tag">반영</span> 2026-01-19 인원/작업 추가 (문정, 족장(SCU))</div>
-      <div><span class="tag">반영</span> 2026-01-22 4라운드 휴무 → 2026-01-23 1라운드로 이월(한 칸 밀림)</div>
-      <div><span class="tag">반영</span> 설날 휴무 (2026-02-16 ~ 2026-02-19)</div>
-    </div>
-    <div class="footer">버전: vFinal / 최종 수정일: 2026-01-15</div>
+    <div class="notice" id="noticeBox"></div>
+    <div class="footer" id="footerBox"></div>
   </div>
 
 </div>
@@ -88,20 +84,43 @@ th{background:#fafafa;}
 <button class="help-btn" id="helpBtn">?</button>
 
 <script>
-/* ===== 아이폰 안전 날짜 파싱 ===== */
+/* =========================
+   0) 공지/버전 (스케줄과 완전 분리)
+========================= */
+const APP_VERSION = "vFinal";
+const LAST_UPDATED = "2026-01-16";
+
+const NOTICE_LINES = [
+  "2026-01-19 인원/작업 추가 (문정, 족장(SCU))",
+  "2026-01-22 4라운드 휴무 → 2026-01-23 1라운드로 이월(한 칸 밀림)",
+  "설날 휴무 (2026-02-16 ~ 2026-02-19)"
+];
+
+function renderNotice(){
+  const el = document.getElementById("noticeBox");
+  el.innerHTML = NOTICE_LINES.map(t =>
+    `<div><span class="tag">반영</span> ${t}</div>`
+  ).join("");
+  document.getElementById("footerBox").textContent =
+    `버전: ${APP_VERSION} / 최종 수정일: ${LAST_UPDATED}`;
+}
+
+/* =========================
+   1) 날짜 유틸 (아이폰 안전)
+========================= */
 function parseDate(v){
   if(!v) return null;
   const [y,m,d] = v.split('-').map(Number);
   return new Date(y, m-1, d);
 }
-
-/* ===== 로컬(한국시간) ISO 문자열 ===== */
 function pad2(n){ return String(n).padStart(2,'0'); }
 function isoLocal(d){
   return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
 }
 
-/* ===== 기본 설정 ===== */
+/* =========================
+   2) 기본 설정
+========================= */
 const START = parseDate("2026-01-05");
 
 /* 설날 휴무 */
@@ -109,10 +128,13 @@ const HOLIDAYS = ["2026-02-16","2026-02-17","2026-02-18","2026-02-19"];
 
 /* ✅ 라운드별 휴무(=그 라운드는 수행 안 함, 다음날로 이월) */
 const ROUND_OFF = {
-  "2026-01-22": [4]   // 22일 4라운드 전체 휴무 → 23일 1라운드로 이월(한 칸 밀림)
+  "2026-01-22": [4] // 22일 4라운드 전체 휴무 → 23일 1라운드로 이월(한 칸 밀림)
 };
 
-/* ===== 1/19 이전(기준 1/13) 데이터 ===== */
+/* =========================
+   3) 데이터 구간 (1/19 전/후)
+========================= */
+/* 1/19 이전(기준 1/13) */
 const DATA_V1 = {
   from: "2026-01-05",
   to:   "2026-01-18",
@@ -134,7 +156,7 @@ const DATA_V1 = {
   ]
 };
 
-/* ===== 1/19 이후(문정/족장 추가, 기준 1/19) 데이터 ===== */
+/* 1/19 이후(문정/족장 추가, 기준 1/19 / LH휀다 = 상건) */
 const DATA_V2 = {
   from: "2026-01-19",
   to:   "2099-12-31",
@@ -157,59 +179,54 @@ const DATA_V2 = {
 };
 
 function pickData(dateIso){
-  if(dateIso >= DATA_V2.from) return DATA_V2;
-  return DATA_V1;
+  return (dateIso >= DATA_V2.from) ? DATA_V2 : DATA_V1;
 }
 
-/* ===== 근무일 판단 ===== */
+/* =========================
+   4) 근무/라운드휴무 판단
+========================= */
 function isWork(d){
   if(!d) return false;
   if(d < START) return false;
   if(d.getDay() === 0) return false; // 일요일
   return !HOLIDAYS.includes(isoLocal(d));
 }
-
 function isRoundOff(dateIso, roundNum){
   const arr = ROUND_OFF[dateIso];
-  if(!arr) return false;
-  return arr.includes(roundNum);
+  return !!(arr && arr.includes(roundNum));
 }
 
-/* ===== 핵심: 기준일부터 특정 날짜 "시작 시점"까지 진행된 총 라운드 수(휴무 라운드 제외 누적) ===== */
+/* =========================
+   5) 핵심: (휴무 라운드 제외) 누적 라운드 계산
+   - 기준일(baseDate)부터 targetDate "전날"까지 실제 수행된 라운드 수 합
+========================= */
 function roundsDoneBeforeDate(data, targetDate){
   const targetIso = isoLocal(targetDate);
   const baseD = parseDate(data.baseDate);
   if(!baseD) return 0;
 
-  // target가 base 이전이면(거의 안씀) 역방향도 처리
   const forward = (targetDate >= baseD);
   let sum = 0;
 
   if(forward){
-    // baseDate부터 targetDate 전날까지 누적
     let d = new Date(baseD.getTime());
     while(isoLocal(d) < targetIso){
       if(isWork(d)){
         const iso = isoLocal(d);
         let offCnt = 0;
-        for(let r=1;r<=4;r++){
-          if(isRoundOff(iso, r)) offCnt++;
-        }
+        for(let r=1;r<=4;r++) if(isRoundOff(iso, r)) offCnt++;
         sum += (4 - offCnt);
       }
       d.setDate(d.getDate()+1);
     }
     return sum;
   } else {
-    // target가 base 이전이면, target부터 base 전날까지 누적한 걸 빼는 방식
     let d = new Date(targetDate.getTime());
     while(isoLocal(d) < isoLocal(baseD)){
       if(isWork(d)){
         const iso = isoLocal(d);
         let offCnt = 0;
-        for(let r=1;r<=4;r++){
-          if(isRoundOff(iso, r)) offCnt++;
-        }
+        for(let r=1;r<=4;r++) if(isRoundOff(iso, r)) offCnt++;
         sum += (4 - offCnt);
       }
       d.setDate(d.getDate()+1);
@@ -218,13 +235,7 @@ function roundsDoneBeforeDate(data, targetDate){
   }
 }
 
-/* ===== 오늘 날짜 "하루 안에서" 실제 진행되는 라운드 인덱스(휴무 제외) =====
-   예) 4라운드 휴무면
-   round=1 -> performedIdx 0
-   round=2 -> performedIdx 1
-   round=3 -> performedIdx 2
-   round=4 -> (휴무) null
-*/
+/* 하루 안에서 "실제 수행되는" 라운드 인덱스(휴무 제외) */
 function performedIndexInDay(dateIso, roundNum){
   if(isRoundOff(dateIso, roundNum)) return null;
   let idx = 0;
@@ -234,13 +245,14 @@ function performedIndexInDay(dateIso, roundNum){
   return idx;
 }
 
-/* ===== 스케줄 계산(휴무 라운드 누적 밀림 반영) ===== */
+/* =========================
+   6) 스케줄 계산 (휴무 라운드 이월/밀림 반영)
+========================= */
 function getScheduleForDate(targetDate){
   if(!isWork(targetDate)) return null;
 
   const dateIso = isoLocal(targetDate);
   const data = pickData(dateIso);
-
   const workers = data.workers;
   const tasks = data.tasks;
 
@@ -248,7 +260,6 @@ function getScheduleForDate(targetDate){
   const basePersonIdx = workers.indexOf(data.basePerson);
   if(baseTaskIdx < 0 || basePersonIdx < 0) return null;
 
-  // 기준일부터 "오늘 시작 전까지" 진행된 총 라운드 수(휴무 제외)
   const offsetRounds = roundsDoneBeforeDate(data, targetDate);
 
   return workers.map((name, personIdx)=>{
@@ -261,16 +272,16 @@ function getScheduleForDate(targetDate){
         rounds.push("휴무");
         continue;
       }
-
       const taskIdx = (baseTaskIdx + offsetRounds + personDelta + pi) % tasks.length;
       rounds.push(tasks[(taskIdx + tasks.length) % tasks.length]);
     }
-
     return { name, rounds };
   });
 }
 
-/* ===== 출력 ===== */
+/* =========================
+   7) 화면 출력
+========================= */
 function renderDay(){
   const d = parseDate(document.getElementById("dayDate").value);
   const dayBody = document.getElementById("dayBody");
@@ -308,7 +319,6 @@ function renderDay(){
   });
 }
 
-/* ===== 오늘 ===== */
 function goToday(){
   const t = new Date();
   const d = isWork(t) ? t : START;
@@ -316,11 +326,13 @@ function goToday(){
   renderDay();
 }
 
-/* ===== 도움말 ===== */
+/* 도움말 */
 document.getElementById("helpBtn").addEventListener("click", ()=>{
-  alert("만든사람 : 김이슬\n버전 : vFinal\n최종 수정일 : 2026-01-15");
+  alert(`만든사람 : 김이슬\n버전 : ${APP_VERSION}\n최종 수정일 : ${LAST_UPDATED}`);
 });
 
+/* 최초 실행 */
+renderNotice();
 goToday();
 </script>
 
