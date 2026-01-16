@@ -7,8 +7,6 @@
 
 <style>
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f7;color:#222;}
-header{background:#111;color:#fff;padding:16px;text-align:center;position:sticky;top:0;z-index:10;}
-.today-btn{margin-top:10px;padding:8px 18px;border:none;border-radius:999px;background:#0a8a43;color:#fff;}
 .container{max-width:960px;margin:0 auto;padding:16px;}
 .card{background:#fff;border-radius:16px;padding:14px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.06);}
 h2{font-size:16px;margin-bottom:10px;text-align:center;}
@@ -39,19 +37,23 @@ th{background:#fafafa;}
 
 <body>
 
-<header>
-  <div style="font-size:22px;font-weight:800;">트림2반 작업 스케줄 조회</div>
-  <button class="today-btn" onclick="goToday()">오늘도 화이팅~‼️</button>
-</header>
-
 <div class="container">
 
+  <!-- ✅ 공지: 맨 위로 이동 -->
+  <div class="card">
+    <h2>📌 공지</h2>
+    <div class="notice" id="noticeBox"></div>
+    <div class="footer" id="footerBox"></div>
+  </div>
+
+  <!-- ✅ 전체 스케줄 -->
   <div class="card">
     <h2>🐥✈️ 트림 2반 전체 스케줄 조회하기 🍀🐥</h2>
 
     <div class="date-row">
       <input type="date" id="dayDate">
       <button class="primary" onclick="renderDay()">조회</button>
+      <button class="primary" onclick="goToday()">오늘</button>
     </div>
 
     <div id="dayWarn" class="warning"></div>
@@ -70,13 +72,6 @@ th{background:#fafafa;}
         <tbody id="dayBody"></tbody>
       </table>
     </div>
-  </div>
-
-  <!-- ✅ 공지: 코드에 고정(모두에게 동일) -->
-  <div class="card">
-    <h2>📌 공지</h2>
-    <div class="notice" id="noticeBox"></div>
-    <div class="footer" id="footerBox"></div>
   </div>
 
 </div>
@@ -197,8 +192,7 @@ function isRoundOff(dateIso, roundNum){
 }
 
 /* =========================
-   5) 핵심: (휴무 라운드 제외) 누적 라운드 계산
-   - 기준일(baseDate)부터 targetDate "전날"까지 실제 수행된 라운드 수 합
+   5) (휴무 라운드 제외) 누적 라운드 계산
 ========================= */
 function roundsDoneBeforeDate(data, targetDate){
   const targetIso = isoLocal(targetDate);
