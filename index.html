@@ -6,14 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
+body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:#f5f5f7;
   color:#222;
 }
-
-header {
+header{
   background:#111;
   color:#fff;
   padding:16px;
@@ -22,8 +21,7 @@ header {
   top:0;
   z-index:10;
 }
-
-.today-btn {
+.today-btn{
   margin-top:10px;
   padding:8px 18px;
   border:none;
@@ -31,82 +29,67 @@ header {
   background:#0a8a43;
   color:#fff;
 }
-
-.container {
+.container{
   max-width:960px;
   margin:0 auto;
   padding:16px;
 }
-
-.card {
+.card{
   background:#fff;
   border-radius:16px;
   padding:14px;
   margin-bottom:16px;
   box-shadow:0 6px 16px rgba(0,0,0,.06);
 }
-
-h2 {
+h2{
   font-size:16px;
   margin-bottom:10px;
   text-align:center;
 }
-
-input {
+input{
   padding:6px 10px;
   font-size:14px;
   border-radius:8px;
   border:1px solid #ccc;
 }
-
-button.primary {
+button.primary{
   padding:8px 16px;
   border-radius:999px;
   border:none;
   background:#007aff;
   color:#fff;
 }
-
-.warning {
+.warning{
   color:#c00;
   font-size:13px;
   margin-top:6px;
   text-align:center;
 }
-
-/* 날짜 + 조회 버튼 가운데 정렬 */
-.date-row {
+.date-row{
   display:flex;
   justify-content:center;
   align-items:center;
   gap:10px;
   margin-bottom:6px;
 }
-
-.table-wrap {
+.table-wrap{
   overflow-x:auto;
   margin-top:8px;
 }
-
-table {
+table{
   border-collapse:collapse;
   min-width:600px;
   width:max-content;
   font-size:11.5px;
 }
-
-th, td {
+th,td{
   padding:6px 8px;
   border-bottom:1px solid #eee;
   text-align:center;
   white-space:nowrap;
 }
-
-th {
-  background:#fafafa;
-}
-
-.name-col {
+th{ background:#fafafa; }
+.name-col{
   position:sticky;
   left:0;
   background:#fff;
@@ -114,14 +97,13 @@ th {
   z-index:2;
 }
 /* 라운드 시인성 (파랑계열) */
-.round-1 { color:#4B5FA8; }   /* 연한 하늘색 */
-.round-2 { color:#66B2FF; }   /* 밝은 파랑 */
-.round-3 { color:#1E88E5; }   /* 진한 파랑 */
-.round-4 { color:#0D47A1; font-weight:600; }  /* 가장 진한 네이비 */
-
+.round-1{ color:#4B5FA8; }
+.round-2{ color:#66B2FF; }
+.round-3{ color:#1E88E5; }
+.round-4{ color:#0D47A1; font-weight:600; }
 
 /* ❓ 도움말 버튼 */
-.help-btn {
+.help-btn{
   position:fixed;
   right:14px;
   bottom:14px;
@@ -140,14 +122,12 @@ th {
 </head>
 
 <body>
-
 <header>
   <div style="font-size:22px;font-weight:800;">트림2반 작업 스케줄 조회</div>
   <button class="today-btn" onclick="goToday()">오늘도 화이팅~‼️</button>
 </header>
 
 <div class="container">
-
   <div class="card">
     <h2>🐥✈️ 트림 2반 전체 스케줄 조회하기 🍀🐥</h2>
 
@@ -173,96 +153,143 @@ th {
       </table>
     </div>
   </div>
-
 </div>
 
-<!-- ❓ 도움말 버튼 -->
 <button class="help-btn" id="helpBtn">?</button>
 
 <script>
-/* ===== 아이폰 안전 날짜 파싱 ===== */
+/* =========================
+   날짜/시간 유틸 (아이폰/한국시간 안전)
+========================= */
 function parseDate(v){
   if(!v) return null;
   const [y,m,d] = v.split('-').map(Number);
   return new Date(y, m-1, d);
 }
-
-/* ===== 로컬(한국시간) ISO 문자열 ===== */
 function pad2(n){ return String(n).padStart(2,'0'); }
 function isoLocal(d){
   return d.getFullYear() + "-" + pad2(d.getMonth()+1) + "-" + pad2(d.getDate());
 }
 
-/* ===== 기준 설정 ===== */
+/* =========================
+   설정(너가 운영하면서 수정하는 구간)
+========================= */
+
+// 시작일(이전은 조회 불가)
 const START = new Date(2026,0,5);
 
-/* 기준일 */
-const BASE_DATE = new Date(2026,0,13);
-const BASE_TASK = "LH휀다";
-const BASE_PERSON = "갑수";
-
-/* 휴무일 */
+// ✅ 휴무일(명절 등)
 const HOLIDAYS = [
-  "2026-02-16",
-  "2026-02-17",
-  "2026-02-18",
-  "2026-02-19"
+  "2026-02-16","2026-02-17","2026-02-18","2026-02-19"
 ];
 
-/* 작업자 순서 */
-const names = [
+// ✅ "명단/작업" 변경이 적용되는 기준일(19일부터 반영)
+const CHANGE_DATE_1 = new Date(2026,0,19);
+
+// 19일부터 적용되는 작업자 순서(준현-문정-서진)
+const names_v2 = [
   "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
   "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
-  "성훈","원빈","길운","대현","진솔","준현","서진","이슬","민국","성천","충훈"
+  "성훈","원빈","길운","대현","진솔","준현","문정","서진","이슬","민국","성천","충훈"
 ];
 
-/* 작업 순서 */
-const tasks = [
+// 19일부터 적용되는 작업 순서(AS커버 다음에 족장(SCU))
+const tasks_v2 = [
   "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
   "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
-  "낚1","범퍼가이드","2조2번","AS커버","LH 루1","LH 루2",
+  "낚1","범퍼가이드","2조2번","AS커버","족장(SCU)","LH 루1","LH 루2",
   "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
   "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
   "3조2번","RH 루1","RH 루2"
 ];
 
-/* ===== 유틸 ===== */
+// ✅ 기준일/기준매칭(19일 LH휀다 담당자 = 상건)
+const BASE_DATE = new Date(2026,0,19);
+const BASE_TASK = "LH휀다";
+const BASE_PERSON = "상건";
+
+// ✅ 라운드 “한 칸 밀림” 이벤트(1/22 4R 미실시 → 1/23 1R로 이월)
+// shift = +1  (그 다음 근무일부터 전체가 1칸 밀림)
+const ROUND_SHIFT_EVENTS = [
+  { date: "2026-01-22", shift: 1 }
+];
+
+/* =========================
+   근무일/인덱스/이벤트 누적
+========================= */
 function isWork(d){
   if(d < START) return false;
-  if(d.getDay() === 0) return false;          // 일요일
-  return !HOLIDAYS.includes(isoLocal(d));     // ✅ 로컬 날짜로 비교
+  if(d.getDay() === 0) return false;     // 일요일 휴무
+  return !HOLIDAYS.includes(isoLocal(d));
 }
-
 function workIndex(d){
   if(!isWork(d)) return null;
   let i = -1;
   let t = new Date(START.getTime());
-
   while(t <= d){
     if(isWork(t)) i++;
-    if(isoLocal(t) === isoLocal(d)) return i; // ✅ 로컬 날짜로 비교
+    if(isoLocal(t) === isoLocal(d)) return i;
     t.setDate(t.getDate() + 1);
   }
   return null;
 }
 
-/* ===== 스케줄 로직 ===== */
+// 특정 날짜 이전까지 누적 shift(근무일 기준으로 "그 날짜 다음 근무일부터" 적용)
+function cumulativeShiftBefore(date){
+  const w = workIndex(date);
+  if(w === null) return 0;
+
+  let sum = 0;
+  for(const ev of ROUND_SHIFT_EVENTS){
+    const ed = parseDate(ev.date);
+    const ew = workIndex(ed);
+    if(ew !== null && ew < w){
+      sum += (ev.shift || 0);
+    }
+  }
+  return sum;
+}
+
+/* =========================
+   스케줄 계산
+   - 19일부터 names_v2 / tasks_v2 사용
+   - BASE_DATE(1/19)에서 BASE_PERSON=상건이 BASE_TASK=LH휀다인 상태를 “고정”
+   - 근무일이 하루 지나면 4라운드씩 이동
+   - ROUND_SHIFT_EVENTS 누적만큼 추가로 이동(=한칸 밀림)
+========================= */
+function getActiveDataForDate(d){
+  // 지금은 19일부터만 제대로 쓰는 상태라서(너가 원하는 정확 데이터 구간)
+  // 19일 이전을 보고 싶으면 v1 데이터도 만들어서 여기서 분기하면 됨.
+  return { names: names_v2, tasks: tasks_v2 };
+}
+
 function getSchedule(d){
+  if(!isWork(d)) return null;
+
+  const { names, tasks } = getActiveDataForDate(d);
+
   const todayIdx = workIndex(d);
-  const baseIdx = workIndex(BASE_DATE);
+  const baseIdx  = workIndex(BASE_DATE);
   if(todayIdx === null || baseIdx === null) return null;
 
-  const dayShift = (todayIdx - baseIdx) * 4;
-  const baseTaskIdx = tasks.indexOf(BASE_TASK);
+  const baseTaskIdx   = tasks.indexOf(BASE_TASK);
   const basePersonIdx = names.indexOf(BASE_PERSON);
-
   if(baseTaskIdx < 0 || basePersonIdx < 0) return null;
+
+  // 기본 이동(근무일 차이 * 4라운드)
+  const dayShift = (todayIdx - baseIdx) * 4;
+
+  // ✅ 라운드 밀림 이벤트 누적
+  const extraShift = cumulativeShiftBefore(d);
+
+  // 최종 이동량
+  const totalShift = dayShift + extraShift;
 
   return names.map((name, personIdx)=>{
     const rounds = [];
     for(let r=0; r<4; r++){
       const taskIdx =
-        (baseTaskIdx + dayShift + r + (personIdx - basePersonIdx) + tasks.length)
+        (baseTaskIdx + totalShift + r + (personIdx - basePersonIdx) + tasks.length)
         % tasks.length;
       rounds.push(tasks[taskIdx]);
     }
@@ -270,7 +297,9 @@ function getSchedule(d){
   });
 }
 
-/* ===== 출력 ===== */
+/* =========================
+   화면 출력
+========================= */
 function renderDay(){
   const d = parseDate(document.getElementById("dayDate").value);
   const dayBody = document.getElementById("dayBody");
@@ -284,12 +313,11 @@ function renderDay(){
 
   const s = getSchedule(d);
   if(!s){
-    dayWarn.textContent = "스케줄 계산에 문제가 있어요. (기준 작업/작업자 확인 필요)";
+    dayWarn.textContent = "스케줄 계산에 문제가 있어요. (기준 작업/작업자/데이터 확인 필요)";
     return;
   }
 
   dayWarn.textContent = "";
-
   s.forEach(r=>{
     dayBody.innerHTML += `
       <tr>
@@ -303,24 +331,22 @@ function renderDay(){
   });
 }
 
-/* ===== 오늘 ===== */
 function goToday(){
   const t = new Date();
   const d = isWork(t) ? t : START;
-  document.getElementById("dayDate").value = isoLocal(d); // ✅ 로컬 날짜로 세팅
+  document.getElementById("dayDate").value = isoLocal(d);
   renderDay();
 }
 
-/* ===== 도움말 ===== */
 document.getElementById("helpBtn").addEventListener("click", ()=>{
   alert(
     "만든사람 : 김이슬\n" +
-    "최종 수정일 : 2026-01-15"
+    "버전 : vFinal\n" +
+    "최종 수정일 : 2026-01-19"
   );
 });
 
 goToday();
 </script>
-
 </body>
 </html>
