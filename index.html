@@ -91,15 +91,15 @@ const APP_VERSION = "vFinal";
 const LAST_UPDATED = "2026-01-16";
 
 const NOTICE_LINES = [
-  "2026-01-19 인원/작업 추가 (문정, 족장(SCU))",
-  "2026-01-22 4라운드 휴무 → 2026-01-23 1라운드로 이월(한 칸 밀림)",
+  "2026-01-19  문정, 족장(SCU) 작업추가함",
+  "2026-01-22 4R 선거휴무 → 2026-01-23 1R됨",
   "설날 휴무 (2026-02-16 ~ 2026-02-19)"
 ];
 
 function renderNotice(){
   const el = document.getElementById("noticeBox");
   el.innerHTML = NOTICE_LINES.map(t =>
-    `<div><span class="tag">반영</span> ${t}</div>`
+    `<div><span class="tag">🍀</span> ${t}</div>`
   ).join("");
   document.getElementById("footerBox").textContent =
     `버전: ${APP_VERSION} / 최종 수정일: ${LAST_UPDATED}`;
