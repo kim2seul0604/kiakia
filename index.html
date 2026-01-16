@@ -1,157 +1,39 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>트림2반 작업 스케줄 조회</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:#f5f5f7;
-  color:#222;
-}
-
-header {
-  background:#111;
-  color:#fff;
-  padding:16px;
-  text-align:center;
-  position:sticky;
-  top:0;
-  z-index:10;
-}
-
-.today-btn {
-  margin-top:10px;
-  padding:8px 18px;
-  border:none;
-  border-radius:999px;
-  background:#0a8a43;
-  color:#fff;
-}
-
-.container {
-  max-width:960px;
-  margin:0 auto;
-  padding:16px;
-}
-
-.card {
-  background:#fff;
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:16px;
-  box-shadow:0 6px 16px rgba(0,0,0,.06);
-}
-
-h2 {
-  font-size:16px;
-  margin-bottom:10px;
-  text-align:center;
-}
-
-input {
-  padding:6px 10px;
-  font-size:14px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-
-button.primary {
-  padding:8px 16px;
-  border-radius:999px;
-  border:none;
-  background:#007aff;
-  color:#fff;
-}
-
-.warning {
-  color:#c00;
-  font-size:13px;
-  margin-top:6px;
-  text-align:center;
-}
-
-/* 날짜 + 조회 버튼 가운데 정렬 */
-.date-row {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  margin-bottom:6px;
-}
-
-.table-wrap {
-  overflow-x:auto;
-  margin-top:8px;
-}
-
-table {
-  border-collapse:collapse;
-  min-width:600px;
-  width:max-content;
-  font-size:11.5px;
-}
-
-th, td {
-  padding:6px 8px;
-  border-bottom:1px solid #eee;
-  text-align:center;
-  white-space:nowrap;
-}
-
-th { background:#fafafa; }
-
-.name-col {
-  position:sticky;
-  left:0;
-  background:#fff;
-  font-weight:700;
-  z-index:2;
-}
-
-/* 라운드 시인성 (파랑계열) */
-.round-1 { color:#4B5FA8; }
-.round-2 { color:#66B2FF; }
-.round-3 { color:#1E88E5; }
-.round-4 { color:#0D47A1; font-weight:600; }
-
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f7;color:#222;}
+header{background:#111;color:#fff;padding:16px;text-align:center;position:sticky;top:0;z-index:10;}
+.today-btn{margin-top:10px;padding:8px 18px;border:none;border-radius:999px;background:#0a8a43;color:#fff;}
+.container{max-width:960px;margin:0 auto;padding:16px;}
+.card{background:#fff;border-radius:16px;padding:14px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.06);}
+h2{font-size:16px;margin-bottom:10px;text-align:center;}
+input{padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid #ccc;}
+button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007aff;color:#fff;}
+.warning{color:#c00;font-size:13px;margin-top:6px;text-align:center;}
+.date-row{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:6px;}
+.table-wrap{overflow-x:auto;margin-top:8px;}
+table{border-collapse:collapse;min-width:600px;width:max-content;font-size:11.5px;}
+th,td{padding:6px 8px;border-bottom:1px solid #eee;text-align:center;white-space:nowrap;}
+th{background:#fafafa;}
+.name-col{position:sticky;left:0;background:#fff;font-weight:700;z-index:2;}
+/* 라운드 시인성(파랑계열) */
+.round-1{color:#4B5FA8;}
+.round-2{color:#66B2FF;}
+.round-3{color:#1E88E5;}
+.round-4{color:#0D47A1;font-weight:600;}
+/* 휴무 표시 */
+.off{color:#c00;font-weight:800;}
 /* ❓ 도움말 버튼 */
-.help-btn {
-  position:fixed;
-  right:14px;
-  bottom:14px;
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  border:none;
-  background:#007aff;
-  color:#fff;
-  font-size:22px;
-  font-weight:800;
-  box-shadow:0 4px 10px rgba(0,0,0,.25);
-  z-index:50;
-}
-
+.help-btn{position:fixed;right:14px;bottom:14px;width:44px;height:44px;border-radius:50%;border:none;background:#007aff;color:#fff;font-size:22px;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,.25);z-index:50;}
 /* 공지 */
-.notice {
-  font-size:13px;
-  line-height:1.5;
-  color:#333;
-}
-.notice ul{ margin:8px 0 0; padding-left:18px; }
-.notice li{ margin:4px 0; }
-.notice .tag{
-  display:inline-block;
-  font-size:12px;
-  padding:2px 8px;
-  border-radius:999px;
-  background:#eef5ff;
-  color:#0D47A1;
-  margin-right:6px;
-}
+.notice{font-size:12.5px;line-height:1.55;color:#333;background:#fafafa;border:1px solid #eee;border-radius:12px;padding:10px;}
+.notice .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:#111;color:#fff;margin-right:6px;}
+.footer{font-size:12px;color:#666;text-align:center;margin-top:10px;}
 </style>
 </head>
 
@@ -168,7 +50,7 @@ th { background:#fafafa; }
     <h2>🐥✈️ 트림 2반 전체 스케줄 조회하기 🍀🐥</h2>
 
     <div class="date-row">
-      <input type="date" id="dayDate" />
+      <input type="date" id="dayDate">
       <button class="primary" onclick="renderDay()">조회</button>
     </div>
 
@@ -190,31 +72,22 @@ th { background:#fafafa; }
     </div>
   </div>
 
-  <!-- ✅ 공지(코드 고정: 모두에게 동일) -->
+  <!-- ✅ 공지: 코드에 고정(모두에게 동일) -->
   <div class="card">
     <h2>📌 공지</h2>
     <div class="notice">
       <div><span class="tag">반영</span> 2026-01-19 인원/작업 추가 (문정, 족장(SCU))</div>
       <div><span class="tag">반영</span> 2026-01-22 4라운드 휴무 → 2026-01-23 1라운드로 이월(한 칸 밀림)</div>
       <div><span class="tag">반영</span> 설날 휴무 (2026-02-16 ~ 2026-02-19)</div>
-      <ul>
-        <li>미래 날짜도 미리 조회 가능 (예: 1/25)</li>
-      </ul>
     </div>
+    <div class="footer">버전: vFinal / 최종 수정일: 2026-01-15</div>
   </div>
 
 </div>
 
-<!-- ❓ 도움말 버튼 -->
 <button class="help-btn" id="helpBtn">?</button>
 
 <script>
-/* =========================
-   ✅ 버전 / 최종수정일
-   ========================= */
-const APP_VERSION = "v-final";
-const LAST_UPDATED = "2026-01-16";
-
 /* ===== 아이폰 안전 날짜 파싱 ===== */
 function parseDate(v){
   if(!v) return null;
@@ -225,157 +98,172 @@ function parseDate(v){
 /* ===== 로컬(한국시간) ISO 문자열 ===== */
 function pad2(n){ return String(n).padStart(2,'0'); }
 function isoLocal(d){
-  return d.getFullYear() + "-" + pad2(d.getMonth()+1) + "-" + pad2(d.getDate());
-}
-function dateFromISO(iso){
-  const [y,m,d] = iso.split("-").map(Number);
-  return new Date(y, m-1, d);
+  return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
 }
 
-/* =========================
-   ✅ 기본 운영 규칙
-   ========================= */
-const START = new Date(2026,0,5); // 2026-01-05부터
+/* ===== 기본 설정 ===== */
+const START = parseDate("2026-01-05");
 
 /* 설날 휴무 */
 const HOLIDAYS = ["2026-02-16","2026-02-17","2026-02-18","2026-02-19"];
 
-/* =========================
-   ✅ 1/19 변경분(인원/작업 추가)
-   ========================= */
-const names = [
-  "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
-  "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
-  "성훈","원빈","길운","대현","진솔","준현","문정","서진","이슬","민국","성천","충훈"
-];
-
-const tasks = [
-  "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
-  "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
-  "낚1","범퍼가이드","2조2번","AS커버","족장(SCU)","LH 루1","LH 루2",
-  "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
-  "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
-  "3조2번","RH 루1","RH 루2"
-];
-
-/* 1/19 기준: 1라운드(첫번째 작업=tasks[0]) LH휀다 작업자 = 상건 */
-const BASE_DATE = "2026-01-19";
-const BASE_PERSON = "상건";
-
-/* =========================
-   ✅ 특수 라운드 휴무/이월
-   - 2026-01-22: 4라운드 휴무(미수행)
-   => 그 다음 수행 슬롯이 1칸 당겨지므로 2026-01-23 1라운드부터 한 칸 밀림
-   ========================= */
+/* ✅ 라운드별 휴무(=그 라운드는 수행 안 함, 다음날로 이월) */
 const ROUND_OFF = {
-  "2026-01-22": [4]
+  "2026-01-22": [4]   // 22일 4라운드 전체 휴무 → 23일 1라운드로 이월(한 칸 밀림)
 };
 
-function isRoundOff(isoDate, roundNum){
-  const arr = ROUND_OFF[isoDate];
-  return Array.isArray(arr) && arr.includes(roundNum);
-}
-function offCountForDay(isoDate){
-  const arr = ROUND_OFF[isoDate];
-  return Array.isArray(arr) ? arr.length : 0;
+/* ===== 1/19 이전(기준 1/13) 데이터 ===== */
+const DATA_V1 = {
+  from: "2026-01-05",
+  to:   "2026-01-18",
+  baseDate: "2026-01-13",
+  baseTask: "LH휀다",
+  basePerson: "갑수",
+  workers: [
+    "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
+    "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
+    "성훈","원빈","길운","대현","진솔","준현","서진","이슬","민국","성천","충훈"
+  ],
+  tasks: [
+    "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
+    "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
+    "낚1","범퍼가이드","2조2번","AS커버","LH 루1","LH 루2",
+    "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
+    "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
+    "3조2번","RH 루1","RH 루2"
+  ]
+};
+
+/* ===== 1/19 이후(문정/족장 추가, 기준 1/19) 데이터 ===== */
+const DATA_V2 = {
+  from: "2026-01-19",
+  to:   "2099-12-31",
+  baseDate: "2026-01-19",
+  baseTask: "LH휀다",
+  basePerson: "상건",
+  workers: [
+    "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
+    "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
+    "성훈","원빈","길운","대현","진솔","준현","문정","서진","이슬","민국","성천","충훈"
+  ],
+  tasks: [
+    "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
+    "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
+    "낚1","범퍼가이드","2조2번","AS커버","족장(SCU)","LH 루1","LH 루2",
+    "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
+    "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
+    "3조2번","RH 루1","RH 루2"
+  ]
+};
+
+function pickData(dateIso){
+  if(dateIso >= DATA_V2.from) return DATA_V2;
+  return DATA_V1;
 }
 
-/* =========================
-   ✅ 근무일 판단
-   ========================= */
+/* ===== 근무일 판단 ===== */
 function isWork(d){
+  if(!d) return false;
   if(d < START) return false;
-  if(d.getDay() === 0) return false;          // 일요일
-  return !HOLIDAYS.includes(isoLocal(d));     // 설날 휴무
+  if(d.getDay() === 0) return false; // 일요일
+  return !HOLIDAYS.includes(isoLocal(d));
 }
 
-/* =========================
-   ✅ 기준일부터 target 날짜 "시작"까지 수행한 슬롯 누적
-   - 기본 4슬롯/일
-   - 특정일은 (4 - 휴무라운드수)만큼만 수행
-   ========================= */
-function slotsBetween(baseISO, targetISO){
-  const base = dateFromISO(baseISO);
-  const target = dateFromISO(targetISO);
+function isRoundOff(dateIso, roundNum){
+  const arr = ROUND_OFF[dateIso];
+  if(!arr) return false;
+  return arr.includes(roundNum);
+}
 
-  if(isoLocal(base) === isoLocal(target)) return 0;
+/* ===== 핵심: 기준일부터 특정 날짜 "시작 시점"까지 진행된 총 라운드 수(휴무 라운드 제외 누적) ===== */
+function roundsDoneBeforeDate(data, targetDate){
+  const targetIso = isoLocal(targetDate);
+  const baseD = parseDate(data.baseDate);
+  if(!baseD) return 0;
 
-  let slots = 0;
+  // target가 base 이전이면(거의 안씀) 역방향도 처리
+  const forward = (targetDate >= baseD);
+  let sum = 0;
 
-  if(base < target){
-    let d = new Date(base.getTime());
-    while(isoLocal(d) !== isoLocal(target)){
+  if(forward){
+    // baseDate부터 targetDate 전날까지 누적
+    let d = new Date(baseD.getTime());
+    while(isoLocal(d) < targetIso){
       if(isWork(d)){
-        const isoD = isoLocal(d);
-        slots += (4 - offCountForDay(isoD));
+        const iso = isoLocal(d);
+        let offCnt = 0;
+        for(let r=1;r<=4;r++){
+          if(isRoundOff(iso, r)) offCnt++;
+        }
+        sum += (4 - offCnt);
       }
       d.setDate(d.getDate()+1);
     }
-    return slots;
-  }
-
-  if(base > target){
-    let d = new Date(target.getTime());
-    while(isoLocal(d) !== isoLocal(base)){
+    return sum;
+  } else {
+    // target가 base 이전이면, target부터 base 전날까지 누적한 걸 빼는 방식
+    let d = new Date(targetDate.getTime());
+    while(isoLocal(d) < isoLocal(baseD)){
       if(isWork(d)){
-        const isoD = isoLocal(d);
-        slots += (4 - offCountForDay(isoD));
+        const iso = isoLocal(d);
+        let offCnt = 0;
+        for(let r=1;r<=4;r++){
+          if(isRoundOff(iso, r)) offCnt++;
+        }
+        sum += (4 - offCnt);
       }
       d.setDate(d.getDate()+1);
     }
-    return -slots;
+    return -sum;
   }
-
-  return 0;
 }
 
-/* =========================
-   ✅ 해당 날짜 안에서 round 이전에 "실제 수행된 슬롯" 수
-   - 휴무 라운드가 있으면 그만큼 제외
-   ========================= */
-function slotsBeforeRoundInDay(isoDate, roundNum){
-  let cnt = 0;
-  for(let r=1; r<roundNum; r++){
-    if(!isRoundOff(isoDate, r)) cnt += 1;
+/* ===== 오늘 날짜 "하루 안에서" 실제 진행되는 라운드 인덱스(휴무 제외) =====
+   예) 4라운드 휴무면
+   round=1 -> performedIdx 0
+   round=2 -> performedIdx 1
+   round=3 -> performedIdx 2
+   round=4 -> (휴무) null
+*/
+function performedIndexInDay(dateIso, roundNum){
+  if(isRoundOff(dateIso, roundNum)) return null;
+  let idx = 0;
+  for(let r=1;r<roundNum;r++){
+    if(!isRoundOff(dateIso, r)) idx++;
   }
-  return cnt;
+  return idx;
 }
 
-/* =========================
-   ✅ 스케줄 계산
-   - 작업 기준은 "항상 tasks[0]" (잠금X, 리스트 첫번째)
-   - BASE_DATE의 1R에서 BASE_PERSON이 tasks[0] 수행
-   - 라운드 휴무/이월은 '수행 슬롯' 기준으로 자동 밀림
-   ========================= */
-function getScheduleForDate(d){
-  if(!isWork(d)) return null;
+/* ===== 스케줄 계산(휴무 라운드 누적 밀림 반영) ===== */
+function getScheduleForDate(targetDate){
+  if(!isWork(targetDate)) return null;
 
-  const isoD = isoLocal(d);
+  const dateIso = isoLocal(targetDate);
+  const data = pickData(dateIso);
 
-  const basePersonIdx = names.indexOf(BASE_PERSON);
-  if(basePersonIdx < 0) return null;
+  const workers = data.workers;
+  const tasks = data.tasks;
 
-  const baseTaskIdx = 0; // 항상 첫 작업
+  const baseTaskIdx = tasks.indexOf(data.baseTask);
+  const basePersonIdx = workers.indexOf(data.basePerson);
+  if(baseTaskIdx < 0 || basePersonIdx < 0) return null;
 
-  // 날짜 시작까지 누적 수행 슬롯(휴무 라운드 반영)
-  const shiftSlots = slotsBetween(BASE_DATE, isoD);
+  // 기준일부터 "오늘 시작 전까지" 진행된 총 라운드 수(휴무 제외)
+  const offsetRounds = roundsDoneBeforeDate(data, targetDate);
 
-  return names.map((name, personIdx)=>{
+  return workers.map((name, personIdx)=>{
+    const personDelta = personIdx - basePersonIdx;
     const rounds = [];
 
-    for(let r=1; r<=4; r++){
-      if(isRoundOff(isoD, r)){
+    for(let roundNum=1; roundNum<=4; roundNum++){
+      const pi = performedIndexInDay(dateIso, roundNum);
+      if(pi === null){
         rounds.push("휴무");
         continue;
       }
 
-      const inDaySlots = slotsBeforeRoundInDay(isoD, r);
-      const slot = shiftSlots + inDaySlots;
-
-      const rawIdx = (baseTaskIdx + (personIdx - basePersonIdx) + slot) % tasks.length;
-      const taskIdx = (rawIdx + tasks.length) % tasks.length;
-
-      rounds.push(tasks[taskIdx]);
+      const taskIdx = (baseTaskIdx + offsetRounds + personDelta + pi) % tasks.length;
+      rounds.push(tasks[(taskIdx + tasks.length) % tasks.length]);
     }
 
     return { name, rounds };
@@ -389,32 +277,32 @@ function renderDay(){
   const dayWarn = document.getElementById("dayWarn");
   dayBody.innerHTML = "";
 
-  if(!d){
-    dayWarn.textContent = "날짜를 선택해주세요.";
-    return;
-  }
-
-  if(!isWork(d)){
+  if(!d || !isWork(d)){
     dayWarn.textContent = "휴무일입니다.";
     return;
   }
 
   const s = getScheduleForDate(d);
   if(!s){
-    dayWarn.textContent = "스케줄 계산 오류 (기준 작업자/데이터 확인 필요)";
+    dayWarn.textContent = "스케줄 계산에 문제가 있어요. (기준/명단/작업 순서 확인 필요)";
     return;
   }
 
   dayWarn.textContent = "";
 
   s.forEach(r=>{
+    const c1 = (r.rounds[0]==="휴무") ? "off" : "round-1";
+    const c2 = (r.rounds[1]==="휴무") ? "off" : "round-2";
+    const c3 = (r.rounds[2]==="휴무") ? "off" : "round-3";
+    const c4 = (r.rounds[3]==="휴무") ? "off" : "round-4";
+
     dayBody.innerHTML += `
       <tr>
         <td class="name-col">${r.name}</td>
-        <td class="round-1">${r.rounds[0]}</td>
-        <td class="round-2">${r.rounds[1]}</td>
-        <td class="round-3">${r.rounds[2]}</td>
-        <td class="round-4">${r.rounds[3]}</td>
+        <td class="${c1}">${r.rounds[0]}</td>
+        <td class="${c2}">${r.rounds[1]}</td>
+        <td class="${c3}">${r.rounds[2]}</td>
+        <td class="${c4}">${r.rounds[3]}</td>
       </tr>
     `;
   });
@@ -430,10 +318,7 @@ function goToday(){
 
 /* ===== 도움말 ===== */
 document.getElementById("helpBtn").addEventListener("click", ()=>{
-  alert(
-    "만든사람 : 김이슬\n" +
-    "버전 : " + APP_VERSION + "\n"
-  );
+  alert("만든사람 : 김이슬\n버전 : vFinal\n최종 수정일 : 2026-01-15");
 });
 
 goToday();
