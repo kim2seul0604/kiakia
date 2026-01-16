@@ -86,8 +86,8 @@ const APP_VERSION = "vFinal";
 const LAST_UPDATED = "2026-01-16";
 
 const NOTICE_LINES = [
-  "2026-01-19  문정, 족장(SCU) 작업추가함",
-  "2026-01-22 4R 선거휴무 → 2026-01-23 1R됨",
+  "2026-01-19  문정, 족장(SCU) 추가",
+  "2026-01-22 4R 선거휴무 반영",
   "설날 휴무 (2026-02-16 ~ 2026-02-19)"
 ];
 
@@ -97,7 +97,7 @@ function renderNotice(){
     `<div><span class="tag">🍀</span> ${t}</div>`
   ).join("");
   document.getElementById("footerBox").textContent =
-    `버전: ${APP_VERSION} / 최종 수정일: ${LAST_UPDATED}`;
+    `최종 수정일: ${LAST_UPDATED}`;
 }
 
 /* =========================
