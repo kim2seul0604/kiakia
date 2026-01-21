@@ -1,0 +1,21 @@
+{
+  "name": "트림2반 작업 스케줄",
+  "short_name": "T2B",
+  "start_url": "/kiakia/",
+  "scope": "/kiakia/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "/kiakia/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/kiakia/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
