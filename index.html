@@ -20,8 +20,35 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
 <style>
+:root{
+  --appbar-h:56px;
+}
+
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f7;color:#222;}
-.container{max-width:960px;margin:0 auto;padding:16px;}
+
+/* =========================
+   ✅ 1) 상단 고정 헤더(앱바)
+========================= */
+.appbar{
+  position:fixed; top:0; left:0; right:0;
+  height:var(--appbar-h);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#111;
+  color:#fff;
+  z-index:100;
+  box-shadow:0 6px 16px rgba(0,0,0,.18);
+}
+.appbar .title{
+  font-weight:800;
+  font-size:16px;
+  letter-spacing:.2px;
+}
+
+/* 앱바 공간 확보 */
+.container{max-width:960px;margin:0 auto;padding:16px;padding-top:calc(16px + var(--appbar-h));}
+
 .card{background:#fff;border-radius:16px;padding:14px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.06);}
 h2{font-size:16px;margin:0 0 10px;text-align:center;}
 input{padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid #ccc;}
@@ -91,9 +118,13 @@ button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007a
 .footer{font-size:12px;color:#666;text-align:center;margin-top:8px;}
 
 /* =========================
-   ✅ 모바일 표 시인성 개선
+   ✅ 2) 모바일 표 시인성 개선 + 헤더 sticky + 이름칸 그림자
 ========================= */
-.table-wrap{overflow-x:auto;margin-top:8px;}
+.table-wrap{
+  overflow-x:auto;
+  margin-top:8px;
+  -webkit-overflow-scrolling:touch;
+}
 
 table{
   border-collapse:collapse;
@@ -111,17 +142,32 @@ th,td{
 }
 
 th{background:#fafafa;}
-thead th{border-bottom:2px solid #e5e5e5;}
 
-/* 이름칸: 옅은 배경 */
+/* ✅ 헤더 sticky */
+thead th{
+  position:sticky;
+  top:0;
+  z-index:5;
+  border-bottom:2px solid #e5e5e5;
+}
+
+/* 이름칸: 옅은 배경 + sticky + 그림자 */
 .name-col{
   position:sticky;
   left:0;
   background:#f3f4f6;
   font-weight:700;
-  z-index:2;
+  z-index:6;
   width:58px;
   max-width:58px;
+
+  /* ✅ 이름칸 오른쪽 그림자 */
+  box-shadow: 6px 0 10px rgba(0,0,0,.06);
+}
+
+/* 헤더의 이름칸은 더 위로 */
+thead th.name-col{
+  z-index:10;
 }
 
 /* 1R~4R 사이 얇은 세로선 */
@@ -133,7 +179,7 @@ th:not(.name-col), td:not(.name-col){
 .round-1{color:#C62828;}
 .round-2{color:#EF6C00;}
 .round-3{color:#1B5E20;}
-.round-4{color:#1F2A5A;} /* ✅ 굵기 제거 */
+.round-4{color:#1F2A5A;}
 
 /* 휴무 표시 */
 .off{color:#c00;font-weight:800;}
@@ -146,6 +192,16 @@ tbody td.name-col{ background:#f3f4f6; }
 /* 터치 강조 */
 tbody tr:active td{ background:#f1f7ff; }
 
+/* =========================
+   ✅ 5) 이름/행 탭하면 강조 (검색 없이)
+========================= */
+tr.row-selected td{
+  background:#eaf3ff !important;
+}
+tr.row-selected td.name-col{
+  background:#dbeaff !important;
+}
+
 /* ❓ 도움말 버튼 */
 .help-btn{
   position:fixed;right:14px;bottom:14px;width:44px;height:44px;
@@ -157,6 +213,11 @@ tbody tr:active td{ background:#f1f7ff; }
 </head>
 
 <body>
+
+<!-- ✅ 앱바 -->
+<div class="appbar">
+  <div class="title">🚗 트림2반 작업 스케줄 (T2B)</div>
+</div>
 
 <div class="container">
 
@@ -435,15 +496,14 @@ function renderDay(){
 
   dayWarn.textContent = "";
 
-// ✅ 표 순서만 변경 (작업 배치는 그대로)
-s.sort((a,b)=>{
-  if(a.name==="갑수") return -1;
-  if(b.name==="갑수") return 1;
-  if(a.name==="영훈") return 1;
-  if(b.name==="영훈") return -1;
-  return 0; // 나머지는 기존 순서 유지
-});
-
+  // ✅ 표 순서만 변경 (작업 배치는 그대로)
+  s.sort((a,b)=>{
+    if(a.name==="갑수") return -1;
+    if(b.name==="갑수") return 1;
+    if(a.name==="영훈") return 1;
+    if(b.name==="영훈") return -1;
+    return 0;
+  });
 
   s.forEach(r=>{
     const c1 = (r.rounds[0]==="휴무") ? "off" : "round-1";
@@ -460,6 +520,15 @@ s.sort((a,b)=>{
         <td class="${c4}">${r.rounds[3]}</td>
       </tr>
     `;
+  });
+
+  // ✅ 5) 행 탭하면 강조 (한 번에 하나만)
+  const rows = dayBody.querySelectorAll("tr");
+  rows.forEach(tr=>{
+    tr.addEventListener("click", ()=>{
+      rows.forEach(x=>x.classList.remove("row-selected"));
+      tr.classList.add("row-selected");
+    });
   });
 }
 
