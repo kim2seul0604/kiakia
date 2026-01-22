@@ -28,11 +28,44 @@ input{padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid #ccc;}
 button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007aff;color:#fff;}
 .warning{color:#c00;font-size:13px;margin-top:6px;text-align:center;}
 .date-row{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:6px;}
+
+/* ✅ 모바일 표 시인성 개선 */
 .table-wrap{overflow-x:auto;margin-top:8px;}
-table{border-collapse:collapse;min-width:600px;width:max-content;font-size:11.5px;}
-th,td{padding:6px 8px;border-bottom:1px solid #eee;text-align:center;white-space:nowrap;}
+
+table{
+  border-collapse:collapse;
+  width:100%;
+  min-width:0;
+  table-layout:fixed;  /* ✅ 1R~4R 칸폭 균등 */
+  font-size:12px;
+}
+
+th,td{
+  padding:4px 4px;     /* ✅ 간격 좁히기 */
+  border-bottom:1px solid #eee;
+  text-align:center;
+  white-space:nowrap;
+}
+
 th{background:#fafafa;}
-.name-col{position:sticky;left:0;background:#fff;font-weight:700;z-index:2;}
+thead th{border-bottom:2px solid #e5e5e5;}
+
+/* ✅ 이름칸: 경계선 대신 옅은 배경으로 구분 */
+.name-col{
+  position:sticky;
+  left:0;
+  background:#f3f4f6;  /* ✅ 옅은 배경 */
+  font-weight:700;
+  z-index:2;
+  width:58px;
+  max-width:58px;
+}
+
+/* ✅ 1R~4R 사이 얇은 세로선(구분선) */
+th:not(.name-col), td:not(.name-col){
+  border-left:1px solid #eee;
+}
+
 /* 라운드 시인성(레드오렌지그린네이비) */
 .round-1{color:#C62828;}
 .round-2{color:#EF6C00;}
@@ -40,6 +73,17 @@ th{background:#fafafa;}
 .round-4{color:#1F2A5A;font-weight:600;}
 /* 휴무 표시 */
 .off{color:#c00;font-weight:800;}
+
+/* ✅ 지브라(줄무늬) - 작업칸만 아주 옅게 */
+tbody tr:nth-child(even) td:not(.name-col){ background:#fcfcfd; }
+tbody tr:nth-child(odd)  td:not(.name-col){ background:#ffffff; }
+
+/* 이름칸은 항상 같은 옅은 배경 유지 */
+tbody td.name-col{ background:#f3f4f6; }
+
+/* (선택) 터치시 살짝 강조 */
+tbody tr:active td{ background:#f1f7ff; }
+
 /* ❓ 도움말 버튼 */
 .help-btn{position:fixed;right:14px;bottom:14px;width:44px;height:44px;border-radius:50%;border:none;background:#007aff;color:#fff;font-size:22px;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,.25);z-index:50;}
 /* 공지 */
@@ -131,8 +175,8 @@ function isoLocal(d){
 ========================= */
 const START = parseDate("2026-01-05");
 
-/* 설날 휴무 및 5월 휴무*/
-const HOLIDAYS = ["2026-02-16","2026-02-17","2026-02-18","2026-02-19","2026-05-01","2026-05-02","2026-05-04","2026-05-05","2026-05-25","2026-06-03"];
+/* 설날 휴무 */
+const HOLIDAYS = ["2026-02-16","2026-02-17","2026-02-18","2026-02-19"];
 
 /* ✅ 라운드별 휴무(=그 라운드는 수행 안 함, 다음날로 이월) */
 const ROUND_OFF = {
@@ -343,7 +387,7 @@ renderNotice();
 goToday();
 </script>
 
-<!-- ✅ (권장) 서비스워커 등록: 안드로이드 설치/실행 안정화 -->
+<!-- ✅ (권장) 서비스워커 등록 -->
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
