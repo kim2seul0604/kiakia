@@ -29,13 +29,18 @@ button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007a
 .warning{color:#c00;font-size:13px;margin-top:6px;text-align:center;}
 .date-row{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:6px;}
 
-/* ✅ 요일 표시 */
-.dow{
-  text-align:center;
+/* ✅ 날짜 옆 요일 표시 */
+.dow-badge{
   font-size:13px;
-  color:#444;
-  margin:6px 0 2px;
-  font-weight:700;
+  font-weight:800;
+  color:#334155;
+  background:#eef2ff;
+  border:1px solid #e5e7eb;
+  padding:6px 10px;
+  border-radius:999px;
+  line-height:1;
+  min-width:42px;
+  text-align:center;
 }
 
 /* =========================
@@ -204,11 +209,11 @@ tr.row-selected td.name-col{ background:#dbeaff !important; }
 
     <div class="date-row">
       <input type="date" id="dayDate">
+      <!-- ✅ 요일 표시(날짜 옆) -->
+      <div class="dow-badge" id="dowBadge">(월)</div>
+
       <button class="primary" onclick="renderDay()">조회</button>
     </div>
-
-    <!-- ✅ 선택 날짜 요일 표시 -->
-    <div class="dow" id="dayDow"></div>
 
     <div id="dayWarn" class="warning"></div>
 
@@ -281,23 +286,16 @@ function isoLocal(d){
   return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
 }
 
-/* ✅ 요일 텍스트 */
-const DOW_KO = ["일","월","화","수","목","금","토"];
-function setDowText(dateObj){
-  const el = document.getElementById("dayDow");
+/* ✅ 요일 표시 */
+const DOW = ["일","월","화","수","목","금","토"];
+function setDowBadge(dateObj){
+  const el = document.getElementById("dowBadge");
   if(!dateObj){
-    el.textContent = "";
+    el.textContent = "(?)";
     return;
   }
-  const iso = isoLocal(dateObj);
-  const dow = DOW_KO[dateObj.getDay()];
-  el.textContent = `${iso} (${dow})`;
+  el.textContent = `(${DOW[dateObj.getDay()]})`;
 }
-
-/* 날짜 바꾸면 요일도 즉시 갱신 */
-document.getElementById("dayDate").addEventListener("change", (e)=>{
-  setDowText(parseDate(e.target.value));
-});
 
 /* =========================
    2) 기본 설정
@@ -465,8 +463,8 @@ function renderDay(){
   const dayWarn = document.getElementById("dayWarn");
   dayBody.innerHTML = "";
 
-  // ✅ 요일 표시 갱신
-  setDowText(d);
+  // ✅ 요일 갱신(조회 누를 때도)
+  setDowBadge(d);
 
   if(!d || !isWork(d)){
     dayWarn.textContent = "휴무일입니다.";
@@ -522,11 +520,17 @@ function goToday(){
   const d = isWork(t) ? t : START;
   document.getElementById("dayDate").value = isoLocal(d);
 
-  // ✅ 요일 표시도 먼저 세팅
-  setDowText(d);
+  // ✅ 오늘로 세팅될 때 요일도 같이 표시
+  setDowBadge(d);
 
   renderDay();
 }
+
+/* 날짜 변경하면 요일만 즉시 바뀌게 */
+document.getElementById("dayDate").addEventListener("change", (e)=>{
+  const d = parseDate(e.target.value);
+  setDowBadge(d);
+});
 
 /* 도움말 */
 document.getElementById("helpBtn").addEventListener("click", ()=>{
