@@ -181,6 +181,15 @@ tr.row-selected td.name-col{ background:#dbeaff !important; }
   font-size:22px;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,.25);
   z-index:50;
 }
+
+/* ✅ 날짜 옆 요일(작게/캡슐없음/굵게없음) */
+.dow{
+  font-size: 11px;
+  font-weight: 400;
+  color: #888;
+  margin-left: 6px;
+}
+
 </style>
 </head>
 
@@ -209,9 +218,7 @@ tr.row-selected td.name-col{ background:#dbeaff !important; }
 
     <div class="date-row">
       <input type="date" id="dayDate">
-      <!-- ✅ 요일 표시(날짜 옆) -->
-      <div class="dow-badge" id="dowBadge">(월)</div>
-
+      <span id="dowLabel" class="dow"></span>
       <button class="primary" onclick="renderDay()">조회</button>
     </div>
 
@@ -285,6 +292,18 @@ function pad2(n){ return String(n).padStart(2,'0'); }
 function isoLocal(d){
   return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
 }
+function getDowKor(d){
+  const days = ["일","월","화","수","목","금","토"];
+  return days[d.getDay()];
+}
+
+function updateDowLabel(){
+  const d = parseDate(document.getElementById("dayDate").value);
+  const el = document.getElementById("dowLabel");
+  if(!el) return;
+  el.textContent = d ? `(${getDowKor(d)})` : "";
+}
+
 
 /* ✅ 요일 표시 */
 const DOW = ["일","월","화","수","목","금","토"];
@@ -458,6 +477,7 @@ function getScheduleForDate(targetDate){
    7) 화면 출력
 ========================= */
 function renderDay(){
+  updateDowLabel();
   const d = parseDate(document.getElementById("dayDate").value);
   const dayBody = document.getElementById("dayBody");
   const dayWarn = document.getElementById("dayWarn");
@@ -522,7 +542,7 @@ function goToday(){
 
   // ✅ 오늘로 세팅될 때 요일도 같이 표시
   setDowBadge(d);
-
+updateDowLabel();
   renderDay();
 }
 
