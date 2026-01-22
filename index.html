@@ -1,3 +1,8 @@
+좋아! ✅ 앱바는 완전 제거했고, 이름칸 폭을 더 좁게(58px → 48px) 줄인 최종본이야.
+그대로 index.html에 통째로 덮어쓰기 하면 돼.
+
+(✅ 헤더 sticky + 이름칸 그림자 + 행 탭 강조는 유지)
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -20,35 +25,8 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
 <style>
-:root{
-  --appbar-h:56px;
-}
-
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f7;color:#222;}
-
-/* =========================
-   ✅ 1) 상단 고정 헤더(앱바)
-========================= */
-.appbar{
-  position:fixed; top:0; left:0; right:0;
-  height:var(--appbar-h);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#111;
-  color:#fff;
-  z-index:100;
-  box-shadow:0 6px 16px rgba(0,0,0,.18);
-}
-.appbar .title{
-  font-weight:800;
-  font-size:16px;
-  letter-spacing:.2px;
-}
-
-/* 앱바 공간 확보 */
-.container{max-width:960px;margin:0 auto;padding:16px;padding-top:calc(16px + var(--appbar-h));}
-
+.container{max-width:960px;margin:0 auto;padding:16px;}
 .card{background:#fff;border-radius:16px;padding:14px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.06);}
 h2{font-size:16px;margin:0 0 10px;text-align:center;}
 input{padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid #ccc;}
@@ -74,7 +52,6 @@ button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007a
   cursor:pointer;
   user-select:none;
 }
-
 .notice-toggle .left{
   display:flex;
   align-items:center;
@@ -83,17 +60,13 @@ button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007a
   color:#222;
   font-weight:700;
 }
-
 .notice-toggle .right{
   font-size:14px;
   color:#666;
   font-weight:800;
 }
 
-.notice-body{
-  margin-top:10px;
-  display:none; /* 기본: 접힘 */
-}
+.notice-body{margin-top:10px;display:none;} /* 기본: 접힘 */
 
 .notice{
   font-size:12px;
@@ -104,7 +77,6 @@ button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007a
   border-radius:12px;
   padding:8px;
 }
-
 .notice .tag{
   display:inline-block;
   font-size:10px;
@@ -114,11 +86,10 @@ button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007a
   color:#fff;
   margin-right:6px;
 }
-
 .footer{font-size:12px;color:#666;text-align:center;margin-top:8px;}
 
 /* =========================
-   ✅ 2) 모바일 표 시인성 개선 + 헤더 sticky + 이름칸 그림자
+   ✅ 모바일 표 시인성 개선 + 헤더 sticky + 이름칸 그림자
 ========================= */
 .table-wrap{
   overflow-x:auto;
@@ -151,24 +122,22 @@ thead th{
   border-bottom:2px solid #e5e5e5;
 }
 
-/* 이름칸: 옅은 배경 + sticky + 그림자 */
+/* ✅ 이름칸: 더 좁게 + 옅은 배경 + sticky + 그림자 */
 .name-col{
   position:sticky;
   left:0;
   background:#f3f4f6;
   font-weight:700;
   z-index:6;
-  width:58px;
-  max-width:58px;
 
-  /* ✅ 이름칸 오른쪽 그림자 */
+  width:48px;        /* ✅ 기존 58px → 48px */
+  max-width:48px;
+
   box-shadow: 6px 0 10px rgba(0,0,0,.06);
 }
 
 /* 헤더의 이름칸은 더 위로 */
-thead th.name-col{
-  z-index:10;
-}
+thead th.name-col{ z-index:10; }
 
 /* 1R~4R 사이 얇은 세로선 */
 th:not(.name-col), td:not(.name-col){
@@ -192,15 +161,9 @@ tbody td.name-col{ background:#f3f4f6; }
 /* 터치 강조 */
 tbody tr:active td{ background:#f1f7ff; }
 
-/* =========================
-   ✅ 5) 이름/행 탭하면 강조 (검색 없이)
-========================= */
-tr.row-selected td{
-  background:#eaf3ff !important;
-}
-tr.row-selected td.name-col{
-  background:#dbeaff !important;
-}
+/* ✅ 행 탭하면 강조 */
+tr.row-selected td{ background:#eaf3ff !important; }
+tr.row-selected td.name-col{ background:#dbeaff !important; }
 
 /* ❓ 도움말 버튼 */
 .help-btn{
@@ -213,11 +176,6 @@ tr.row-selected td.name-col{
 </head>
 
 <body>
-
-<!-- ✅ 앱바 -->
-<div class="appbar">
-  <div class="title">🚗 트림2반 작업 스케줄 (T2B)</div>
-</div>
 
 <div class="container">
 
@@ -299,7 +257,6 @@ function setNotice(open){
   document.getElementById("noticeBody").style.display = open ? "block" : "none";
   document.getElementById("noticeArrow").textContent = open ? "▲" : "▼";
 }
-
 document.getElementById("noticeToggle").addEventListener("click", ()=>{
   setNotice(!noticeOpen);
 });
@@ -522,7 +479,7 @@ function renderDay(){
     `;
   });
 
-  // ✅ 5) 행 탭하면 강조 (한 번에 하나만)
+  // ✅ 행 탭하면 강조 (한 번에 하나만)
   const rows = dayBody.querySelectorAll("tr");
   rows.forEach(tr=>{
     tr.addEventListener("click", ()=>{
@@ -546,7 +503,7 @@ document.getElementById("helpBtn").addEventListener("click", ()=>{
 
 /* 최초 실행 */
 renderNotice();
-setNotice(false); /* 기본: 접힘 */
+setNotice(false);
 goToday();
 </script>
 
