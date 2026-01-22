@@ -435,6 +435,16 @@ function renderDay(){
 
   dayWarn.textContent = "";
 
+// ✅ 표 순서만 변경 (작업 배치는 그대로)
+s.sort((a,b)=>{
+  if(a.name==="갑수") return -1;
+  if(b.name==="갑수") return 1;
+  if(a.name==="영훈") return 1;
+  if(b.name==="영훈") return -1;
+  return 0; // 나머지는 기존 순서 유지
+});
+
+
   s.forEach(r=>{
     const c1 = (r.rounds[0]==="휴무") ? "off" : "round-1";
     const c2 = (r.rounds[1]==="휴무") ? "off" : "round-2";
