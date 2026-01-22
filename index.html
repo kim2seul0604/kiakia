@@ -23,25 +23,88 @@
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f7;color:#222;}
 .container{max-width:960px;margin:0 auto;padding:16px;}
 .card{background:#fff;border-radius:16px;padding:14px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.06);}
-h2{font-size:16px;margin-bottom:10px;text-align:center;}
+h2{font-size:16px;margin:0 0 10px;text-align:center;}
 input{padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid #ccc;}
 button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007aff;color:#fff;}
 .warning{color:#c00;font-size:13px;margin-top:6px;text-align:center;}
 .date-row{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:6px;}
 
-/* ✅ 모바일 표 시인성 개선 */
+/* =========================
+   ✅ 공지 접기/펼치기 UI
+========================= */
+.notice-card{padding:10px;margin-bottom:12px;}
+.notice-card h2{margin:4px 0 8px;}
+
+.notice-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  background:#fafafa;
+  border:1px solid #eee;
+  border-radius:12px;
+  padding:10px 12px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.notice-toggle .left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  color:#222;
+  font-weight:700;
+}
+
+.notice-toggle .right{
+  font-size:14px;
+  color:#666;
+  font-weight:800;
+}
+
+.notice-body{
+  margin-top:10px;
+  display:none; /* 기본: 접힘 */
+}
+
+.notice{
+  font-size:12px;
+  line-height:1.35;
+  color:#333;
+  background:#fff;
+  border:1px solid #eee;
+  border-radius:12px;
+  padding:8px;
+}
+
+.notice .tag{
+  display:inline-block;
+  font-size:10px;
+  padding:1px 6px;
+  border-radius:999px;
+  background:#111;
+  color:#fff;
+  margin-right:6px;
+}
+
+.footer{font-size:12px;color:#666;text-align:center;margin-top:8px;}
+
+/* =========================
+   ✅ 모바일 표 시인성 개선
+========================= */
 .table-wrap{overflow-x:auto;margin-top:8px;}
 
 table{
   border-collapse:collapse;
   width:100%;
   min-width:0;
-  table-layout:fixed;  /* ✅ 1R~4R 칸폭 균등 */
+  table-layout:fixed;
   font-size:12px;
 }
 
 th,td{
-  padding:4px 4px;     /* ✅ 간격 좁히기 */
+  padding:4px 4px;
   border-bottom:1px solid #eee;
   text-align:center;
   white-space:nowrap;
@@ -50,46 +113,46 @@ th,td{
 th{background:#fafafa;}
 thead th{border-bottom:2px solid #e5e5e5;}
 
-/* ✅ 이름칸: 경계선 대신 옅은 배경으로 구분 */
+/* 이름칸: 옅은 배경 */
 .name-col{
   position:sticky;
   left:0;
-  background:#f3f4f6;  /* ✅ 옅은 배경 */
+  background:#f3f4f6;
   font-weight:700;
   z-index:2;
   width:58px;
   max-width:58px;
 }
 
-/* ✅ 1R~4R 사이 얇은 세로선(구분선) */
+/* 1R~4R 사이 얇은 세로선 */
 th:not(.name-col), td:not(.name-col){
   border-left:1px solid #eee;
 }
 
-/* 라운드 시인성(레드오렌지그린네이비) */
+/* 라운드 시인성 */
 .round-1{color:#C62828;}
 .round-2{color:#EF6C00;}
 .round-3{color:#1B5E20;}
-.round-4{color:#1F2A5A;}
+.round-4{color:#1F2A5A;} /* ✅ 굵기 제거 */
+
 /* 휴무 표시 */
 .off{color:#c00;font-weight:800;}
 
-/* ✅ 지브라(줄무늬) - 작업칸만 아주 옅게 */
+/* 지브라(줄무늬) - 작업칸만 */
 tbody tr:nth-child(even) td:not(.name-col){ background:#fcfcfd; }
 tbody tr:nth-child(odd)  td:not(.name-col){ background:#ffffff; }
-
-/* 이름칸은 항상 같은 옅은 배경 유지 */
 tbody td.name-col{ background:#f3f4f6; }
 
-/* (선택) 터치시 살짝 강조 */
+/* 터치 강조 */
 tbody tr:active td{ background:#f1f7ff; }
 
 /* ❓ 도움말 버튼 */
-.help-btn{position:fixed;right:14px;bottom:14px;width:44px;height:44px;border-radius:50%;border:none;background:#007aff;color:#fff;font-size:22px;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,.25);z-index:50;}
-/* 공지 */
-.notice{font-size:12.5px;line-height:1.55;color:#333;background:#fafafa;border:1px solid #eee;border-radius:12px;padding:10px;}
-.notice .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:#111;color:#fff;margin-right:6px;}
-.footer{font-size:12px;color:#666;text-align:center;margin-top:10px;}
+.help-btn{
+  position:fixed;right:14px;bottom:14px;width:44px;height:44px;
+  border-radius:50%;border:none;background:#007aff;color:#fff;
+  font-size:22px;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,.25);
+  z-index:50;
+}
 </style>
 </head>
 
@@ -97,11 +160,19 @@ tbody tr:active td{ background:#f1f7ff; }
 
 <div class="container">
 
-  <!-- ✅ 공지: 맨 위로 이동 -->
-  <div class="card">
+  <!-- ✅ 공지: 접기/펼치기 -->
+  <div class="card notice-card">
     <h2>📌 공지</h2>
-    <div class="notice" id="noticeBox"></div>
-    <div class="footer" id="footerBox"></div>
+
+    <div class="notice-toggle" id="noticeToggle">
+      <div class="left">🍀 최신 공지 <span id="noticeCount">0</span>건</div>
+      <div class="right" id="noticeArrow">▼</div>
+    </div>
+
+    <div class="notice-body" id="noticeBody">
+      <div class="notice" id="noticeBox"></div>
+      <div class="footer" id="footerBox"></div>
+    </div>
   </div>
 
   <!-- ✅ 전체 스케줄 -->
@@ -149,13 +220,28 @@ const NOTICE_LINES = [
 ];
 
 function renderNotice(){
+  document.getElementById("noticeCount").textContent = NOTICE_LINES.length;
+
   const el = document.getElementById("noticeBox");
   el.innerHTML = NOTICE_LINES.map(t =>
-    `<div><span class="tag">🍀</span> ${t}</div>`
+    `<div style="margin:4px 0;"><span class="tag">🍀</span> ${t}</div>`
   ).join("");
+
   document.getElementById("footerBox").textContent =
     `최종 수정일: ${LAST_UPDATED}`;
 }
+
+/* 공지 접기/펼치기 */
+let noticeOpen = false;
+function setNotice(open){
+  noticeOpen = open;
+  document.getElementById("noticeBody").style.display = open ? "block" : "none";
+  document.getElementById("noticeArrow").textContent = open ? "▲" : "▼";
+}
+
+document.getElementById("noticeToggle").addEventListener("click", ()=>{
+  setNotice(!noticeOpen);
+});
 
 /* =========================
    1) 날짜 유틸 (아이폰 안전)
@@ -180,13 +266,12 @@ const HOLIDAYS = ["2026-02-16","2026-02-17","2026-02-18","2026-02-19"];
 
 /* ✅ 라운드별 휴무(=그 라운드는 수행 안 함, 다음날로 이월) */
 const ROUND_OFF = {
-  "2026-01-22": [4] // 22일 4라운드 전체 휴무 → 23일 1라운드로 이월(한 칸 밀림)
+  "2026-01-22": [4]
 };
 
 /* =========================
    3) 데이터 구간 (1/19 전/후)
 ========================= */
-/* 1/19 이전(기준 1/13) */
 const DATA_V1 = {
   from: "2026-01-05",
   to:   "2026-01-18",
@@ -208,7 +293,6 @@ const DATA_V1 = {
   ]
 };
 
-/* 1/19 이후(문정/족장 추가, 기준 1/19 / LH휀다 = 상건) */
 const DATA_V2 = {
   from: "2026-01-19",
   to:   "2099-12-31",
@@ -240,7 +324,7 @@ function pickData(dateIso){
 function isWork(d){
   if(!d) return false;
   if(d < START) return false;
-  if(d.getDay() === 0) return false; // 일요일
+  if(d.getDay() === 0) return false;
   return !HOLIDAYS.includes(isoLocal(d));
 }
 function isRoundOff(dateIso, roundNum){
@@ -286,7 +370,6 @@ function roundsDoneBeforeDate(data, targetDate){
   }
 }
 
-/* 하루 안에서 "실제 수행되는" 라운드 인덱스(휴무 제외) */
 function performedIndexInDay(dateIso, roundNum){
   if(isRoundOff(dateIso, roundNum)) return null;
   let idx = 0;
@@ -297,7 +380,7 @@ function performedIndexInDay(dateIso, roundNum){
 }
 
 /* =========================
-   6) 스케줄 계산 (휴무 라운드 이월/밀림 반영)
+   6) 스케줄 계산
 ========================= */
 function getScheduleForDate(targetDate){
   if(!isWork(targetDate)) return null;
@@ -384,10 +467,11 @@ document.getElementById("helpBtn").addEventListener("click", ()=>{
 
 /* 최초 실행 */
 renderNotice();
+setNotice(false); /* 기본: 접힘 */
 goToday();
 </script>
 
-<!-- ✅ (권장) 서비스워커 등록 -->
+<!-- ✅ 서비스워커 등록 -->
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
