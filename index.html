@@ -355,7 +355,7 @@ function pickData(dateIso){
 function isWork(d){
   if(!d) return false;
   if(d < START) return false;
-  if(d.getDay() === 0) return false;
+  if(d.getDay() === 0) return false; // 일요일 휴무
   return !HOLIDAYS.includes(isoLocal(d));
 }
 function isRoundOff(dateIso, roundNum){
@@ -504,9 +504,25 @@ function renderDay(){
   });
 }
 
+/* ✅ 처음 들어오면:
+   - 오늘이 근무일이면 오늘
+   - 휴무(일요일/공휴일)이면 다음 근무일(월~토, 공휴일 제외) */
 function goToday(){
-  const t = new Date();
-  const d = isWork(t) ? t : START;
+  let d = new Date();
+
+  // 시간이 늦은 밤 등에서도 날짜만 쓰게 정규화(선택사항이지만 안정적)
+  d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  // ✅ 휴무면 다음 근무일로 이동
+  let guard = 0;
+  while(!isWork(d) && guard < 31){
+    d.setDate(d.getDate() + 1);
+    guard++;
+  }
+
+  // START 이전 날짜 방지 (혹시 모를 예외)
+  if(d < START) d = new Date(START);
+
   document.getElementById("dayDate").value = isoLocal(d);
   updateDowLabel();
   renderDay();
