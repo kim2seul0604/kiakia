@@ -505,14 +505,26 @@ function renderDay(){
     `;
   });
 
-  // ✅ 행 탭하면 강조 (한 번에 하나만)
-  const rows = dayBody.querySelectorAll("tr");
-  rows.forEach(tr=>{
-    tr.addEventListener("click", ()=>{
-      rows.forEach(x=>x.classList.remove("row-selected"));
-      tr.classList.add("row-selected");
-    });
+  // ✅ 행 탭하면 강조 (최대 3명까지 선택 가능 / 다시 누르면 해제)
+const rows = dayBody.querySelectorAll("tr");
+rows.forEach(tr=>{
+  tr.addEventListener("click", ()=>{
+    // 이미 선택된 줄이면 -> 해제
+    if(tr.classList.contains("row-selected")){
+      tr.classList.remove("row-selected");
+      return;
+    }
+
+    // 선택된 줄이 3개 이상이면 -> 추가 선택 막기
+    const selected = dayBody.querySelectorAll("tr.row-selected");
+    if(selected.length >= 3){
+      return;
+    }
+
+    // 아니면 -> 선택
+    tr.classList.add("row-selected");
   });
+});
 }
 
 /* ✅ 처음 들어오면:
