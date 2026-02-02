@@ -24,10 +24,11 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
 .container{max-width:960px;margin:0 auto;padding:16px;}
 .card{background:#fff;border-radius:16px;padding:14px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.06);}
 h2{font-size:16px;margin:0 0 10px;text-align:center;}
-input{padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid #ccc;}
+input, select{padding:6px 10px;font-size:14px;border-radius:8px;border:1px solid #ccc;}
 button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007aff;color:#fff;}
+button.ghost{padding:8px 12px;border-radius:999px;border:1px solid #d7d7db;background:#fff;color:#111;}
 .warning{color:#c00;font-size:13px;margin-top:6px;text-align:center;}
-.date-row{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:6px;}
+.date-row{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
 
 /* ✅ 날짜 옆 요일(작게/캡슐없음/굵게없음) */
 .dow{
@@ -168,12 +169,38 @@ tbody tr:active td{ background:#f1f7ff; }
 tr.row-selected td{ background:#eaf3ff !important; }
 tr.row-selected td.name-col{ background:#dbeaff !important; }
 
+/* ✅ 내 이름(저장된 작업자) 자동 하이라이트 - 연노랑 */
+tr.my-row td{ background:#fff9d6 !important; }
+tr.my-row td.name-col{ background:#fff1b8 !important; }
+
 /* ❓ 도움말 버튼 */
 .help-btn{
   position:fixed;right:14px;bottom:14px;width:44px;height:44px;
   border-radius:50%;border:none;background:#007aff;color:#fff;
   font-size:22px;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,.25);
   z-index:50;
+}
+
+/* ✅ 맨 아래 설정 카드 */
+.settings-title{
+  font-size:14px;
+  font-weight:800;
+  margin:0 0 10px;
+  text-align:center;
+}
+.settings-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.settings-row select{ min-width:170px; }
+.settings-hint{
+  font-size:12px;
+  color:#666;
+  text-align:center;
+  margin-top:8px;
 }
 </style>
 
@@ -185,8 +212,6 @@ tr.row-selected td.name-col{ background:#dbeaff !important; }
   gtag('js', new Date());
   gtag('config', 'G-KETWK2RT0T', { anonymize_ip: true });
 </script>
-
-
 </head>
 
 <body>
@@ -233,6 +258,21 @@ tr.row-selected td.name-col{ background:#dbeaff !important; }
         </thead>
         <tbody id="dayBody"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- ✅ 맨 아래: 내 이름 설정(선택형) -->
+  <div class="card" id="settingsCard">
+    <div class="settings-title">⚙️ 내 이름 설정</div>
+    <div class="settings-row">
+      <select id="myNameSelect">
+        <option value="">(선택 안 함)</option>
+      </select>
+      <button class="primary" type="button" onclick="saveMyNameFromSelect()">저장</button>
+      <button class="ghost" type="button" onclick="clearMyName()">삭제</button>
+    </div>
+    <div class="settings-hint">
+      내 이름을 저장하면 다음 접속부터 내 줄이 <b>연노랑</b>으로 표시돼요.
     </div>
   </div>
 
@@ -362,6 +402,74 @@ function pickData(dateIso){
 }
 
 /* =========================
+   ✅ 내 이름 저장/선택 (오름차순 선택)
+========================= */
+const MY_NAME_KEY = "t2b_my_name";
+
+function getMyName(){
+  return (localStorage.getItem(MY_NAME_KEY) || "").trim();
+}
+
+function setMyName(v){
+  const name = (v || "").trim();
+  if(!name){
+    localStorage.removeItem(MY_NAME_KEY);
+  }else{
+    localStorage.setItem(MY_NAME_KEY, name);
+  }
+}
+
+/* ✅ 현재 날짜 기준 명단을 오름차순으로 셀렉트에 넣기 */
+function populateMyNameSelect(){
+  const select = document.getElementById("myNameSelect");
+  if(!select) return;
+
+  // 기준 날짜: 현재 선택된 날짜가 있으면 그 날짜, 없으면 오늘
+  const picked = parseDate(document.getElementById("dayDate").value) || new Date();
+  const iso = isoLocal(picked);
+  const data = pickData(iso);
+
+  // 오름차순(가나다/abc) 정렬
+  const names = [...data.workers].sort((a,b)=> a.localeCompare(b, "ko"));
+
+  // 옵션 재구성
+  select.innerHTML = `<option value="">(선택 안 함)</option>` + names.map(n=>(
+    `<option value="${n}">${n}</option>`
+  )).join("");
+
+  // 저장된 값 있으면 선택 상태로
+  const saved = getMyName();
+  if(saved){
+    // 명단에 없을 수도 있으니 존재할 때만 선택
+    const opt = [...select.options].find(o=>o.value === saved);
+    if(opt) select.value = saved;
+  }else{
+    select.value = "";
+  }
+}
+
+function saveMyNameFromSelect(){
+  const select = document.getElementById("myNameSelect");
+  const v = select ? select.value : "";
+  if(!v){
+    setMyName("");
+    alert("선택 안 함으로 저장(=삭제)");
+  }else{
+    setMyName(v);
+    alert(`저장 완료! 다음부터 '${v}' 줄이 연노랑으로 표시됩니다.`);
+  }
+  renderDay();
+}
+
+function clearMyName(){
+  setMyName("");
+  const select = document.getElementById("myNameSelect");
+  if(select) select.value = "";
+  alert("저장된 내 이름을 삭제함");
+  renderDay();
+}
+
+/* =========================
    4) 근무/라운드휴무 판단
 ========================= */
 function isWork(d){
@@ -462,6 +570,9 @@ function getScheduleForDate(targetDate){
 function renderDay(){
   updateDowLabel();
 
+  // ✅ 날짜 바뀔 때마다(또는 최초) 셀렉트 옵션 갱신
+  populateMyNameSelect();
+
   const d = parseDate(document.getElementById("dayDate").value);
   const dayBody = document.getElementById("dayBody");
   const dayWarn = document.getElementById("dayWarn");
@@ -489,14 +600,18 @@ function renderDay(){
     return 0;
   });
 
+  const myName = getMyName();
+
   s.forEach(r=>{
     const c1 = (r.rounds[0]==="휴무") ? "off" : "round-1";
     const c2 = (r.rounds[1]==="휴무") ? "off" : "round-2";
     const c3 = (r.rounds[2]==="휴무") ? "off" : "round-3";
     const c4 = (r.rounds[3]==="휴무") ? "off" : "round-4";
 
+    const isMine = myName && (r.name === myName);
+
     dayBody.innerHTML += `
-      <tr>
+      <tr class="${isMine ? "my-row" : ""}">
         <td class="name-col">${r.name}</td>
         <td class="${c1}">${r.rounds[0]}</td>
         <td class="${c2}">${r.rounds[1]}</td>
@@ -507,25 +622,25 @@ function renderDay(){
   });
 
   // ✅ 행 탭하면 강조 (최대 3명까지 선택 가능 / 다시 누르면 해제)
-const rows = dayBody.querySelectorAll("tr");
-rows.forEach(tr=>{
-  tr.addEventListener("click", ()=>{
-    // 이미 선택된 줄이면 -> 해제
-    if(tr.classList.contains("row-selected")){
-      tr.classList.remove("row-selected");
-      return;
-    }
+  const rows = dayBody.querySelectorAll("tr");
+  rows.forEach(tr=>{
+    tr.addEventListener("click", ()=>{
+      // 이미 선택된 줄이면 -> 해제
+      if(tr.classList.contains("row-selected")){
+        tr.classList.remove("row-selected");
+        return;
+      }
 
-    // 선택된 줄이 3개 이상이면 -> 추가 선택 막기
-    const selected = dayBody.querySelectorAll("tr.row-selected");
-    if(selected.length >= 3){
-      return;
-    }
+      // 선택된 줄이 3개 이상이면 -> 추가 선택 막기
+      const selected = dayBody.querySelectorAll("tr.row-selected");
+      if(selected.length >= 3){
+        return;
+      }
 
-    // 아니면 -> 선택
-    tr.classList.add("row-selected");
+      // 아니면 -> 선택
+      tr.classList.add("row-selected");
+    });
   });
-});
 }
 
 /* ✅ 처음 들어오면:
@@ -534,7 +649,7 @@ rows.forEach(tr=>{
 function goToday(){
   let d = new Date();
 
-  // 시간이 늦은 밤 등에서도 날짜만 쓰게 정규화(선택사항이지만 안정적)
+  // 시간이 늦은 밤 등에서도 날짜만 쓰게 정규화
   d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
   // ✅ 휴무면 다음 근무일로 이동
@@ -549,12 +664,16 @@ function goToday(){
 
   document.getElementById("dayDate").value = isoLocal(d);
   updateDowLabel();
+
+  // ✅ 셀렉트 먼저 채우고 렌더
+  populateMyNameSelect();
   renderDay();
 }
 
-/* 날짜 바꾸면 요일만 즉시 갱신 */
+/* 날짜 바꾸면 요일 + 셀렉트 즉시 갱신 */
 document.getElementById("dayDate").addEventListener("change", ()=>{
   updateDowLabel();
+  populateMyNameSelect();
 });
 
 /* 도움말 */
