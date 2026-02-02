@@ -685,6 +685,58 @@ document.getElementById("helpBtn").addEventListener("click", ()=>{
 /* 최초 실행 */
 renderNotice();
 setNotice(false);
+
+/* =========================
+   ✅ 좌우 스와이프로 날짜 이동
+========================= */
+let touchStartX = 0;
+let touchEndX = 0;
+const SWIPE_THRESHOLD = 60; // 이 이상 밀어야 인식(px)
+
+/* 다음/이전 근무일 계산 */
+function moveWorkDay(delta){
+  let d = parseDate(document.getElementById("dayDate").value);
+  if(!d) return;
+
+  let guard = 0;
+  do{
+    d.setDate(d.getDate() + delta);
+    guard++;
+  }while(!isWork(d) && guard < 31);
+
+  document.getElementById("dayDate").value = isoLocal(d);
+  updateDowLabel();
+  renderDay();
+}
+
+/* 터치 시작 */
+document.addEventListener("touchstart", (e)=>{
+  if(e.touches.length !== 1) return;
+  touchStartX = e.touches[0].clientX;
+}, { passive:true });
+
+/* 터치 종료 */
+document.addEventListener("touchend", (e)=>{
+  touchEndX = e.changedTouches[0].clientX;
+  handleSwipe();
+}, { passive:true });
+
+function handleSwipe(){
+  const diff = touchEndX - touchStartX;
+
+  if(Math.abs(diff) < SWIPE_THRESHOLD) return;
+
+  if(diff < 0){
+    // 👉 왼쪽으로 스와이프 → 다음날
+    moveWorkDay(+1);
+  }else{
+    // 👉 오른쪽으로 스와이프 → 이전날
+    moveWorkDay(-1);
+  }
+}
+
+
+
 goToday();
 </script>
 
