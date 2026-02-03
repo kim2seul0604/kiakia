@@ -32,8 +32,8 @@ button.ghost{padding:8px 12px;border-radius:999px;border:1px solid #d7d7db;backg
 
 /* ✅ 날짜 옆 요일(작게/캡슐없음/굵게없음) */
 .dow{
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 400;
   color: #888;
   margin-left: 6px;
 }
@@ -223,7 +223,7 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
     <h2>📌 공지</h2>
 
     <div class="notice-toggle" id="noticeToggle">
-      <div class="left">✴️ 공지 ✴️<span id="noticeCount">0</span>건</div>
+      <div class="left">🌟 공지 🌟<span id="noticeCount">0</span>건</div>
       <div class="right" id="noticeArrow">▼</div>
     </div>
 
@@ -288,10 +288,11 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
 const APP_VERSION = "vFinal";
 const LAST_UPDATED = "2026-02-02";
 
-const NOTICE_LINES = 
+const NOTICE_LINES = [
+  "설날 휴무 (2026-02-16 ~ 2026-02-19)",
   "월 ~ 토요일 조회 가능 / 일요일 휴무",
   "특근 없는날은 토요일 조회❌",
-  "화면 ➡️ 스와이프 시 다음날짜로 이동"
+  "3명 까지 선택 가능👌"
 ];
 
 function renderNotice(){
