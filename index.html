@@ -202,6 +202,14 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
   text-align:center;
   margin-top:8px;
 }
+.swipe-hint{
+  font-size:12px;
+  color:#666;
+  text-align:center;
+  margin:4px 0 6px;
+  user-select:none;
+}
+
 </style>
 
 <!-- ✅ GA4 (방문자 통계 - 관리자만 확인 가능) -->
@@ -243,6 +251,7 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
       <button class="primary" onclick="renderDay()">조회</button>
     </div>
 
+<div class="swipe-hint">👉 오른쪽으로 스와이프하면 다음날로 넘어갑니다</div>
     <div id="dayWarn" class="warning"></div>
 
     <div class="table-wrap">
