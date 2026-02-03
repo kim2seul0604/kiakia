@@ -30,7 +30,7 @@ button.ghost{padding:8px 12px;border-radius:999px;border:1px solid #d7d7db;backg
 .warning{color:#c00;font-size:13px;margin-top:6px;text-align:center;}
 .date-row{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
 
-/* ✅ 날짜 옆 요일(작게/캡슐없음/굵게없음) */
+/* ✅ 날짜 옆 요일(기존) */
 .dow{
   font-size: 11px;
   font-weight: 400;
@@ -202,6 +202,28 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
   text-align:center;
   margin-top:8px;
 }
+
+/* =========================
+   ✅ "날짜칸 안에 요일" 표시용 (스타일 그대로)
+========================= */
+.date-display{
+  padding:6px 10px;
+  font-size:14px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  background:#fff;
+  color:#222;
+  text-align:center;
+  line-height:1.2;
+}
+
+/* ✅ 실제 date input은 숨김(값/달력만 담당) */
+.date-hidden{
+  position:absolute;
+  left:-9999px;
+  width:1px;height:1px;
+  opacity:0;
+}
 </style>
 
 <!-- ✅ GA4 (방문자 통계 - 관리자만 확인 가능) -->
@@ -238,8 +260,15 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
     <h2>🚗🚙 트림 2반 작업 스케줄 조회 🚕🚓</h2>
 
     <div class="date-row">
-      <input type="date" id="dayDate">
-      <span id="dowLabel" class="dow"></span>
+      <!-- ✅ 화면에 보이는 날짜칸(요일까지 포함) -->
+      <button type="button" class="date-display" id="dayDisplay">날짜 선택</button>
+
+      <!-- ✅ 실제 날짜값/달력 담당(숨김) -->
+      <input type="date" id="dayDate" class="date-hidden">
+
+      <!-- (기존 옆 요일 라벨은 숨김 처리) -->
+      <span id="dowLabel" class="dow" style="display:none;"></span>
+
       <button class="primary" onclick="renderDay()">조회</button>
     </div>
 
@@ -291,8 +320,8 @@ const LAST_UPDATED = "2026-02-02";
 const NOTICE_LINES = [
   "설날 휴무 (2026-02-16 ~ 2026-02-19)",
   "월 ~ 토요일 조회 가능 / 일요일 휴무",
-  "특근 없는날은 토요일 조회❌",
-  "3명 까지 선택 가능👌"
+  "특근 없는날은 토요일 조회❌"️
+  "화면 ➡️스와이프시 다음날 날짜 이동"
 ];
 
 function renderNotice(){
@@ -334,10 +363,30 @@ function getDowKor(d){
   const days = ["일","월","화","수","목","금","토"];
   return days[d.getDay()];
 }
+
+/* ✅ 날짜칸 "안에" 2026. 2. 3. (화) 형태로 표시 */
+function formatKorDateWithDow(d){
+  const y = d.getFullYear();
+  const m = d.getMonth()+1;
+  const day = d.getDate();
+  return `${y}. ${m}. ${day}. (${getDowKor(d)})`;
+}
+
+/* ✅ 기존 함수명은 유지(호환), 표시 대상만 dayDisplay로 변경 */
 function updateDowLabel(){
   const d = parseDate(document.getElementById("dayDate").value);
+
+  // 화면 표시(버튼)
+  const disp = document.getElementById("dayDisplay");
+  if(disp){
+    disp.textContent = d ? formatKorDateWithDow(d) : "날짜 선택";
+  }
+
+  // (기존 옆 요일 라벨은 숨김이지만 값은 세팅해둠)
   const el = document.getElementById("dowLabel");
-  el.textContent = d ? `(${getDowKor(d)})` : "";
+  if(el){
+    el.textContent = d ? `(${getDowKor(d)})` : "";
+  }
 }
 
 /* =========================
@@ -441,7 +490,6 @@ function populateMyNameSelect(){
   // 저장된 값 있으면 선택 상태로
   const saved = getMyName();
   if(saved){
-    // 명단에 없을 수도 있으니 존재할 때만 선택
     const opt = [...select.options].find(o=>o.value === saved);
     if(opt) select.value = saved;
   }else{
@@ -626,19 +674,14 @@ function renderDay(){
   const rows = dayBody.querySelectorAll("tr");
   rows.forEach(tr=>{
     tr.addEventListener("click", ()=>{
-      // 이미 선택된 줄이면 -> 해제
       if(tr.classList.contains("row-selected")){
         tr.classList.remove("row-selected");
         return;
       }
-
-      // 선택된 줄이 3개 이상이면 -> 추가 선택 막기
       const selected = dayBody.querySelectorAll("tr.row-selected");
       if(selected.length >= 3){
         return;
       }
-
-      // 아니면 -> 선택
       tr.classList.add("row-selected");
     });
   });
@@ -649,27 +692,36 @@ function renderDay(){
    - 휴무(일요일/공휴일)이면 다음 근무일(월~토, 공휴일 제외) */
 function goToday(){
   let d = new Date();
-
-  // 시간이 늦은 밤 등에서도 날짜만 쓰게 정규화
   d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
-  // ✅ 휴무면 다음 근무일로 이동
   let guard = 0;
   while(!isWork(d) && guard < 31){
     d.setDate(d.getDate() + 1);
     guard++;
   }
 
-  // START 이전 날짜 방지 (혹시 모를 예외)
   if(d < START) d = new Date(START);
 
   document.getElementById("dayDate").value = isoLocal(d);
   updateDowLabel();
 
-  // ✅ 셀렉트 먼저 채우고 렌더
   populateMyNameSelect();
   renderDay();
 }
+
+/* ✅ 날짜칸(보이는 버튼) 눌러서 달력 열기 */
+document.getElementById("dayDisplay").addEventListener("click", ()=>{
+  const input = document.getElementById("dayDate");
+  if(!input) return;
+
+  // 지원 브라우저면 showPicker(안드로이드/크롬 계열)
+  if(typeof input.showPicker === "function"){
+    input.showPicker();
+  }else{
+    // iOS 등: click으로 열기
+    input.click();
+  }
+});
 
 /* 날짜 바꾸면 요일 + 셀렉트 즉시 갱신 */
 document.getElementById("dayDate").addEventListener("change", ()=>{
@@ -691,9 +743,8 @@ setNotice(false);
 ========================= */
 let touchStartX = 0;
 let touchEndX = 0;
-const SWIPE_THRESHOLD = 60; // 이 이상 밀어야 인식(px)
+const SWIPE_THRESHOLD = 60;
 
-/* 다음/이전 근무일 계산 */
 function moveWorkDay(delta){
   let d = parseDate(document.getElementById("dayDate").value);
   if(!d) return;
@@ -709,13 +760,11 @@ function moveWorkDay(delta){
   renderDay();
 }
 
-/* 터치 시작 */
 document.addEventListener("touchstart", (e)=>{
   if(e.touches.length !== 1) return;
   touchStartX = e.touches[0].clientX;
 }, { passive:true });
 
-/* 터치 종료 */
 document.addEventListener("touchend", (e)=>{
   touchEndX = e.changedTouches[0].clientX;
   handleSwipe();
@@ -723,19 +772,14 @@ document.addEventListener("touchend", (e)=>{
 
 function handleSwipe(){
   const diff = touchEndX - touchStartX;
-
   if(Math.abs(diff) < SWIPE_THRESHOLD) return;
 
   if(diff < 0){
-    // 👉 왼쪽으로 스와이프 → 다음날
     moveWorkDay(+1);
   }else{
-    // 👉 오른쪽으로 스와이프 → 이전날
     moveWorkDay(-1);
   }
 }
-
-
 
 goToday();
 </script>
