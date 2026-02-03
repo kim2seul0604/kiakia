@@ -209,6 +209,16 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
   margin:4px 0 6px;
   user-select:none;
 }
+/* ✅ 날짜 변경 피드백(살짝 깜빡임) */
+.date-flash{
+  animation: flash 0.25s ease;
+}
+
+@keyframes flash{
+  from{ background:#eaf3ff; }
+  to{ background:transparent; }
+}
+
 
 </style>
 
@@ -715,6 +725,16 @@ function moveWorkDay(delta){
 
   document.getElementById("dayDate").value = isoLocal(d);
   updateDowLabel();
+    /* ✅ 날짜 바뀐 시각적 피드백 */
+  const row = document.querySelector(".date-row");
+  if(row){
+    row.classList.remove("date-flash");
+    void row.offsetWidth; // 애니메이션 다시 실행용
+    row.classList.add("date-flash");
+  
+  
+  
+  
   renderDay();
 }
 
