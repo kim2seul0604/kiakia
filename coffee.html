@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>커피 주문 계산기</title>
+
+<style>
+
+body{
+font-family:-apple-system;
+background:#f2f4f7;
+padding:20px;
+}
+
+h1{
+text-align:center;
+}
+
+.person{
+background:white;
+padding:12px;
+margin-bottom:8px;
+border-radius:10px;
+display:flex;
+justify-content:space-between;
+}
+
+.result{
+background:#222;
+color:white;
+padding:15px;
+margin-top:20px;
+border-radius:10px;
+font-size:18px;
+line-height:1.6;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:12px;
+border:none;
+border-radius:10px;
+background:#007aff;
+color:white;
+font-size:16px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>☕ 커피 주문</h1>
+
+<div id="list"></div>
+
+<button onclick="resetAll()">전체 초기화</button>
+
+<div class="result" id="result"></div>
+
+<script>
+
+const people=[
+
+{name:"반장",drink:"작은아아"},
+{name:"민근",drink:"ICE바닐라라떼"},
+{name:"형원",drink:"아아"},
+{name:"정무",drink:"ICE바닐라라떼"},
+{name:"재권",drink:"아아"},
+{name:"범성",drink:"아아"},
+{name:"학현",drink:"아아"},
+{name:"진솔",drink:"아아"},
+{name:"응규",drink:"아이스티"},
+{name:"기백",drink:"아이스티"},
+{name:"서진",drink:"아아"},
+{name:"이슬",drink:"아아"},
+{name:"원빈",drink:"아아"},
+{name:"대현",drink:"아아"},
+{name:"민국",drink:"아아"},
+{name:"정훈",drink:"아아"}
+
+];
+
+const price={
+
+"아아":2000,
+"작은아아":1500,
+"ICE바닐라라떼":2800,
+"아이스티":3000
+
+};
+
+const list=document.getElementById("list");
+
+people.forEach((p,i)=>{
+
+const div=document.createElement("div");
+
+div.className="person";
+
+div.innerHTML=`
+<span>${p.name} - ${p.drink}</span>
+<input type="checkbox" onchange="calc()">
+`;
+
+list.appendChild(div);
+
+});
+
+function calc(){
+
+let result={};
+let total=0;
+let totalPrice=0;
+
+document.querySelectorAll(".person").forEach((row,i)=>{
+
+const checked=row.querySelector("input").checked;
+
+if(!checked){
+
+let drink=people[i].drink;
+
+if(!result[drink]){
+result[drink]=0;
+}
+
+result[drink]++;
+
+total++;
+totalPrice+=price[drink];
+
+}
+
+});
+
+let text="";
+
+for(let d in result){
+
+text+=`${d} : ${result[d]}잔<br>`;
+
+}
+
+text+=`<br><b>총 주문 : ${total}잔</b><br>`;
+text+=`<b>총 금액 : ${totalPrice.toLocaleString()}원</b>`;
+
+document.getElementById("result").innerHTML=text;
+
+}
+
+function resetAll(){
+
+document.querySelectorAll("input").forEach(i=>i.checked=false);
+
+calc();
+
+}
+
+calc();
+
+</script>
+
+</body>
+</html>
