@@ -157,7 +157,7 @@ const orderSort=[
 "ICE바닐라라떼",
 "아이스티"
 ];
-
+people.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
 const list=document.getElementById("list");
 
 people.forEach((p,i)=>{
