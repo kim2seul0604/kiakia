@@ -2,48 +2,73 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>커피 주문 계산기</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>커피 주문</title>
 
 <style>
 
 body{
 font-family:-apple-system;
-background:#f2f4f7;
+background:#f5f6f8;
 padding:20px;
+margin:0;
 }
 
 h1{
 text-align:center;
+margin-bottom:25px;
 }
 
 .person{
 background:white;
-padding:12px;
-margin-bottom:8px;
-border-radius:10px;
+padding:16px;
+margin-bottom:10px;
+border-radius:12px;
 display:flex;
 justify-content:space-between;
+align-items:center;
+font-size:18px;
+box-shadow:0 2px 6px rgba(0,0,0,0.05);
 }
 
-.result{
-background:#222;
-color:white;
-padding:15px;
-margin-top:20px;
-border-radius:10px;
-font-size:18px;
-line-height:1.6;
+input[type="checkbox"]{
+width:22px;
+height:22px;
 }
 
 button{
 width:100%;
-padding:12px;
-margin-top:12px;
+padding:16px;
+font-size:18px;
 border:none;
-border-radius:10px;
+border-radius:12px;
+margin-top:10px;
+}
+
+.calc{
 background:#007aff;
 color:white;
-font-size:16px;
+}
+
+.reset{
+background:#e5e5ea;
+}
+
+.result{
+background:white;
+margin-top:20px;
+padding:20px;
+border-radius:12px;
+font-size:18px;
+box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+.total{
+margin-top:15px;
+padding-top:15px;
+border-top:1px solid #eee;
+font-size:20px;
+font-weight:bold;
 }
 
 </style>
@@ -55,9 +80,12 @@ font-size:16px;
 
 <div id="list"></div>
 
-<button onclick="resetAll()">전체 초기화</button>
+<button class="calc" onclick="calc()">주문 조회</button>
+<button class="reset" onclick="resetAll()">전체 초기화</button>
 
-<div class="result" id="result"></div>
+<div class="result" id="result">
+조회 버튼을 누르면 주문이 계산됩니다.
+</div>
 
 <script>
 
@@ -101,7 +129,7 @@ div.className="person";
 
 div.innerHTML=`
 <span>${p.name} - ${p.drink}</span>
-<input type="checkbox" onchange="calc()">
+<input type="checkbox">
 `;
 
 list.appendChild(div);
@@ -143,8 +171,12 @@ text+=`${d} : ${result[d]}잔<br>`;
 
 }
 
-text+=`<br><b>총 주문 : ${total}잔</b><br>`;
-text+=`<b>총 금액 : ${totalPrice.toLocaleString()}원</b>`;
+text+=`
+<div class="total">
+총 주문 : ${total}잔<br>
+총 금액 : ${totalPrice.toLocaleString()}원
+</div>
+`;
 
 document.getElementById("result").innerHTML=text;
 
@@ -154,11 +186,9 @@ function resetAll(){
 
 document.querySelectorAll("input").forEach(i=>i.checked=false);
 
-calc();
+document.getElementById("result").innerHTML="조회 버튼을 누르면 주문이 계산됩니다.";
 
 }
-
-calc();
 
 </script>
 
