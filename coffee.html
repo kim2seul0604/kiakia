@@ -3,77 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>커피 주문</title>
 
 <style>
 
 body{
 font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-background:#f4f4f4;
+background:#f5f6f8;
+padding:10px;
 margin:0;
-padding:12px;
 max-width:520px;
 margin:auto;
 }
 
-.title{
-font-size:18px;
-font-weight:700;
-margin-bottom:10px;
+h1{
+text-align:center;
+margin:4px 0 6px;
+font-size:20px;
 }
 
-.people{
+.guide{
+text-align:center;
+color:#666;
+margin-bottom:8px;
+font-size:13px;
+}
+
+#list{
 display:grid;
 grid-template-columns:repeat(3,1fr);
-gap:8px;
+gap:4px;
 }
 
 .person{
 background:white;
-border-radius:12px;
-padding:14px 6px;
-text-align:center;
-font-size:14px;
-font-weight:600;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
+padding:6px;
+border-radius:8px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:13px;
+box-shadow:0 1px 3px rgba(0,0,0,0.05);
 cursor:pointer;
 }
 
-.person small{
-display:block;
-font-weight:400;
-font-size:12px;
-margin-top:4px;
-color:#666;
+.person span{
+line-height:1.2;
 }
 
-.person.off{
-background:#dcdcdc;
+.person.checked{
+background:#e9ecef;
 color:#888;
 text-decoration:line-through;
 }
 
-.result{
-margin-top:14px;
-background:white;
-border-radius:12px;
-padding:14px;
-font-size:16px;
-font-weight:600;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
+input[type="checkbox"]{
+width:16px;
+height:16px;
 }
 
-.copy{
-margin-top:10px;
+button{
 width:100%;
 padding:10px;
-border:none;
-border-radius:10px;
-background:#333;
-color:white;
 font-size:15px;
-font-weight:600;
+border:none;
+border-radius:8px;
+margin-top:6px;
+}
+
+.calc{
+background:#007aff;
+color:white;
+}
+
+.reset{
+background:#e5e5ea;
+}
+
+.result{
+background:white;
+margin-top:8px;
+padding:12px;
+border-radius:10px;
+font-size:15px;
+box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+.total{
+margin-top:8px;
+padding-top:8px;
+border-top:1px solid #eee;
+font-size:17px;
+font-weight:bold;
 }
 
 </style>
@@ -81,82 +102,164 @@ font-weight:600;
 
 <body>
 
-<div class="title">주문에서 뺄 사람을 누르세요</div>
+<h1>☕ 커피 주문</h1>
 
-<div class="people" id="people"></div>
+<div class="guide">
+주문에서 뺄 사람을 체크하세요
+</div>
 
-<div class="result" id="result"></div>
+<div id="list"></div>
 
-<button class="copy" onclick="copyOrder()">주문 복사</button>
+<button class="calc" onclick="calc()">주문 조회</button>
+<button class="reset" onclick="resetAll()">전체 초기화</button>
+
+<div class="result" id="result">
+조회 버튼을 누르면 주문이 계산됩니다.
+</div>
 
 <script>
 
-const data=[
-{name:"이슬",menu:"아아 연하게"},
-{name:"서진",menu:"아아 연하게"},
-{name:"민수",menu:"아아"},
-{name:"지훈",menu:"라떼"},
-{name:"유진",menu:"아아"},
-{name:"수현",menu:"바닐라라떼"}
-]
+const people=[
 
-const peopleDiv=document.getElementById("people")
+{name:"반장",drink:"작은아아"},
+{name:"민근",drink:"ICE바닐라라떼"},
+{name:"형원",drink:"아아"},
+{name:"정무",drink:"ICE바닐라라떼"},
+{name:"재권",drink:"아아"},
+{name:"범성",drink:"아아"},
+{name:"학현",drink:"아아"},
+{name:"진솔",drink:"아아"},
+{name:"응규",drink:"아이스티"},
+{name:"기백",drink:"아이스티"},
+{name:"서진",drink:"아아 연하게"},
+{name:"이슬",drink:"아아 연하게"},
+{name:"원빈",drink:"아아"},
+{name:"대현",drink:"아아"},
+{name:"민국",drink:"아아"},
+{name:"정훈",drink:"아아"}
 
-data.forEach((p,i)=>{
+];
 
-const div=document.createElement("div")
-div.className="person"
+const price={
 
-div.innerHTML=p.name+"<small>☕ "+p.menu+"</small>"
+"아아":2000,
+"아아 연하게":2000,
+"작은아아":1500,
+"ICE바닐라라떼":2800,
+"아이스티":3000
 
-div.onclick=()=>{
-div.classList.toggle("off")
-update()
+};
+
+const orderSort=[
+"아아",
+"아아 연하게",
+"작은아아",
+"ICE바닐라라떼",
+"아이스티"
+];
+
+const list=document.getElementById("list");
+
+people.forEach((p,i)=>{
+
+const div=document.createElement("div");
+
+div.className="person";
+
+div.innerHTML=`
+<span>${p.name}<br>${p.drink}</span>
+<input type="checkbox">
+`;
+
+div.onclick=function(e){
+
+const cb=this.querySelector("input");
+
+if(e.target.tagName!=="INPUT"){
+cb.checked=!cb.checked;
 }
 
-peopleDiv.appendChild(div)
+if(cb.checked){
+this.classList.add("checked");
+}else{
+this.classList.remove("checked");
+}
 
-})
+};
 
-function update(){
+div.querySelector("input").onchange=function(){
 
-const persons=document.querySelectorAll(".person")
-const result={}
+if(this.checked){
+div.classList.add("checked");
+}else{
+div.classList.remove("checked");
+}
 
-persons.forEach((p,i)=>{
+};
 
-if(!p.classList.contains("off")){
+list.appendChild(div);
 
-const menu=data[i].menu
-result[menu]=(result[menu]||0)+1
+});
+
+function calc(){
+
+let result={};
+let total=0;
+let totalPrice=0;
+
+document.querySelectorAll(".person").forEach((row,i)=>{
+
+const checked=row.querySelector("input").checked;
+
+if(!checked){
+
+let drink=people[i].drink;
+
+if(!result[drink]){
+result[drink]=0;
+}
+
+result[drink]++;
+
+total++;
+totalPrice+=price[drink];
 
 }
 
-})
+});
 
-let text="☕ 주문 결과<br><br>"
-let copyText=""
+let text="";
 
-for(let m in result){
+orderSort.forEach(d=>{
 
-text+=m+" "+result[m]+"잔<br>"
-copyText+=m+" "+result[m]+"잔\n"
+if(result[d]){
+text+=d+" : "+result[d]+"잔<br>";
+}
+
+});
+
+text+=`
+<div class="total">
+총 주문 : ${total}잔<br>
+총 금액 : ${totalPrice.toLocaleString()}원
+</div>
+`;
+
+document.getElementById("result").innerHTML=text;
 
 }
 
-document.getElementById("result").innerHTML=text
-window.orderText=copyText
+function resetAll(){
+
+document.querySelectorAll(".person").forEach(row=>{
+row.classList.remove("checked");
+});
+
+document.querySelectorAll("input").forEach(i=>i.checked=false);
+
+document.getElementById("result").innerHTML="조회 버튼을 누르면 주문이 계산됩니다.";
 
 }
-
-function copyOrder(){
-
-navigator.clipboard.writeText(window.orderText)
-alert("주문이 복사되었습니다")
-
-}
-
-update()
 
 </script>
 
