@@ -22,20 +22,28 @@ margin-bottom:10px;
 .guide{
 text-align:center;
 color:#666;
-margin-bottom:15px;
+margin-bottom:12px;
 font-size:15px;
 }
 
 .person{
 background:white;
-padding:10px 14px;
-margin-bottom:6px;
+padding:7px 12px;
+margin-bottom:3px;
 border-radius:10px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-font-size:17px;
+font-size:16px;
 box-shadow:0 1px 3px rgba(0,0,0,0.05);
+cursor:pointer;
+transition:0.15s;
+}
+
+.person.checked{
+background:#e9ecef;
+color:#888;
+text-decoration:line-through;
 }
 
 input[type="checkbox"]{
@@ -45,7 +53,7 @@ height:20px;
 
 button{
 width:100%;
-padding:15px;
+padding:14px;
 font-size:17px;
 border:none;
 border-radius:10px;
@@ -102,7 +110,7 @@ font-weight:bold;
 
 const people=[
 
-{name:"근재",drink:"작은아아"},
+{name:"반장",drink:"작은아아"},
 {name:"민근",drink:"ICE바닐라라떼"},
 {name:"형원",drink:"아아"},
 {name:"정무",drink:"ICE바닐라라떼"},
@@ -151,6 +159,32 @@ div.innerHTML=`
 <span>${p.name} - ${p.drink}</span>
 <input type="checkbox">
 `;
+
+div.onclick=function(e){
+
+const cb=this.querySelector("input");
+
+if(e.target.tagName!=="INPUT"){
+cb.checked=!cb.checked;
+}
+
+if(cb.checked){
+this.classList.add("checked");
+}else{
+this.classList.remove("checked");
+}
+
+};
+
+div.querySelector("input").onchange=function(){
+
+if(this.checked){
+div.classList.add("checked");
+}else{
+div.classList.remove("checked");
+}
+
+};
 
 list.appendChild(div);
 
@@ -205,6 +239,10 @@ document.getElementById("result").innerHTML=text;
 }
 
 function resetAll(){
+
+document.querySelectorAll(".person").forEach(row=>{
+row.classList.remove("checked");
+});
 
 document.querySelectorAll("input").forEach(i=>i.checked=false);
 
