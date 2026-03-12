@@ -16,32 +16,39 @@ margin:0;
 
 h1{
 text-align:center;
-margin-bottom:25px;
+margin-bottom:10px;
+}
+
+.guide{
+text-align:center;
+color:#666;
+margin-bottom:15px;
+font-size:15px;
 }
 
 .person{
 background:white;
-padding:16px;
-margin-bottom:10px;
-border-radius:12px;
+padding:10px 14px;
+margin-bottom:6px;
+border-radius:10px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-font-size:18px;
-box-shadow:0 2px 6px rgba(0,0,0,0.05);
+font-size:17px;
+box-shadow:0 1px 3px rgba(0,0,0,0.05);
 }
 
 input[type="checkbox"]{
-width:22px;
-height:22px;
+width:20px;
+height:20px;
 }
 
 button{
 width:100%;
-padding:16px;
-font-size:18px;
+padding:15px;
+font-size:17px;
 border:none;
-border-radius:12px;
+border-radius:10px;
 margin-top:10px;
 }
 
@@ -56,18 +63,18 @@ background:#e5e5ea;
 
 .result{
 background:white;
-margin-top:20px;
-padding:20px;
+margin-top:18px;
+padding:18px;
 border-radius:12px;
-font-size:18px;
+font-size:17px;
 box-shadow:0 2px 6px rgba(0,0,0,0.05);
 }
 
 .total{
-margin-top:15px;
-padding-top:15px;
+margin-top:12px;
+padding-top:12px;
 border-top:1px solid #eee;
-font-size:20px;
+font-size:19px;
 font-weight:bold;
 }
 
@@ -77,6 +84,10 @@ font-weight:bold;
 <body>
 
 <h1>☕ 커피 주문</h1>
+
+<div class="guide">
+주문에서 뺄 사람을 체크하세요
+</div>
 
 <div id="list"></div>
 
@@ -101,8 +112,8 @@ const people=[
 {name:"진솔",drink:"아아"},
 {name:"응규",drink:"아이스티"},
 {name:"기백",drink:"아이스티"},
-{name:"서진",drink:"아아"},
-{name:"이슬",drink:"아아"},
+{name:"서진",drink:"아아 연하게"},
+{name:"이슬",drink:"아아 연하게"},
 {name:"원빈",drink:"아아"},
 {name:"대현",drink:"아아"},
 {name:"민국",drink:"아아"},
@@ -113,11 +124,20 @@ const people=[
 const price={
 
 "아아":2000,
+"아아 연하게":2000,
 "작은아아":1500,
 "ICE바닐라라떼":2800,
 "아이스티":3000
 
 };
+
+const orderSort=[
+"아아",
+"아아 연하게",
+"작은아아",
+"ICE바닐라라떼",
+"아이스티"
+];
 
 const list=document.getElementById("list");
 
@@ -165,11 +185,13 @@ totalPrice+=price[drink];
 
 let text="";
 
-for(let d in result){
+orderSort.forEach(d=>{
 
+if(result[d]){
 text+=`${d} : ${result[d]}잔<br>`;
-
 }
+
+});
 
 text+=`
 <div class="total">
