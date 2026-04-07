@@ -236,20 +236,7 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
 
 <div class="container">
 
-  <!-- ✅ 공지: 접기/펼치기 -->
-  <div class="card notice-card">
-    <h2>📌 공지</h2>
-
-    <div class="notice-toggle" id="noticeToggle">
-      <div class="left">🌟 공지 🌟<span id="noticeCount">0</span>건</div>
-      <div class="right" id="noticeArrow">▼</div>
-    </div>
-
-    <div class="notice-body" id="noticeBody">
-      <div class="notice" id="noticeBox"></div>
-      <div class="footer" id="footerBox"></div>
-    </div>
-  </div>
+  
 
   <!-- ✅ 전체 스케줄 -->
   <div class="card">
@@ -290,6 +277,22 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
       <button class="primary" type="button" onclick="saveMyNameFromSelect()">저장</button>
       <button class="ghost" type="button" onclick="clearMyName()">삭제</button>
     </div>
+    
+    <!-- ✅ 공지: 접기/펼치기 -->
+  <div class="card notice-card">
+    <h2>📌 공지</h2>
+
+    <div class="notice-toggle" id="noticeToggle">
+      <div class="left">🌟 공지 🌟<span id="noticeCount">0</span>건</div>
+      <div class="right" id="noticeArrow">▼</div>
+    </div>
+
+    <div class="notice-body" id="noticeBody">
+      <div class="notice" id="noticeBox"></div>
+      <div class="footer" id="footerBox"></div>
+    </div>
+  </div>
+    
     <div class="settings-hint">
       내 이름을 저장하면 다음 접속부터 <b>노랑색</b>으로 표시됩니다.<br>
       다른사람의 이름을 클릭하면 <b>하늘색</b>으로 표시됩니다.
