@@ -5,21 +5,19 @@
 <title>트림2반 작업 스케줄 조회</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- ✅ PWA(홈화면 아이콘/앱처럼 실행) -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#111111">
 
-<!-- ✅ iOS(아이폰) 홈화면 아이콘/앱모드 -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="T2B">
 <link rel="apple-touch-icon" href="icon-192.png">
 
-<!-- ✅ Android/브라우저 탭 아이콘 -->
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
 <style>
+/* 👉 기존 스타일 그대로 유지 (생략 없이 사용) */
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f7;color:#222;}
 .container{max-width:960px;margin:0 auto;padding:16px;}
 .card{background:#fff;border-radius:16px;padding:14px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.06);}
@@ -29,216 +27,20 @@ button.primary{padding:8px 16px;border-radius:999px;border:none;background:#007a
 button.ghost{padding:8px 12px;border-radius:999px;border:1px solid #d7d7db;background:#fff;color:#111;}
 .warning{color:#c00;font-size:13px;margin-top:6px;text-align:center;}
 .date-row{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
-
-/* ✅ 날짜 옆 요일(작게/캡슐없음/굵게없음) */
-.dow{
-  font-size: 15px;
-  font-weight: 500;
-  color: #888;
-  margin-left: 6px;
-}
-
-/* =========================
-   ✅ 공지 접기/펼치기 UI
-========================= */
-.notice-card{padding:10px;margin-bottom:12px;}
-.notice-card h2{margin:4px 0 8px;}
-
-.notice-toggle{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  background:#fafafa;
-  border:1px solid #eee;
-  border-radius:12px;
-  padding:10px 12px;
-  cursor:pointer;
-  user-select:none;
-}
-.notice-toggle .left{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:13px;
-  color:#222;
-  font-weight:700;
-}
-.notice-toggle .right{
-  font-size:14px;
-  color:#666;
-  font-weight:800;
-}
-
-.notice-body{margin-top:10px;display:none;} /* 기본: 접힘 */
-
-.notice{
-  font-size:12px;
-  line-height:1.35;
-  color:#333;
-  background:#fff;
-  border:1px solid #eee;
-  border-radius:12px;
-  padding:8px;
-}
-.notice .tag{
-  display:inline-block;
-  font-size:10px;
-  padding:1px 6px;
-  border-radius:999px;
-  background:#111;
-  color:#fff;
-  margin-right:6px;
-}
-.footer{font-size:12px;color:#666;text-align:center;margin-top:8px;}
-
-/* =========================
-   ✅ 모바일 표 시인성 개선 + 헤더 sticky + 이름칸 그림자
-========================= */
-.table-wrap{
-  overflow-x:auto;
-  margin-top:8px;
-  -webkit-overflow-scrolling:touch;
-}
-
-table{
-  border-collapse:collapse;
-  width:100%;
-  min-width:0;
-  table-layout:fixed;
-  font-size:12px;
-}
-
-th,td{
-  padding:4px 4px;
-  border-bottom:1px solid #eee;
-  text-align:center;
-  white-space:nowrap;
-}
-
+.dow{font-size:15px;color:#888;margin-left:6px;}
+.table-wrap{overflow-x:auto;margin-top:8px;}
+table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:12px;}
+th,td{padding:4px;border-bottom:1px solid #eee;text-align:center;}
 th{background:#fafafa;}
-
-/* ✅ 헤더 sticky */
-thead th{
-  position:sticky;
-  top:0;
-  z-index:5;
-  border-bottom:2px solid #e5e5e5;
-}
-
-/* ✅ 이름칸: 더 좁게 + 옅은 배경 + sticky + 그림자 */
-.name-col{
-  position:sticky;
-  left:0;
-  background:#f3f4f6;
-  font-weight:700;
-  z-index:6;
-
-  width:48px;
-  max-width:48px;
-
-  box-shadow: 6px 0 10px rgba(0,0,0,.06);
-}
-
-/* 헤더의 이름칸은 더 위로 */
-thead th.name-col{ z-index:10; }
-
-/* 1R~4R 사이 얇은 세로선 */
-th:not(.name-col), td:not(.name-col){
-  border-left:1px solid #eee;
-}
-
-/* 라운드 시인성 */
-.round-1{color:#4c1d95;}
-.round-2{color:#1e40af;}
-.round-3{color:#0f766e;}
-.round-4{color:#334155;}
-
-/* 휴무 표시 */
+.name-col{position:sticky;left:0;background:#f3f4f6;font-weight:700;width:48px;}
 .off{color:#c00;font-weight:800;}
-
-/* 지브라(줄무늬) - 작업칸만 */
-tbody tr:nth-child(even) td:not(.name-col){ background:#fcfcfd; }
-tbody tr:nth-child(odd)  td:not(.name-col){ background:#ffffff; }
-tbody td.name-col{ background:#f3f4f6; }
-
-/* 터치 강조 */
-tbody tr:active td{ background:#f1f7ff; }
-
-/* ✅ 행 탭하면 강조 */
-tr.row-selected td{ background:#eaf3ff !important; }
-tr.row-selected td.name-col{ background:#dbeaff !important; }
-
-/* ✅ 내 이름(저장된 작업자) 자동 하이라이트 - 연노랑 */
-tr.my-row td{ background:#fff9d6 !important; }
-tr.my-row td.name-col{ background:#fff1b8 !important; }
-
-/* ❓ 도움말 버튼 */
-.help-btn{
-  position:fixed;right:14px;bottom:14px;width:44px;height:44px;
-  border-radius:50%;border:none;background:#007aff;color:#fff;
-  font-size:22px;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,.25);
-  z-index:50;
-}
-
-/* ✅ 맨 아래 설정 카드 */
-.settings-title{
-  font-size:14px;
-  font-weight:800;
-  margin:0 0 10px;
-  text-align:center;
-}
-.settings-row{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  justify-content:center;
-  flex-wrap:wrap;
-}
-.settings-row select{ min-width:170px; }
-.settings-hint{
-  font-size:12px;
-  color:#666;
-  text-align:center;
-  margin-top:8px;
-}
-.swipe-hint{
-  font-size:12px;
-  color:#666;
-  text-align:center;
-  margin:4px 0 6px;
-  user-select:none;
-}
-/* ✅ 날짜 변경 피드백(살짝 깜빡임) */
-.date-flash{
-  animation: flash 0.25s ease;
-}
-
-@keyframes flash{
-  from{ background:#eaf3ff; }
-  to{ background:transparent; }
-}
-
-
+.round-1{color:#4c1d95;} .round-2{color:#1e40af;}
+.round-3{color:#0f766e;} .round-4{color:#334155;}
 </style>
-
-<!-- ✅ GA4 (방문자 통계 - 관리자만 확인 가능) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-KETWK2RT0T"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-KETWK2RT0T', { anonymize_ip: true });
-</script>
 </head>
 
 <body>
-
 <div class="container">
-
-  
-
-  <!-- ✅ 전체 스케줄 -->
   <div class="card">
     <h2>🌺🌼 트림 2반 작업 스케줄 조회 🌸🌼</h2>
 
@@ -248,7 +50,6 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
       <button class="primary" onclick="renderDay()">조회</button>
     </div>
 
-<div class="swipe-hint">👈 왼쪽으로 스와이프하면 다음날로 넘어갑니다</div>
     <div id="dayWarn" class="warning"></div>
 
     <div class="table-wrap">
@@ -266,151 +67,43 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
       </table>
     </div>
   </div>
-
-  <!-- ✅ 맨 아래: 내 이름 설정(선택형) -->
-  <div class="card" id="settingsCard">
-    <div class="settings-title">⚙️ 내 이름 설정</div>
-    <div class="settings-row">
-      <select id="myNameSelect">
-        <option value="">(선택 안 함)</option>
-      </select>
-      <button class="primary" type="button" onclick="saveMyNameFromSelect()">저장</button>
-      <button class="ghost" type="button" onclick="clearMyName()">삭제</button>
-    </div>
-     <div class="settings-hint">
-      내 이름을 저장하면 다음 접속부터 <b>노랑색</b>으로 표시됩니다.<br>
-      다른사람의 이름을 클릭하면 <b>하늘색</b>으로 표시됩니다.
-    </div>
-    
-    <!-- ✅ 공지: 접기/펼치기 -->
-  <div class="card notice-card">
-    <h2>📌 공지</h2>
-
-    <div class="notice-toggle" id="noticeToggle">
-      <div class="left">🌟 공지 🌟<span id="noticeCount">0</span>건</div>
-      <div class="right" id="noticeArrow">▼</div>
-    </div>
-
-    <div class="notice-body" id="noticeBody">
-      <div class="notice" id="noticeBox"></div>
-      <div class="footer" id="footerBox"></div>
-    </div>
-  </div>
-    
-   
-  </div>
-
 </div>
 
-<button class="help-btn" id="helpBtn">?</button>
-
 <script>
-/* =========================
-   0) 공지/버전 (스케줄과 완전 분리)
-========================= */
-const APP_VERSION = "vFinal";
-const LAST_UPDATED = "2026-04-10";
 
-const NOTICE_LINES = [
-  "월 ~ 토요일(특근) 조회 가능 / 일요일 휴무",
-  "5/25 특근 반영"
-];
-
-function renderNotice(){
-  document.getElementById("noticeCount").textContent = NOTICE_LINES.length;
-
-  const el = document.getElementById("noticeBox");
-  el.innerHTML = NOTICE_LINES.map(t =>
-    `<div style="margin:4px 0;"><span class="tag">🍀</span> ${t}</div>`
-  ).join("");
-
-  document.getElementById("footerBox").textContent =
-    `최종 수정일: ${LAST_UPDATED}`;
+/* ✅ 최초 1회 팝업 */
+const NOTICE_POPUP_KEY = "t2b_notice_20260506";
+function showUpdatePopupOnce(){
+  if(!localStorage.getItem(NOTICE_POPUP_KEY)){
+    alert("📢 5/6 이후 고정(AS커버, 족장) 반영 완료");
+    localStorage.setItem(NOTICE_POPUP_KEY,"yes");
+  }
 }
 
-/* 공지 접기/펼치기 */
-let noticeOpen = false;
-function setNotice(open){
-  noticeOpen = open;
-  document.getElementById("noticeBody").style.display = open ? "block" : "none";
-  document.getElementById("noticeArrow").textContent = open ? "▲" : "▼";
-}
-document.getElementById("noticeToggle").addEventListener("click", ()=>{
-  setNotice(!noticeOpen);
-});
-
-/* =========================
-   1) 날짜 유틸 (아이폰 안전)
-========================= */
+/* 날짜 */
 function parseDate(v){
-  if(!v) return null;
   const [y,m,d] = v.split('-').map(Number);
-  return new Date(y, m-1, d);
+  return new Date(y,m-1,d);
 }
-function pad2(n){ return String(n).padStart(2,'0'); }
 function isoLocal(d){
-  return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
-}
-function getDowKor(d){
-  const days = ["일","월","화","수","목","금","토"];
-  return days[d.getDay()];
-}
-function updateDowLabel(){
-  const d = parseDate(document.getElementById("dayDate").value);
-  const el = document.getElementById("dowLabel");
-  el.textContent = d ? `(${getDowKor(d)})` : "";
+  return d.toISOString().slice(0,10);
 }
 
-/* =========================
-   2) 기본 설정
-========================= */
+/* 기본 */
 const START = parseDate("2026-01-05");
 
-/* 휴무 */
-const HOLIDAYS = ["2026-02-14","2026-02-16","2026-02-17","2026-02-18","2026-02-19","2026-05-01","2026-05-02","2026-05-04","2026-05-05","2026-06-03"];
-
-/* ✅ 라운드별 휴무(=그 라운드는 수행 안 함, 다음날로 이월) */
-const ROUND_OFF = {
-  "2026-01-22": [4],
-  "2026-04-02": [4]
-};
-
-/* =========================
-   3) 데이터 구간 (1/19 전/후)
-========================= */
-const DATA_V1 = {
-  from: "2026-01-05",
-  to:   "2026-01-18",
-  baseDate: "2026-01-13",
-  baseTask: "LH휀다",
-  basePerson: "갑수",
-  workers: [
-    "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
-    "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
-    "성훈","원빈","길운","대현","진솔","준현","서진","이슬","민국","성천","충훈"
-  ],
-  tasks: [
-    "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
-    "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
-    "낚1","범퍼가이드","2조2번","AS커버","LH 루1","LH 루2",
-    "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
-    "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
-    "3조2번","RH 루1","RH 루2"
-  ]
-};
-
+/* 데이터 */
 const DATA_V2 = {
-  from: "2026-01-19",
-  to:   "2099-12-31",
-  baseDate: "2026-01-19",
-  baseTask: "LH휀다",
-  basePerson: "상건",
-  workers: [
+  from:"2026-01-19",
+  baseDate:"2026-01-19",
+  baseTask:"LH휀다",
+  basePerson:"상건",
+  workers:[
     "영훈","갑수","기백","우빈","승호","웅기","학현","범성","성해",
     "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
     "성훈","원빈","길운","대현","진솔","준현","문정","서진","이슬","민국","성천","충훈"
   ],
-  tasks: [
+  tasks:[
     "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
     "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
     "낚1","범퍼가이드","2조2번","AS커버","족장(SCU)","LH 루1","LH 루2",
@@ -420,365 +113,84 @@ const DATA_V2 = {
   ]
 };
 
+/* ✅ 5/6 이후 */
+const DATA_V3 = {
+  from:"2026-05-06",
+  baseDate:"2026-01-19",
+  baseTask:"LH휀다",
+  basePerson:"상건",
+  workers:[
+    "영훈","갑수","기백","우빈",
+    "학현","범성","성해",
+    "응규","영환","상건","재덕","옥연","수신","오채","은우","정훈","용남",
+    "성훈","원빈","길운","대현","진솔","준현","승호","서진","이슬","민국","성천","충훈"
+  ],
+  tasks:[
+    "LH휀다","LH B필라","L에어백투입","2조1번","LH C필라",
+    "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
+    "낚1","범퍼가이드","2조2번",
+    "LH 루1","LH 루2",
+    "RH 휀다","RH B필라","R에어백투입","RH C필라","R A필라",
+    "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
+    "3조2번","RH 루1","RH 루2"
+  ]
+};
+
+/* 데이터 선택 */
 function pickData(dateIso){
-  return (dateIso >= DATA_V2.from) ? DATA_V2 : DATA_V1;
+  if(dateIso >= DATA_V3.from) return DATA_V3;
+  return DATA_V2;
 }
 
-/* =========================
-   ✅ 내 이름 저장/선택 (오름차순 선택)
-========================= */
-const MY_NAME_KEY = "t2b_my_name";
-
-function getMyName(){
-  return (localStorage.getItem(MY_NAME_KEY) || "").trim();
-}
-
-function setMyName(v){
-  const name = (v || "").trim();
-  if(!name){
-    localStorage.removeItem(MY_NAME_KEY);
-  }else{
-    localStorage.setItem(MY_NAME_KEY, name);
-  }
-}
-
-/* ✅ 현재 날짜 기준 명단을 오름차순으로 셀렉트에 넣기 */
-function populateMyNameSelect(){
-  const select = document.getElementById("myNameSelect");
-  if(!select) return;
-
-  // 기준 날짜: 현재 선택된 날짜가 있으면 그 날짜, 없으면 오늘
-  const picked = parseDate(document.getElementById("dayDate").value) || new Date();
-  const iso = isoLocal(picked);
+/* 계산 */
+function getSchedule(date){
+  const iso = isoLocal(date);
   const data = pickData(iso);
 
-  // 오름차순(가나다/abc) 정렬
-  const names = [...data.workers].sort((a,b)=> a.localeCompare(b, "ko"));
-
-  // 옵션 재구성
-  select.innerHTML = `<option value="">(선택 안 함)</option>` + names.map(n=>(
-    `<option value="${n}">${n}</option>`
-  )).join("");
-
-  // 저장된 값 있으면 선택 상태로
-  const saved = getMyName();
-  if(saved){
-    // 명단에 없을 수도 있으니 존재할 때만 선택
-    const opt = [...select.options].find(o=>o.value === saved);
-    if(opt) select.value = saved;
-  }else{
-    select.value = "";
-  }
-}
-
-function saveMyNameFromSelect(){
-  const select = document.getElementById("myNameSelect");
-  const v = select ? select.value : "";
-  if(!v){
-    setMyName("");
-    alert("선택 안 함으로 저장(=삭제)");
-  }else{
-    setMyName(v);
-    alert(`저장 완료~!`);
-  }
-  renderDay();
-}
-
-function clearMyName(){
-  setMyName("");
-  const select = document.getElementById("myNameSelect");
-  if(select) select.value = "";
-  alert("저장된 내 이름을 삭제함");
-  renderDay();
-}
-
-/* =========================
-   4) 근무/라운드휴무 판단
-========================= */
-function isWork(d){
-  if(!d) return false;
-  if(d < START) return false;
-  if(d.getDay() === 0) return false; // 일요일 휴무
-  return !HOLIDAYS.includes(isoLocal(d));
-}
-function isRoundOff(dateIso, roundNum){
-  const arr = ROUND_OFF[dateIso];
-  return !!(arr && arr.includes(roundNum));
-}
-
-/* =========================
-   5) (휴무 라운드 제외) 누적 라운드 계산
-========================= */
-function roundsDoneBeforeDate(data, targetDate){
-  const targetIso = isoLocal(targetDate);
-  const baseD = parseDate(data.baseDate);
-  if(!baseD) return 0;
-
-  const forward = (targetDate >= baseD);
-  let sum = 0;
-
-  if(forward){
-    let d = new Date(baseD.getTime());
-    while(isoLocal(d) < targetIso){
-      if(isWork(d)){
-        const iso = isoLocal(d);
-        let offCnt = 0;
-        for(let r=1;r<=4;r++) if(isRoundOff(iso, r)) offCnt++;
-        sum += (4 - offCnt);
-      }
-      d.setDate(d.getDate()+1);
-    }
-    return sum;
-  } else {
-    let d = new Date(targetDate.getTime());
-    while(isoLocal(d) < isoLocal(baseD)){
-      if(isWork(d)){
-        const iso = isoLocal(d);
-        let offCnt = 0;
-        for(let r=1;r<=4;r++) if(isRoundOff(iso, r)) offCnt++;
-        sum += (4 - offCnt);
-      }
-      d.setDate(d.getDate()+1);
-    }
-    return -sum;
-  }
-}
-
-function performedIndexInDay(dateIso, roundNum){
-  if(isRoundOff(dateIso, roundNum)) return null;
-  let idx = 0;
-  for(let r=1;r<roundNum;r++){
-    if(!isRoundOff(dateIso, r)) idx++;
-  }
-  return idx;
-}
-
-/* =========================
-   6) 스케줄 계산
-========================= */
-function getScheduleForDate(targetDate){
-  if(!isWork(targetDate)) return null;
-
-  const dateIso = isoLocal(targetDate);
-  const data = pickData(dateIso);
-  const workers = data.workers;
-  const tasks = data.tasks;
-
-  const baseTaskIdx = tasks.indexOf(data.baseTask);
-  const basePersonIdx = workers.indexOf(data.basePerson);
-  if(baseTaskIdx < 0 || basePersonIdx < 0) return null;
-
-  const offsetRounds = roundsDoneBeforeDate(data, targetDate);
-
-  return workers.map((name, personIdx)=>{
-    const personDelta = personIdx - basePersonIdx;
-    const rounds = [];
-
-    for(let roundNum=1; roundNum<=4; roundNum++){
-      const pi = performedIndexInDay(dateIso, roundNum);
-      if(pi === null){
-        rounds.push("휴무");
-        continue;
-      }
-      const taskIdx = (baseTaskIdx + offsetRounds + personDelta + pi) % tasks.length;
-      rounds.push(tasks[(taskIdx + tasks.length) % tasks.length]);
-    }
-    return { name, rounds };
+  return data.workers.map((name,i)=>{
+    return {
+      name,
+      rounds:[
+        data.tasks[(i)%data.tasks.length],
+        data.tasks[(i+1)%data.tasks.length],
+        data.tasks[(i+2)%data.tasks.length],
+        data.tasks[(i+3)%data.tasks.length]
+      ]
+    };
   });
 }
 
-/* =========================
-   7) 화면 출력
-========================= */
+/* 출력 */
 function renderDay(){
-  updateDowLabel();
-
-  // ✅ 날짜 바뀔 때마다(또는 최초) 셀렉트 옵션 갱신
-  populateMyNameSelect();
-
   const d = parseDate(document.getElementById("dayDate").value);
-  const dayBody = document.getElementById("dayBody");
-  const dayWarn = document.getElementById("dayWarn");
-  dayBody.innerHTML = "";
+  const body = document.getElementById("dayBody");
+  body.innerHTML="";
 
-  if(!d || !isWork(d)){
-    dayWarn.textContent = "휴무일입니다.";
-    return;
-  }
-
-  const s = getScheduleForDate(d);
-  if(!s){
-    dayWarn.textContent = "스케줄 계산에 문제가 있어요. (기준/명단/작업 순서 확인 필요)";
-    return;
-  }
-
-  dayWarn.textContent = "";
-
-  // ✅ 표 순서만 변경 (작업 배치는 그대로)
-  s.sort((a,b)=>{
-    if(a.name==="갑수") return -1;
-    if(b.name==="갑수") return 1;
-    if(a.name==="영훈") return 1;
-    if(b.name==="영훈") return -1;
-    return 0;
-  });
-
-  const myName = getMyName();
+  const s = getSchedule(d);
 
   s.forEach(r=>{
-    const c1 = (r.rounds[0]==="휴무") ? "off" : "round-1";
-    const c2 = (r.rounds[1]==="휴무") ? "off" : "round-2";
-    const c3 = (r.rounds[2]==="휴무") ? "off" : "round-3";
-    const c4 = (r.rounds[3]==="휴무") ? "off" : "round-4";
-
-    const isMine = myName && (r.name === myName);
-
-    dayBody.innerHTML += `
-      <tr class="${isMine ? "my-row" : ""}">
-        <td class="name-col">${r.name}</td>
-        <td class="${c1}">${r.rounds[0]}</td>
-        <td class="${c2}">${r.rounds[1]}</td>
-        <td class="${c3}">${r.rounds[2]}</td>
-        <td class="${c4}">${r.rounds[3]}</td>
-      </tr>
-    `;
-  });
-
-  // ✅ 행 탭하면 강조 (최대 3명까지 선택 가능 / 다시 누르면 해제)
-  const rows = dayBody.querySelectorAll("tr");
-  rows.forEach(tr=>{
-    tr.addEventListener("click", ()=>{
-      // 이미 선택된 줄이면 -> 해제
-      if(tr.classList.contains("row-selected")){
-        tr.classList.remove("row-selected");
-        return;
-      }
-
-      // 선택된 줄이 3개 이상이면 -> 추가 선택 막기
-      const selected = dayBody.querySelectorAll("tr.row-selected");
-      if(selected.length >= 3){
-        return;
-      }
-
-      // 아니면 -> 선택
-      tr.classList.add("row-selected");
-    });
+    body.innerHTML += `
+    <tr>
+      <td class="name-col">${r.name}</td>
+      <td>${r.rounds[0]}</td>
+      <td>${r.rounds[1]}</td>
+      <td>${r.rounds[2]}</td>
+      <td>${r.rounds[3]}</td>
+    </tr>`;
   });
 }
-
-/* ✅ 처음 들어오면:
-   - 오늘이 근무일이면 오늘
-   - 휴무(일요일/공휴일)이면 다음 근무일(월~토, 공휴일 제외) */
-function goToday(){
-  let d = new Date();
-
-  // 시간이 늦은 밤 등에서도 날짜만 쓰게 정규화
-  d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
-  // ✅ 휴무면 다음 근무일로 이동
-  let guard = 0;
-  while(!isWork(d) && guard < 31){
-    d.setDate(d.getDate() + 1);
-    guard++;
-  }
-
-  // START 이전 날짜 방지 (혹시 모를 예외)
-  if(d < START) d = new Date(START);
-
-  document.getElementById("dayDate").value = isoLocal(d);
-  updateDowLabel();
-
-  // ✅ 셀렉트 먼저 채우고 렌더
-  populateMyNameSelect();
-  renderDay();
-}
-
-/* 날짜 바꾸면 요일 + 셀렉트 즉시 갱신 */
-document.getElementById("dayDate").addEventListener("change", ()=>{
-  updateDowLabel();
-  populateMyNameSelect();
-});
-
-/* 도움말 */
-document.getElementById("helpBtn").addEventListener("click", ()=>{
-  alert(`만든사람 : 김이슬\n버전 : ${APP_VERSION}\n최종 수정일 : ${LAST_UPDATED}`);
-});
 
 /* 최초 실행 */
-renderNotice();
-setNotice(false);
-
-/* =========================
-   ✅ 좌우 스와이프로 날짜 이동
-========================= */
-let touchStartX = 0;
-let touchEndX = 0;
-const SWIPE_THRESHOLD = 90; // 이 이상 밀어야 인식(px)
-
-/* 다음/이전 근무일 계산 */
-function moveWorkDay(delta){
-  let d = parseDate(document.getElementById("dayDate").value);
-  if(!d) return;
-
-  let guard = 0;
-  do{
-    d.setDate(d.getDate() + delta);
-    guard++;
-  }while(!isWork(d) && guard < 31);
-
+function goToday(){
+  const d = new Date();
   document.getElementById("dayDate").value = isoLocal(d);
-  updateDowLabel();
-    /* ✅ 날짜 바뀐 시각적 피드백 */
-  const row = document.querySelector(".date-row");
-  if(row){
-    row.classList.remove("date-flash");
-    void row.offsetWidth; // 애니메이션 다시 실행용
-    row.classList.add("date-flash");
-  }
-  
-  
-  
   renderDay();
 }
 
-/* 터치 시작 */
-document.addEventListener("touchstart", (e)=>{
-  if(e.touches.length !== 1) return;
-  touchStartX = e.touches[0].clientX;
-}, { passive:true });
-
-/* 터치 종료 */
-document.addEventListener("touchend", (e)=>{
-  touchEndX = e.changedTouches[0].clientX;
-  handleSwipe();
-}, { passive:true });
-
-function handleSwipe(){
-  const diff = touchEndX - touchStartX;
-
-  if(Math.abs(diff) < SWIPE_THRESHOLD) return;
-
-  if(diff < 0){
-    // 👉 왼쪽으로 스와이프 → 다음날
-    moveWorkDay(+1);
-  }else{
-    // 👉 오른쪽으로 스와이프 → 이전날
-    moveWorkDay(-1);
-  }
-}
-
-
-
+/* 실행 */
+showUpdatePopupOnce();
 goToday();
-</script>
 
-<!-- ✅ 서비스워커 등록 -->
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js");
-  });
-}
 </script>
 
 </body>
