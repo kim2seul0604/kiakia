@@ -650,11 +650,11 @@ function renderDay(){
   dayWarn.textContent = "";
 
   // ✅ 표 순서만 변경 (작업 배치는 그대로)
-// ✅ 대현부터 시작해서 순서 정렬
+// ✅ 갑수부터 시작해서 순서 정렬
 const data = pickData(isoLocal(d));
 const order = data.workers;
 
-const startIdx = order.indexOf("대현");
+const startIdx = order.indexOf("갑수");
 
 const rotated = [
   ...order.slice(startIdx),
