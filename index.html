@@ -218,7 +218,42 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
   from{ background:#eaf3ff; }
   to{ background:transparent; }
 }
+/* =========================
+   ✅ 토스트 팝업
+========================= */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:26px;
+  transform:translateX(-50%) translateY(20px);
 
+  background:rgba(20,20,20,.92);
+  color:#fff;
+
+  padding:14px 18px;
+  border-radius:16px;
+
+  font-size:14px;
+  font-weight:700;
+  line-height:1.4;
+
+  box-shadow:0 10px 24px rgba(0,0,0,.25);
+  backdrop-filter:blur(10px);
+
+  z-index:9999;
+
+  opacity:0;
+  pointer-events:none;
+
+  transition:
+    opacity .28s ease,
+    transform .28s ease;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
 
 </style>
 
@@ -305,7 +340,7 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
 </div>
 
 <button class="help-btn" id="helpBtn">?</button>
-
+<div id="toast" class="toast"></div>
 <script>
 /* =========================
    0) 공지/버전 (스케줄과 완전 분리)
@@ -771,6 +806,21 @@ document.getElementById("helpBtn").addEventListener("click", ()=>{
   alert(`만든사람 : 김이슬\n버전 : ${APP_VERSION}\n최종 수정일 : ${LAST_UPDATED}`);
 });
 
+
+function showToast(msg, duration = 2500){
+  const toast = document.getElementById("toast");
+
+  toast.innerHTML = msg;
+  toast.classList.add("show");
+
+  clearTimeout(toast._timer);
+
+  toast._timer = setTimeout(()=>{
+    toast.classList.remove("show");
+  }, duration);
+}
+
+
 /* 최초 실행 */
 renderNotice();
 setNotice(false);
@@ -837,6 +887,11 @@ function handleSwipe(){
 
 
 goToday();
+showToast(`
+5/26 업데이트 완료<br>
+• LH휀다 고정 반영
+`);
+
 </script>
 
 <!-- ✅ 서비스워커 등록 -->
