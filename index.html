@@ -219,70 +219,105 @@ tr.my-row td.name-col{ background:#fff1b8 !important; }
   to{ background:transparent; }
 }
 /* =========================
-/* =========================
-   ✅ 토스트 팝업
+   ✅ 프리미엄 토스트 팝업
 ========================= */
 .toast{
   position:fixed;
   top:50%;
   left:50%;
-  transform:translate(-50%, -50%) scale(.92);
 
-  width:min(82%, 320px);
+  transform:
+    translate(-50%, -50%)
+    scale(.92);
+
+  width:min(78%, 320px);
 
   background:rgba(255,255,255,.88);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
 
-  border:1px solid rgba(255,255,255,.75);
-  border-radius:28px;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
 
-  padding:22px 22px;
+  border:1px solid rgba(255,255,255,.55);
 
-  box-shadow:0 14px 36px rgba(0,0,0,.16);
+  border-radius:30px;
+
+  padding:28px 24px;
+
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.18),
+    0 4px 12px rgba(0,0,0,.08);
 
   z-index:9999;
+
   opacity:0;
   pointer-events:none;
 
-  transition:opacity .25s ease, transform .25s ease;
+  transition:
+    opacity .45s ease,
+    transform .45s cubic-bezier(.2,.8,.2,1);
+
+  text-align:center;
 }
 
+/* 등장 */
 .toast.show{
   opacity:1;
-  transform:translate(-50%, -50%) scale(1);
+
+  transform:
+    translate(-50%, -50%)
+    scale(1);
 }
 
+/* 사라질 때 */
+.toast.hide{
+  opacity:0;
+
+  transform:
+    translate(-50%, -50%)
+    scale(.88);
+}
+
+/* 체크 아이콘 */
 .toast-icon{
-  width:54px;
-  height:54px;
-  margin:0 auto 12px;
+  width:72px;
+  height:72px;
+
+  margin:0 auto 18px;
+
   border-radius:50%;
-  background:linear-gradient(135deg,#38bdf8,#6366f1,#8b5cf6);
-  color:#fff;
+
+  background:
+    linear-gradient(135deg,#4facfe,#7b5cff);
+
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:32px;
+
+  color:#fff;
+  font-size:42px;
   font-weight:900;
-  box-shadow:0 8px 20px rgba(99,102,241,.28);
+
+  box-shadow:
+    0 10px 25px rgba(91,114,255,.35);
 }
 
 .toast-title{
-  font-size:18px;
+  font-size:28px;
   font-weight:900;
-  color:#111827;
-  text-align:center;
-  margin-bottom:8px;
+  color:#111;
+
+  margin-bottom:10px;
+
+  letter-spacing:-0.4px;
 }
 
 .toast-desc{
-  font-size:14px;
-  line-height:1.45;
-  color:#374151;
-  text-align:center;
-}
+  font-size:17px;
+  line-height:1.5;
+  color:#555;
 
+  word-break:keep-all;
+}
 </style>
 
 <!-- ✅ GA4 (방문자 통계 - 관리자만 확인 가능) -->
@@ -861,7 +896,7 @@ document.getElementById("helpBtn").addEventListener("click", ()=>{
 });
 
 
-function showToast(title, desc, duration = 1300){
+function showToast(title, desc, duration = 1600){
   const toast = document.getElementById("toast");
 
   toast.innerHTML = `
@@ -870,12 +905,14 @@ function showToast(title, desc, duration = 1300){
     <div class="toast-desc">${desc}</div>
   `;
 
+  toast.classList.remove("hide");
   toast.classList.add("show");
 
   clearTimeout(toast._timer);
 
   toast._timer = setTimeout(()=>{
     toast.classList.remove("show");
+    toast.classList.add("hide");
   }, duration);
 }
 
