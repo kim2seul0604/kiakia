@@ -906,10 +906,19 @@ function handleSwipe(){
 
 
 goToday();
-showToast(
-  "🌱 5/26 업데이트 완료 🌱",
-  "LH휀다 고정작업 추가"
-);
+const today = new Date();
+const todayStr =
+  today.getFullYear() + "-" +
+  String(today.getMonth()+1).padStart(2,"0") + "-" +
+  String(today.getDate()).padStart(2,"0");
+
+/* ✅ 2026-05-26까지만 표시 */
+if(todayStr <= "2026-05-26"){
+  showToast(
+    "🌱 5/26 업데이트 완료 🌱",
+    "LH휀다 고정 작업추가"
+  );
+}
 
 </script>
 
