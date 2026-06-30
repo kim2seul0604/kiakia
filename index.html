@@ -413,7 +413,7 @@ const LAST_UPDATED = "2026-05-26";
 
 const NOTICE_LINES = [
   "월 ~ 토요일(특근) 조회 가능 / 일요일 휴무",
-  "고정 작업 AS커버, SCU(족장), LH휀다, RH 휀다 반영"
+  "부재/고정: 승호 웅기 문정 학현"
 ];
 
 function renderNotice(){
@@ -990,10 +990,9 @@ const todayStr =
   String(today.getDate()).padStart(2,"0");
 
 /* ✅ 2026-05-27까지만 표시 */
-if(todayStr <= "2026-05-27"){
+if(todayStr <= "2026-07-06"){
   showToast(
-    "5/27(수) 업데이트 완료",
-    "LH휀다(고정), RH휀다(고정) 반영"
+    "7/17(금) 특근 반영완료"
   );
 }
 
