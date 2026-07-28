@@ -595,9 +595,37 @@ workers: [
   ]
 };
 
+const DATA_V6 = {
+  from: "2026-07-29",
+  to:   "2099-12-31",
+  baseDate: "2026-07-29",
+  baseTask: "LH B필라",
+  basePerson: "옥연",
+workers: [
+"옥연","수신","오채","은우","정훈","용남",
+  "성훈","원빈","길운","대현","준현","재덕","승호","서진","이슬",
+  "민국","성천","충훈",
+  "영훈","갑수","기백","우빈",
+  "진솔","범성","성해","응규","영환","문정"
+],
+  tasks: [
+    "LH B필라","L에어백투입","2조1번","LH C필라",
+    "SK주유구","멤버어스","LH A필라","마스터백","L도어탈거",
+    "낚1","범퍼가이드","2조2번","AS커버",
+    "LH 루1","LH 루2",
+    "RH B필라","R에어백투입","RH C필라","R A필라",
+    "후드","3조1번","R도어탈거","하이드로닉체결","낚2","엔진어스",
+    "3조2번","RH 루1","RH 루2"
+  ]
+};
+
+
+
+
 
 
 function pickData(dateIso){
+  if(dateIso >= DATA_V6.from) return DATA_V6;
 
 if(dateIso >= DATA_V5.from) return DATA_V5;
  if(dateIso >= DATA_V4.from) return DATA_V4;
