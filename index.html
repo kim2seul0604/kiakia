@@ -27,6 +27,176 @@ body{
   color:#222;
 }
 
+/* =========================================
+   🌕 2026 추석 테마
+   9/18 ~ 9/28에만 자동 적용
+========================================= */
+
+body.chuseok-theme{
+  background:
+    radial-gradient(
+      circle at 88% 5%,
+      rgba(244,196,92,.16) 0,
+      rgba(244,196,92,.08) 90px,
+      transparent 190px
+    ),
+    linear-gradient(
+      180deg,
+      #faf8f1 0%,
+      #f7f5ef 45%,
+      #f5f5f7 100%
+    );
+}
+
+body.chuseok-theme::before{
+  content:"🌕";
+  position:fixed;
+  top:8px;
+  right:13px;
+  font-size:38px;
+  opacity:.78;
+  z-index:0;
+  pointer-events:none;
+  filter:drop-shadow(0 3px 8px rgba(170,120,40,.15));
+}
+
+body.chuseok-theme .container{
+  position:relative;
+  z-index:1;
+}
+
+body.chuseok-theme .card{
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(205,177,113,.20);
+  box-shadow:
+    0 6px 18px rgba(100,80,40,.07),
+    0 1px 2px rgba(100,80,40,.04);
+}
+
+body.chuseok-theme h2{
+  color:#493c2b;
+}
+
+body.chuseok-theme .primary{
+  background:linear-gradient(
+    135deg,
+    #8d7650,
+    #b39764
+  );
+  box-shadow:0 3px 8px rgba(130,100,50,.18);
+}
+
+body.chuseok-theme .ghost{
+  border-color:#d9cdb6;
+  background:#fffdf8;
+  color:#493c2b;
+}
+
+body.chuseok-theme .notice-toggle{
+  background:#fcfaf4;
+  border-color:#e8dfcf;
+}
+
+body.chuseok-theme .notice .tag{
+  background:#8d7650;
+}
+
+body.chuseok-theme thead th{
+  background:#fbfaf6;
+  border-bottom-color:#e5dccb;
+}
+
+body.chuseok-theme .name-col{
+  background:#f4f0e6;
+}
+
+body.chuseok-theme tbody td.name-col{
+  background:#f4f0e6;
+}
+
+body.chuseok-theme .round-1{
+  color:#66502c;
+}
+
+body.chuseok-theme .round-2{
+  color:#355b72;
+}
+
+body.chuseok-theme .round-3{
+  color:#42695d;
+}
+
+body.chuseok-theme .round-4{
+  color:#59616b;
+}
+
+body.chuseok-theme .help-btn{
+  background:linear-gradient(
+    135deg,
+    #8d7650,
+    #b39764
+  );
+}
+
+body.chuseok-theme .swipe-hint{
+  color:#796b58;
+}
+
+body.chuseok-theme .settings-title{
+  color:#493c2b;
+}
+
+
+/* =========================================
+   🌾 추석 상단 장식
+========================================= */
+
+.chuseok-banner{
+  display:none;
+}
+
+body.chuseok-theme .chuseok-banner{
+  display:block;
+  text-align:center;
+  margin:-4px 0 9px;
+  font-size:12px;
+  color:#806b48;
+  letter-spacing:-.2px;
+  user-select:none;
+}
+
+.chuseok-banner .line{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+}
+
+.chuseok-banner .line::before,
+.chuseok-banner .line::after{
+  content:"";
+  height:1px;
+  width:34px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    #d7c49e
+  );
+}
+
+.chuseok-banner .line::after{
+  background:linear-gradient(
+    90deg,
+    #d7c49e,
+    transparent
+  );
+}
+
+
+/* =========================================
+   기존 스타일
+========================================= */
+
 .container{
   max-width:960px;
   margin:0 auto;
@@ -483,10 +653,17 @@ gtag('config', 'G-KETWK2RT0T', {
 
 <div class="container">
 
+  <!-- 🌕 추석 장식 -->
+  <div class="chuseok-banner">
+    <div class="line">
+      🌾 한가위, 풍성하고 따뜻한 연휴 보내세요 🌾
+    </div>
+  </div>
+
   <!-- ✅ 전체 스케줄 -->
   <div class="card">
 
-    <h2>🌊🐳 트림 2반 작업 스케줄 조회 🐬🪼</h2>
+    <h2>🍃🍂트림 2반 작업 스케줄 조회🍁🍂</h2>
 
     <div class="date-row">
 
@@ -501,7 +678,7 @@ gtag('config', 'G-KETWK2RT0T', {
     </div>
 
     <div class="swipe-hint">
-      🔥 <b>🌷 날짜별 LH B필라 1R 기준으로 이름이 정렬됩니당 ✈️</b>🔥
+      🔥 <b>날짜별 LH B필라 1R 기준으로 이름이 정렬됩니다😊</b>🔥
       <br>
       👈 왼쪽으로 스와이프 하면 다음날로 넘어갑니다 👈
     </div>
@@ -683,6 +860,53 @@ document
   .addEventListener("click", ()=>{
     setNotice(!noticeOpen);
   });
+
+
+/* =========================
+   🌕 추석 테마 자동 적용
+   2026-09-18 ~ 2026-09-28
+========================= */
+
+function applyChuseokTheme(){
+
+  const today =
+    new Date();
+
+  const todayIso =
+    today.getFullYear()
+    + "-"
+    + String(
+        today.getMonth()+1
+      ).padStart(2,"0")
+    + "-"
+    + String(
+        today.getDate()
+      ).padStart(2,"0");
+
+  const start =
+    "2026-09-18";
+
+  const end =
+    "2026-09-28";
+
+  if(
+    todayIso >= start &&
+    todayIso <= end
+  ){
+
+    document.body.classList.add(
+      "chuseok-theme"
+    );
+
+  }else{
+
+    document.body.classList.remove(
+      "chuseok-theme"
+    );
+
+  }
+
+}
 
 
 /* =========================
@@ -1033,7 +1257,7 @@ const DATA_V5 = {
     "성해","응규","영환","문정","옥연","수신",
     "오채","은우","정훈","용남",
     "성훈","원빈","길운",
-    "대현","준현","재덕","서진","이슬",
+    "대현","준현","재재","서진","이슬",
     "민국","성천","충훈",
     "영훈","갑수","기백","우빈",
     "진솔","범성"
@@ -1679,14 +1903,7 @@ function renderDay(){
 
 
   /* ==================================================
-     ⭐ 핵심 변경 부분 ⭐
-
-     그날 1R이 LH B필라인 사람을 찾아서
-     그 사람을 표의 맨 위로 올림.
-
-     예:
-     9/14 → 충훈
-     9/15 → 서진
+     ⭐ 1R LH B필라 담당자를 맨 위로 정렬
   ================================================== */
 
   const data =
@@ -1698,7 +1915,6 @@ function renderDay(){
     data.workers;
 
 
-  /* ✅ 1R 기준으로 LH B필라 담당자 찾기 */
   const lhBPillarPerson =
     s.find(
       r => r.rounds[0] === "LH B필라"
@@ -2027,6 +2243,8 @@ renderNotice();
 
 setNotice(false);
 
+applyChuseokTheme();
+
 
 /* =========================
    좌우 스와이프
@@ -2200,7 +2418,7 @@ const todayStr =
     ).padStart(2,"0");
 
 
-/* ✅ 8/26까지 표시 */
+/* ✅ 업데이트 토스트 */
 
 if(
   todayStr <= "2026-09-12"
