@@ -5,17 +5,17 @@
 <title>트림2반 작업 스케줄 조회</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- PWA -->
+<!-- ✅ PWA(홈화면 아이콘/앱처럼 실행) -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#111111">
 
-<!-- iOS -->
+<!-- ✅ iOS(아이폰) 홈화면 아이콘/앱모드 -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="T2B">
 <link rel="apple-touch-icon" href="icon-192.png">
 
-<!-- Android/브라우저 -->
+<!-- ✅ Android/브라우저 탭 아이콘 -->
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
@@ -25,211 +25,21 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:#f5f5f7;
   color:#222;
-  transition:background .6s ease;
 }
-
-/* =========================================
-   🌕 추석 테마
-========================================= */
-
-body.chuseok-theme{
-  background:
-    radial-gradient(
-      circle at 82% 8%,
-      rgba(255,239,190,.45) 0,
-      rgba(255,239,190,.18) 90px,
-      transparent 190px
-    ),
-    linear-gradient(
-      180deg,
-      #f7f2e8 0%,
-      #f8f5ef 45%,
-      #f5f5f7 100%
-    );
-}
-
-/* 🌕 보름달 */
-
-.chuseok-moon{
-  position:fixed;
-  top:42px;
-  right:-45px;
-
-  width:145px;
-  height:145px;
-
-  border-radius:50%;
-
-  background:
-    radial-gradient(
-      circle at 35% 30%,
-      #fffdf1 0%,
-      #fff8d8 42%,
-      #f4df9c 100%
-    );
-
-  box-shadow:
-    0 0 25px rgba(255,226,142,.32),
-    0 0 65px rgba(255,226,142,.22);
-
-  opacity:0;
-  pointer-events:none;
-
-  z-index:0;
-
-  transition:opacity .8s ease;
-}
-
-body.chuseok-theme .chuseok-moon{
-  opacity:.9;
-}
-
-/* 달 표면 */
-
-.chuseok-moon::before{
-  content:"";
-
-  position:absolute;
-  width:22px;
-  height:22px;
-
-  left:35px;
-  top:38px;
-
-  border-radius:50%;
-
-  background:rgba(214,190,122,.16);
-
-  box-shadow:
-    47px 18px 0 rgba(214,190,122,.13),
-    30px 60px 0 rgba(214,190,122,.12),
-    72px 74px 0 rgba(214,190,122,.10),
-    57px 46px 0 rgba(214,190,122,.08);
-}
-
-/* ☁️ 전통 구름 느낌 */
-
-.chuseok-cloud{
-  position:fixed;
-  top:78px;
-  right:45px;
-
-  width:170px;
-  height:42px;
-
-  opacity:0;
-  pointer-events:none;
-
-  z-index:0;
-
-  transition:opacity .8s ease;
-}
-
-body.chuseok-theme .chuseok-cloud{
-  opacity:.32;
-}
-
-.chuseok-cloud::before,
-.chuseok-cloud::after{
-  content:"";
-  position:absolute;
-
-  border-radius:50%;
-
-  background:#fff;
-
-  box-shadow:
-    42px 8px 0 5px #fff,
-    82px 4px 0 1px #fff,
-    116px 13px 0 5px #fff;
-}
-
-.chuseok-cloud::before{
-  width:65px;
-  height:24px;
-  left:0;
-  top:12px;
-}
-
-.chuseok-cloud::after{
-  width:45px;
-  height:20px;
-  left:48px;
-  top:0;
-}
-
-/* 🌾 아래쪽 억새 */
-
-.chuseok-grass{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-
-  height:55px;
-
-  opacity:0;
-  pointer-events:none;
-
-  z-index:0;
-
-  transition:opacity .8s ease;
-
-  background:
-    repeating-linear-gradient(
-      105deg,
-      transparent 0,
-      transparent 28px,
-      rgba(157,133,82,.12) 29px,
-      rgba(157,133,82,.12) 30px,
-      transparent 31px,
-      transparent 48px
-    );
-}
-
-body.chuseok-theme .chuseok-grass{
-  opacity:.55;
-}
-
-/* 콘텐츠는 장식 위로 */
 
 .container{
-  position:relative;
-  z-index:2;
-
   max-width:960px;
   margin:0 auto;
   padding:16px;
 }
 
 .card{
-  background:rgba(255,255,255,.94);
+  background:#fff;
   border-radius:16px;
   padding:14px;
   margin-bottom:16px;
   box-shadow:0 6px 16px rgba(0,0,0,.06);
 }
-
-body.chuseok-theme .card{
-  box-shadow:
-    0 6px 18px rgba(104,82,38,.07);
-}
-
-/* 🌕 추석 기간 제목 */
-
-.chuseok-title{
-  display:none;
-}
-
-body.chuseok-theme .normal-title{
-  display:none;
-}
-
-body.chuseok-theme .chuseok-title{
-  display:block;
-}
-
-/* ========================================= */
 
 h2{
   font-size:16px;
@@ -276,6 +86,7 @@ button.ghost{
   flex-wrap:wrap;
 }
 
+/* ✅ 날짜 옆 요일 */
 .dow{
   font-size:15px;
   font-weight:500;
@@ -283,7 +94,9 @@ button.ghost{
   margin-left:6px;
 }
 
-/* 공지 */
+/* =========================
+   ✅ 공지 접기/펼치기 UI
+========================= */
 
 .notice-card{
   padding:10px;
@@ -354,7 +167,9 @@ button.ghost{
   margin-top:8px;
 }
 
-/* 표 */
+/* =========================
+   ✅ 모바일 표
+========================= */
 
 .table-wrap{
   overflow-x:auto;
@@ -381,6 +196,7 @@ th{
   background:#fafafa;
 }
 
+/* ✅ 헤더 sticky */
 thead th{
   position:sticky;
   top:0;
@@ -388,6 +204,7 @@ thead th{
   border-bottom:2px solid #e5e5e5;
 }
 
+/* ✅ 이름칸 sticky */
 .name-col{
   position:sticky;
   left:0;
@@ -401,15 +218,18 @@ thead th{
   box-shadow:6px 0 10px rgba(0,0,0,.06);
 }
 
+/* 헤더 이름칸 */
 thead th.name-col{
   z-index:10;
 }
 
+/* 1R~4R 사이 얇은 세로선 */
 th:not(.name-col),
 td:not(.name-col){
   border-left:1px solid #eee;
 }
 
+/* 라운드 시인성 */
 .round-1{
   color:#4c1d95;
 }
@@ -426,11 +246,13 @@ td:not(.name-col){
   color:#334155;
 }
 
+/* 휴무 표시 */
 .off{
   color:#c00;
   font-weight:800;
 }
 
+/* 지브라 */
 tbody tr:nth-child(even) td:not(.name-col){
   background:#fcfcfd;
 }
@@ -443,10 +265,12 @@ tbody td.name-col{
   background:#f3f4f6;
 }
 
+/* 터치 강조 */
 tbody tr:active td{
   background:#f1f7ff;
 }
 
+/* ✅ 행 선택 */
 tr.row-selected td{
   background:#eaf3ff !important;
 }
@@ -455,6 +279,7 @@ tr.row-selected td.name-col{
   background:#dbeaff !important;
 }
 
+/* ✅ 내 이름 */
 tr.my-row td{
   background:#fff9d6 !important;
 }
@@ -463,8 +288,7 @@ tr.my-row td.name-col{
   background:#fff1b8 !important;
 }
 
-/* 도움말 */
-
+/* ❓ 도움말 */
 .help-btn{
   position:fixed;
   right:14px;
@@ -481,7 +305,9 @@ tr.my-row td.name-col{
   z-index:50;
 }
 
-/* 설정 */
+/* =========================
+   ✅ 설정 카드
+========================= */
 
 .settings-title{
   font-size:14px;
@@ -517,7 +343,9 @@ tr.my-row td.name-col{
   user-select:none;
 }
 
-/* 날짜 피드백 */
+/* =========================
+   ✅ 날짜 변경 피드백
+========================= */
 
 .date-flash{
   animation:flash 0.25s ease;
@@ -532,7 +360,9 @@ tr.my-row td.name-col{
   }
 }
 
-/* 토스트 */
+/* =========================
+   ✅ 프리미엄 토스트
+========================= */
 
 .toast{
   position:fixed;
@@ -630,7 +460,7 @@ tr.my-row td.name-col{
 }
 </style>
 
-<!-- GA4 -->
+<!-- ✅ GA4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KETWK2RT0T"></script>
 
 <script>
@@ -651,23 +481,12 @@ gtag('config', 'G-KETWK2RT0T', {
 
 <body>
 
-<!-- 🌕 추석 배경 장식 -->
-<div class="chuseok-moon"></div>
-<div class="chuseok-cloud"></div>
-<div class="chuseok-grass"></div>
-
 <div class="container">
 
-  <!-- 전체 스케줄 -->
+  <!-- ✅ 전체 스케줄 -->
   <div class="card">
 
-    <h2 class="normal-title">
-      🌊🐳 트림 2반 작업 스케줄 조회 🐬🪼
-    </h2>
-
-    <h2 class="chuseok-title">
-      🌕🌾 트림 2반 작업 스케줄 조회🌾🌕
-    </h2>
+    <h2>🌊🐳 트림 2반 작업 스케줄 조회 🐬🪼</h2>
 
     <div class="date-row">
 
@@ -682,7 +501,7 @@ gtag('config', 'G-KETWK2RT0T', {
     </div>
 
     <div class="swipe-hint">
-      🔥 <b>날짜별 LH B필라 1R 기준으로 이름이 정렬됩니다~!</b>🔥
+      🔥 <b>🌷 날짜별 LH B필라 1R 기준으로 이름이 정렬됩니당 ✈️</b>🔥
       <br>
       👈 왼쪽으로 스와이프 하면 다음날로 넘어갑니다 👈
     </div>
@@ -714,7 +533,7 @@ gtag('config', 'G-KETWK2RT0T', {
   </div>
 
 
-  <!-- 내 이름 설정 -->
+  <!-- ✅ 내 이름 설정 -->
   <div class="card" id="settingsCard">
 
     <div class="settings-title">
@@ -749,7 +568,7 @@ gtag('config', 'G-KETWK2RT0T', {
     </div>
 
 
-    <!-- 공지 -->
+    <!-- ✅ 공지 -->
     <div class="card notice-card">
 
       <h2>📌 공지</h2>
@@ -812,9 +631,9 @@ gtag('config', 'G-KETWK2RT0T', {
    0) 공지/버전
 ========================= */
 
-const APP_VERSION = "v5_2";
+const APP_VERSION = "v5_1";
 
-const LAST_UPDATED = "2026-09-18";
+const LAST_UPDATED = "2026-07-28";
 
 const NOTICE_LINES = [
   "월 ~ 토요일(특근) 조회 가능 / 일요일 휴무",
@@ -839,56 +658,6 @@ function renderNotice(){
 
   document.getElementById("footerBox").textContent =
     `최종 수정일: ${LAST_UPDATED}`;
-}
-
-
-/* =========================
-   🌕 추석 테마 기간
-========================= */
-
-const CHUSEOK_START = "2026-09-24";
-const CHUSEOK_END   = "2026-09-28";
-
-
-function isChuseokPeriod(){
-
-  const now =
-    new Date();
-
-  const today =
-    now.getFullYear()
-    + "-"
-    + String(
-        now.getMonth()+1
-      ).padStart(2,"0")
-    + "-"
-    + String(
-        now.getDate()
-      ).padStart(2,"0");
-
-  return (
-    today >= CHUSEOK_START &&
-    today <= CHUSEOK_END
-  );
-}
-
-
-function applyChuseokTheme(){
-
-  if(isChuseokPeriod()){
-
-    document.body.classList.add(
-      "chuseok-theme"
-    );
-
-  }else{
-
-    document.body.classList.remove(
-      "chuseok-theme"
-    );
-
-  }
-
 }
 
 
@@ -1028,10 +797,13 @@ const ROUND_OFF = {
 const DATA_V1 = {
 
   from: "2026-01-05",
+
   to: "2026-01-18",
 
   baseDate: "2026-01-13",
+
   baseTask: "LH휀다",
+
   basePerson: "갑수",
 
   workers: [
@@ -1081,10 +853,13 @@ const DATA_V1 = {
 const DATA_V2 = {
 
   from: "2026-01-19",
+
   to: "2099-12-31",
 
   baseDate: "2026-01-19",
+
   baseTask: "LH휀다",
+
   basePerson: "상건",
 
   workers: [
@@ -1135,10 +910,13 @@ const DATA_V2 = {
 const DATA_V3 = {
 
   from: "2026-05-06",
+
   to: "2099-12-31",
 
   baseDate: "2026-05-06",
+
   baseTask: "LH휀다",
+
   basePerson: "대현",
 
   workers: [
@@ -1188,10 +966,13 @@ const DATA_V3 = {
 const DATA_V4 = {
 
   from: "2026-05-26",
+
   to: "2099-12-31",
 
   baseDate: "2026-05-26",
+
   baseTask: "LH B필라",
+
   basePerson: "옥연",
 
   workers: [
@@ -1239,10 +1020,13 @@ const DATA_V4 = {
 const DATA_V5 = {
 
   from: "2026-05-27",
+
   to: "2099-12-31",
 
   baseDate: "2026-05-27",
+
   baseTask: "LH B필라",
+
   basePerson: "성해",
 
   workers: [
@@ -1290,10 +1074,13 @@ const DATA_V5 = {
 const DATA_V6 = {
 
   from: "2026-07-29",
+
   to: "2099-12-31",
 
   baseDate: "2026-07-29",
+
   baseTask: "LH B필라",
+
   basePerson: "옥연",
 
   workers: [
@@ -1891,7 +1678,16 @@ function renderDay(){
   dayWarn.textContent = "";
 
 
-  /* 1R LH B필라 담당자 기준 정렬 */
+  /* ==================================================
+     ⭐ 핵심 변경 부분 ⭐
+
+     그날 1R이 LH B필라인 사람을 찾아서
+     그 사람을 표의 맨 위로 올림.
+
+     예:
+     9/14 → 충훈
+     9/15 → 서진
+  ================================================== */
 
   const data =
     pickData(
@@ -1902,6 +1698,7 @@ function renderDay(){
     data.workers;
 
 
+  /* ✅ 1R 기준으로 LH B필라 담당자 찾기 */
   const lhBPillarPerson =
     s.find(
       r => r.rounds[0] === "LH B필라"
@@ -2014,7 +1811,10 @@ function renderDay(){
   });
 
 
-  /* 행 탭 강조 */
+  /* =========================
+     행 탭 강조
+     최대 10명
+  ========================= */
 
   const rows =
     dayBody.querySelectorAll("tr");
@@ -2227,8 +2027,6 @@ renderNotice();
 
 setNotice(false);
 
-applyChuseokTheme();
-
 
 /* =========================
    좌우 스와이프
@@ -2282,6 +2080,8 @@ function moveWorkDay(delta){
 
   updateDowLabel();
 
+
+  /* 날짜 변경 피드백 */
 
   const row =
     document.querySelector(
@@ -2364,10 +2164,12 @@ function handleSwipe(){
 
   if(diff < 0){
 
+    // 왼쪽 → 다음 근무일
     moveWorkDay(+1);
 
   }else{
 
+    // 오른쪽 → 이전 근무일
     moveWorkDay(-1);
 
   }
@@ -2376,20 +2178,47 @@ function handleSwipe(){
 
 
 /* =========================
-   🌕 추석 토스트
+   오늘 기준 토스트
 ========================= */
 
-if(isChuseokPeriod()){
+goToday();
+
+
+const today =
+  new Date();
+
+
+const todayStr =
+  today.getFullYear()
+  + "-"
+  + String(
+      today.getMonth()+1
+    ).padStart(2,"0")
+  + "-"
+  + String(
+      today.getDate()
+    ).padStart(2,"0");
+
+
+/* ✅ 8/26까지 표시 */
+
+if(
+  todayStr <= "2026-09-12"
+){
 
   showToast(
-    "🌕 풍성한 한가위 되세요",
-    "트림 2반도 즐거운 추석 보내세요 🌾✨"
+    "🌟업데이트🌟",
+    "최상단 1라운드 LH B필라 인원으로 표시🍀"
   );
 
 }
 
+</script>
 
-/* 서비스워커 */
+
+<!-- ✅ 서비스워커 등록 -->
+
+<script>
 
 if(
   "serviceWorker" in navigator
@@ -2409,6 +2238,7 @@ if(
 }
 
 </script>
+
 
 </body>
 </html>
